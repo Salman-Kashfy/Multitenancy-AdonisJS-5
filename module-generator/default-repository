@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import ##CAP_CLASS## from "App/Models/##CAP_CLASS##";
+
+
+class ##CAP_CLASS##Repo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(##CAP_CLASS##, relations)
+        this.model = ##CAP_CLASS##
+    }
+}
+
+export default new ##CAP_CLASS##Repo()

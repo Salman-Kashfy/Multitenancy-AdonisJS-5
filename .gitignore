@@ -1,0 +1,13 @@
+node_modules
+build
+coverage
+.vscode
+.DS_STORE
+.env
+tmp
+
+
+public/gallery
+public/posts
+public/video-thumbnails
+pm2.config.js

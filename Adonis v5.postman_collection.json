@@ -1,0 +1,639 @@
+{
+	"info": {
+		"_postman_id": "f4fa557e-0917-418f-8c22-919e3d0e81e3",
+		"name": "Adonis v5",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.data.access_token.token);\r",
+									"postman.setEnvironmentVariable(\"refresh_token\", jsonData.data.access_token.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "waqar101@yopmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "2344234",
+									"type": "text"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "2344234",
+									"type": "text"
+								},
+								{
+									"key": "full_name",
+									"value": "Waqar Adil",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "2021-01-01",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "media",
+									"type": "file",
+									"src": "/C:/Users/Waqar Adil/Desktop/9wfr22fp5p241.png"
+								},
+								{
+									"key": "device_type",
+									"value": "android",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "device_token",
+									"value": "api_hjkaldshfjakshldfjaklhjaksdhfjkl",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}register",
+							"host": [
+								"{{baseUrl}}register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Social Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.data.access_token.token);\r",
+									"postman.setEnvironmentVariable(\"refresh_token\", jsonData.data.access_token.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"Andrew\",\r\n    \"email\":\"andrew@yopmail.com\",\r\n    \"device_type\":\"android\",\r\n    \"device_token\":\"api_fjakdlfjasklfjkasdlf\",\r\n    \"social_platform\":\"facebook\",\r\n    \"client_id\":\"jkajdsfkljasdklfaf\",\r\n    \"token\":\"adsfkasjfkasdjfasklfjds\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}social-login",
+							"host": [
+								"{{baseUrl}}social-login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.data.access_token.token);\r",
+									"postman.setEnvironmentVariable(\"refresh_token\", jsonData.data.access_token.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"waqar@yopmail.com\",\r\n    \"password\":\"123123\",\r\n    \"device_type\":\"android\",\r\n    \"device_token\":\"api_fjakdlfjasklfjkasdlf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}login",
+							"host": [
+								"{{baseUrl}}login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Not in Use] Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refresh_token\": \"0b9739141dea27fed134fd7058642d357xfXhY/zMwcKAEND2ykqZjkv7pa6ztixPe4wD3sxZdu7pHL7gpJQeXyJr0IgO/JY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}refresh-token",
+							"host": [
+								"{{baseUrl}}refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}logout",
+							"host": [
+								"{{baseUrl}}logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"waqar@yopmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}forgot-password",
+							"host": [
+								"{{baseUrl}}forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"waqar@yopmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}resend-otp",
+							"host": [
+								"{{baseUrl}}resend-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"waqar@yopmail.com\",\r\n    \"otp_code\": 7845\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}verify-otp",
+							"host": [
+								"{{baseUrl}}verify-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"waqar@yopmail.com\",\r\n    \"otp_code\": 1636,\r\n    \"password\": \"123456\",\r\n    \"password_confirmation\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}reset-password",
+							"host": [
+								"{{baseUrl}}reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"current_password\":\"1234567\",\r\n    \"password\": \"123123\",\r\n    \"password_confirmation\": \"123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}change-password",
+							"host": [
+								"{{baseUrl}}change-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}me",
+							"host": [
+								"{{baseUrl}}me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Model",
+			"item": [
+				{
+					"name": "Save post",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "test title",
+									"type": "text"
+								},
+								{
+									"key": "body",
+									"value": "test description",
+									"type": "text"
+								},
+								{
+									"key": "user_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "media",
+									"type": "file",
+									"src": [
+										"/C:/Users/Waqar Adil/Desktop/image1.jpg",
+										"/C:/Users/Waqar Adil/Desktop/imgpsh_mobile_save_anim.jpg",
+										"/C:/Users/Waqar Adil/Desktop/istockphoto-1277282367-170667a.jpg"
+									]
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}posts",
+							"host": [
+								"{{baseUrl}}posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Single Post",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}posts/61",
+							"host": [
+								"{{baseUrl}}posts"
+							],
+							"path": [
+								"61"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Posts",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}posts?page=1",
+							"host": [
+								"{{baseUrl}}posts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}posts/12",
+							"host": [
+								"{{baseUrl}}posts"
+							],
+							"path": [
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "test title 3",
+									"type": "text"
+								},
+								{
+									"key": "body",
+									"value": "test description",
+									"type": "text"
+								},
+								{
+									"key": "user_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "media",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}posts/9",
+							"host": [
+								"{{baseUrl}}posts"
+							],
+							"path": [
+								"9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

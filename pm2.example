@@ -1,0 +1,10 @@
+module.exports = {
+  apps: [
+    {
+      name: 'there',
+      script: './build/server.js',
+      exec_mode: 'fork',
+      autorestart: true
+    },
+  ],
+}
