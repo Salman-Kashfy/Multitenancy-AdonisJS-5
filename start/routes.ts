@@ -38,6 +38,7 @@ Route.group(() => {
         Route.post('resend-signup-otp', 'API/AuthController.resendSignupOtp')
         Route.post('verify-email', 'API/AuthController.verifyEmail')
         Route.post('login', 'API/AuthController.login')
+        Route.post('social-login', 'Api/AuthController.socialLogin')
 
         // Reset Password
         Route.post('forgot-password', 'API/AuthController.forgotPassword')

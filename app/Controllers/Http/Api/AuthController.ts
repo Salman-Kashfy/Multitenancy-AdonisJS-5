@@ -15,6 +15,8 @@ import UserRepo from "App/Repos/UserRepo";
 import Role from "App/Models/Role";
 import ForgotPasswordValidator from "App/Validators/ForgotPasswordValidator";
 import VerifyOtpValidator from "App/Validators/VerifyOtpValidator";
+import SocialLoginValidator from "App/Validators/SocialLoginValidator";
+import SocialAccountRepo from "App/Repos/SocialAccountRepo";
 
 export default class AuthController extends ApiBaseController{
 
@@ -146,7 +148,7 @@ export default class AuthController extends ApiBaseController{
         return this.globalResponse(response,true,validate.message,validate.data)
     }
 
-    async forgotPassword({request,response}: HttpContextContract) {
+    public async forgotPassword({request,response}: HttpContextContract) {
 
         const input = await request.validate(ForgotPasswordValidator)
         let user = await AuthRepo.findByEmail(input.email)
@@ -174,7 +176,7 @@ export default class AuthController extends ApiBaseController{
         return this.globalResponse(response,true,message,{user: user})
     }
 
-    async verifyOtp({request, response}) {
+    public async verifyOtp({request, response}) {
         let input = await request.validate(VerifyOtpValidator)
         const validate = await OtpRepo.verifyOtp(input)
         return this.globalResponse(response,validate.status,validate.message)
@@ -210,5 +212,44 @@ export default class AuthController extends ApiBaseController{
         await auth.use('api').revoke()
         return this.globalResponse(response,true,'Logged out successfully !',{revoked:true})
     }
-//
+
+    public async socialLogin({request,auth}: HttpContextContract) {
+        await request.validate(SocialLoginValidator)
+        let socialAccount = await SocialAccountRepo.findSocialLogin(request)
+        let user;
+        if (socialAccount) {
+            user = await UserRepo.find(socialAccount.user_id)
+        }
+        let fillables:any = UserRepo.fillables()
+        let input = request.only(fillables)
+        if (!user) {
+            input.password = Math.random().toString(36).substring(2, 15)
+            input.email_verified = 1;
+            input.is_social_login = 1;
+
+            user = await UserRepo.model.updateOrCreate({
+                email: request.input('email', null)
+            }, input)
+
+            await user.related('roles').sync([request.input('account_type')])
+            await SocialAccountRepo.store(request, user.id)
+        }
+        if (input.image) {
+            await UserRepo.update(user.id,{image: input.image})
+        }
+
+        /* Create User Device */
+        const device = {
+            userId:user.id,
+            deviceType:request.input('device_type'),
+            deviceToken:request.input('device_token'),
+        }
+        await UserDeviceRepo.updateOrCreate(device)
+
+        let token = await auth.use('api').generate(user)
+        user = user.toJSON()
+        user.access_token = token
+        return super.apiResponse(`Your account has been created successfully`, user)
+    }
+
 }
