@@ -3,7 +3,7 @@ export enum DeviceTypes {
     android='android'
 }
 
-export default interface OtpInterface {
+export default interface UserDeviceInterface {
     userId: string,
     deviceType: string,
     deviceToken: string,

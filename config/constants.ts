@@ -3,6 +3,7 @@ const constants = {
     PER_PAGE: 20,
     ORDER_BY_COLUMN: 'id',
     ORDER_BY_VALUE: 'desc',
+    OTP_TTL: 5,
     FCM_KEY: 'your key goes here',
     IMAGE_NOT_FOUND: 'not-found.png',
     USER_NOT_FOUND: 'not-found-user.png',

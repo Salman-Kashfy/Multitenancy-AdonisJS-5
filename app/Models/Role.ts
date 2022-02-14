@@ -7,6 +7,10 @@ export default class Role extends BaseModel {
     static PARENT = 2;
     static BUSINESS = 3;
 
+    static select(){
+        return ['id','name','display_name']
+    }
+
     @column({ isPrimary: true })
     public id: number
 
@@ -14,7 +18,7 @@ export default class Role extends BaseModel {
     public name: string
 
     @column()
-    public display_name: string
+    public displayName: string
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime

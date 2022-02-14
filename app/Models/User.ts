@@ -41,7 +41,7 @@ export default class User extends CommonModel {
     public pushNotify: number
 
     @column()
-    public verified: boolean
+    public emailVerified: boolean
 
     @column.date()
     public dob: DateTime
