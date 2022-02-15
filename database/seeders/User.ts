@@ -10,7 +10,7 @@ export default class UserSeeder extends BaseSeeder {
                 email: 'admin@doodle.com',
                 username: 'admin',
                 password: 'qwerty',
-                verified: true,
+                emailVerified: true,
             }
         ])
     }
