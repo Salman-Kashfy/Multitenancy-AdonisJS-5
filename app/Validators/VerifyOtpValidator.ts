@@ -1,7 +1,7 @@
 import {rules, schema} from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class ResendSignupOtpValidator {
+export default class VerifyOtpValidator {
   constructor (protected ctx: HttpContextContract) {
   }
 
@@ -25,10 +25,20 @@ export default class ResendSignupOtpValidator {
 	 *    ```
 	 */
   public schema = schema.create({
-	  email: schema.string({}, [
+	  via: schema.enum(
+		  ['phone', 'email'] as const,
+	  ),
+	  email: schema.string.optional({ trim: true }, [
+		  rules.requiredWhen('via', '=', 'email'),
 		  rules.maxLength(100),
-		  rules.email()
+		  rules.email(),
 	  ]),
+	  phone: schema.string.optional({ trim: true }, [
+		  rules.requiredWhen('via', '=', 'phone'),
+		  rules.maxLength(20)
+	  ]),
+	  code: schema.number( []),
+	  type: schema.string( {}),
   })
 
 	/**

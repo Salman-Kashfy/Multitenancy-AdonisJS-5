@@ -1,5 +1,5 @@
 export default interface OtpInterface {
-    userId: string,
+    userId: number,
     type: string,
     email?: string,
     phone?:string,

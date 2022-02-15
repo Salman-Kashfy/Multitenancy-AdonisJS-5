@@ -8,7 +8,7 @@ export default class Users extends BaseSchema {
             table.increments('id').primary()
             table.string('name', 35).notNullable()
             table.string('email', 100).unique().notNullable()
-            table.string('username', 25).unique().notNullable()
+            table.string('username', 25).unique()
             table.string('phone', 20)
             table.string('password', 180)
             table.string('bio', 250)
@@ -16,7 +16,7 @@ export default class Users extends BaseSchema {
             table.string('image', 25)
             table.boolean('is_social_login').defaultTo(0)
             table.boolean('push_notify').defaultTo(1)
-            table.boolean('verified').defaultTo(0)
+            table.boolean('emailVerified').defaultTo(0)
             table.timestamps();
             table.dateTime('deleted_at');
         })

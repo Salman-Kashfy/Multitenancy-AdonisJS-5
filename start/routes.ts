@@ -35,14 +35,15 @@ Route.group(() => {
 
         // Login | Register | Verify email
         Route.post('signup-parent', 'API/AuthController.signupParent')
-        Route.post('resend-signup-otp', 'API/AuthController.resend_signup_otp')
-        Route.post('verify-email', 'API/AuthController.verify_email')
+        Route.post('resend-signup-otp', 'API/AuthController.resendSignupOtp')
+        Route.post('verify-email', 'API/AuthController.verifyEmail')
         Route.post('login', 'API/AuthController.login')
+        Route.post('social-login', 'Api/AuthController.socialLogin')
 
         // Reset Password
         Route.post('forgot-password', 'API/AuthController.forgotPassword')
         Route.post('verify-otp', 'API/AuthController.verifyOtp')
-        Route.post('reset-password', 'API/AuthController.reset_password')
+        Route.post('reset-password', 'API/AuthController.resetPassword')
     }).middleware('guest')
 
     Route.post('logout', 'API/AuthController.logout')
@@ -53,7 +54,7 @@ Route.group(() => {
     |--------------------------------------------------------------------------
     */
     Route.group(() => {
-
+        Route.get('profile', 'API/AuthController.profile')
 
     }).middleware('auth')
 

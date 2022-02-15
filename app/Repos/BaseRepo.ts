@@ -114,4 +114,8 @@ export default class BaseRepo {
     async findByEmail(email) {
         return this.model.query().where({email}).first()
     }
+
+    async find(id) {
+        return this.model.find(id)
+    }
 }
