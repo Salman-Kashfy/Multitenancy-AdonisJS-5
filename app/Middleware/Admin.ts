@@ -8,7 +8,7 @@ export default class Admin {
         // code for middleware goes here. ABOVE THE NEXT CALL
         let user: any = auth.user
         let exists = await User.query().whereHas('roles', (rolesQuery) => {
-            rolesQuery.wherePivot('role_id', Role.ROLES.ADMIN)
+            rolesQuery.wherePivot('role_id', Role.ADMIN)
         }).where('id', user.id).first()
 
         if (!exists) {
