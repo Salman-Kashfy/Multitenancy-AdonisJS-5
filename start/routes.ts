@@ -58,4 +58,4 @@ Route.group(() => {
 
     }).middleware('auth')
 
-}).prefix('/Api')
+}).prefix('/api')
