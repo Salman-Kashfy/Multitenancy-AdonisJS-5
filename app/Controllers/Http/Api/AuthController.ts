@@ -17,6 +17,8 @@ import ForgotPasswordValidator from "App/Validators/ForgotPasswordValidator";
 import VerifyOtpValidator from "App/Validators/VerifyOtpValidator";
 import SocialLoginValidator from "App/Validators/SocialLoginValidator";
 import SocialAccountRepo from "App/Repos/SocialAccountRepo";
+import RegisterBusinessValidator from 'App/Validators/RegisterBusinessValidator'
+import BusinessRepo from 'App/Repos/BusinessRepo'
 
 export default class AuthController extends ApiBaseController{
 
@@ -33,7 +35,7 @@ export default class AuthController extends ApiBaseController{
         }
 
         /*
-        * Create User
+        * Create Parent User
         * */
         user = await AuthRepo.createParent(request.only(UserRepo.model.fillables))
         if(!user){
@@ -74,6 +76,13 @@ export default class AuthController extends ApiBaseController{
             return this.globalResponse(response,false,'User not found.',null,404)
         }
 
+        /*
+        * Return if user is already verified
+        * */
+        if(user.emailVerified){
+            return this.globalResponse(response, false, 'This email is already verified.')
+        }
+
         /* Send OTP */
         const otp:OtpInterface = {...input,userId:user.id,type:'signup'}
         const code = await OtpRepo.sendOTP(otp)
@@ -89,13 +98,6 @@ export default class AuthController extends ApiBaseController{
         const user = await AuthRepo.findByEmail(input.email)
         if (!user) {
             return this.globalResponse(response, false, 'User not found.', null, 404)
-        }
-
-        /*
-        * Return if user is already verified
-        * */
-        if(user.emailVerified){
-            return this.globalResponse(response, false, 'This email is already verified.')
         }
 
         /*
@@ -250,6 +252,52 @@ export default class AuthController extends ApiBaseController{
         user = user.toJSON()
         user.access_token = token
         return super.apiResponse(`Your account has been created successfully`, user)
+    }
+
+    public async signupBusiness({request,response}: HttpContextContract){
+        const input = await request.validate(RegisterBusinessValidator)
+        let user = await AuthRepo.findByEmail(input.email)
+        /*
+        * Verifications before sign-up
+        * */
+        const validate = await AuthRepo.beforeSignup(user)
+        if(!validate.status){
+            return response.status(200).send(validate)
+        }
+
+        /*
+        * Create Business User
+        * */
+        user = await AuthRepo.createBusiness(request.only(UserRepo.model.fillables),request.only(BusinessRepo.model.fillables),request)
+        if(!user){
+            return this.globalResponse(response,false,'Failed to register user.')
+        }
+
+        /*
+        * Assign User Role
+        * */
+        await user.related('roles').sync([Role.BUSINESS])
+
+        /*
+        * Create OTP
+        * */
+        const otp:OtpInterface = {email:input.email,userId:user.id,type:'signup'}
+        const code = await OtpRepo.sendOTP(otp)
+
+        /* Create User Device */
+        if(input.device_type && input.device_token){
+            const device = {
+                userId:user.id,
+                deviceType:input.device_type,
+                deviceToken:input.device_token,
+            }
+            await UserDeviceRepo.updateOrCreate(device)
+        }
+
+        /* Send Email */
+        const subject = 'Please verify your email address.'
+        await new VerifyEmail(user, code, subject).sendLater()
+        return this.globalResponse(response,true,"An OTP has been sent to your email address",{user: user})
     }
 
 }

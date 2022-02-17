@@ -11,6 +11,7 @@ import Attachment from 'App/Models/Attachment'
 import CommonModel from 'App/Models/CommonModel'
 import Role from 'App/Models/Role'
 import { DateTime } from 'luxon'
+import Business from 'App/Models/Business'
 
 export default class User extends CommonModel {
 
@@ -67,6 +68,9 @@ export default class User extends CommonModel {
         onQuery: query => query.where({ instanceType: Attachment.TYPE.USER }).select('*'),
     })
     public attachments: HasMany<typeof Attachment>
+
+    @hasMany(() => Business)
+    public business: HasMany<typeof Business>
 
     @manyToMany(() => Role,{
         pivotTable: 'user_roles'

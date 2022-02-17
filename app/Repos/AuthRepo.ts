@@ -17,7 +17,7 @@ class AuthRepo extends BaseRepo {
             status:true
         }
         if(user){
-            if (user.verified) {
+            if (user.emailVerified) {
                 response = { status:false, message: 'Email already exist.' }
             }else{
                 await user.forceDelete()
@@ -28,6 +28,14 @@ class AuthRepo extends BaseRepo {
 
     async createParent(input){
         return this.model.create(input);
+    }
+
+    async createBusiness(input,businessDetails,request){
+        const user = await this.model.create(input);
+        if(!user) return false
+        const business = await user.related('business').create(businessDetails)
+        await business.related('categories').sync([request.input('category_id')])
+        return user
     }
 
     async login(input,user,auth){
