@@ -31,7 +31,18 @@ Route.group(() => {
     |--------------------------------------------------------------------------
     */
     Route.group(() => {
-        Route.get('profile', 'Api/AuthController.profile')
+
+        // User Related
+        Route.get('user/profile', 'Api/UsersController.profile')
+        Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
+        Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
+        Route.put('change-password', 'Api/UsersController.changePassword')
+        Route.get('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
+
+        // Static Data Routes
+        Route.get('sizes/all','Api/SizeController.all')
+        Route.get('genders/all','Api/GenderController.all')
+        Route.get('breeds/all','Api/BreedController.all')
 
     }).middleware('auth')
 

@@ -1,8 +1,8 @@
 import {
     beforeSave,
-    column,
+    column, computed,
     hasMany,
-    HasMany,
+    HasMany, HasOne, hasOne,
     ManyToMany,
     manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
@@ -12,10 +12,11 @@ import CommonModel from 'App/Models/CommonModel'
 import Role from 'App/Models/Role'
 import { DateTime } from 'luxon'
 import Business from 'App/Models/Business'
+import myHelpers from 'App/Helpers'
 
 export default class User extends CommonModel {
 
-    public static fillables = ['name','email','password','phone','image','push_notify']
+    public static fillables = ['name','email','password','zip','image','push_notify']
 
     @column({ isPrimary: true })
     public id: number
@@ -39,6 +40,12 @@ export default class User extends CommonModel {
     public bio: string
 
     @column()
+    public zip: string
+
+    @column()
+    public image: string
+
+    @column()
     public pushNotify: number
 
     @column()
@@ -46,9 +53,6 @@ export default class User extends CommonModel {
 
     @column.date()
     public dob: DateTime
-
-    @column()
-    public image: string
 
     @column()
     public isSocialLogin: number
@@ -63,11 +67,11 @@ export default class User extends CommonModel {
         }
     }
 
-    @hasMany(() => Attachment, {
+    @hasOne(() => Attachment, {
         foreignKey: 'instanceId',
-        onQuery: query => query.where({ instanceType: Attachment.TYPE.USER }).select('*'),
+        onQuery: query => query.where({ instanceType: Attachment.TYPE.USER }).select('id','mimeType','path'),
     })
-    public attachments: HasMany<typeof Attachment>
+    public attachment: HasOne<typeof Attachment>
 
     @hasMany(() => Business)
     public business: HasMany<typeof Business>
@@ -76,5 +80,10 @@ export default class User extends CommonModel {
         pivotTable: 'user_roles'
     })
     public roles: ManyToMany<typeof Role>
+
+    @computed()
+    public get imagePath() {
+        return myHelpers.userImageWithBaseURLOrNotFound(this.image)
+    }
 
 }

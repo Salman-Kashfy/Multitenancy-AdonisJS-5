@@ -29,11 +29,11 @@ export default class RegisterBusinessValidator extends BaseValidator {
      *    ```
      */
     public schema = schema.create({
-        name: schema.string({}, [
+        business_name: schema.string({}, [
             rules.maxLength(35),
             rules.unique({
                 table: BusinessRepo.model.table,
-                column: 'name'
+                column: 'business_name'
             })
         ]),
         website: schema.string.optional({}, [

@@ -7,7 +7,8 @@ export default class Businesses extends BaseSchema {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id')
             table.integer('user_id').unsigned().references('id').inTable('users').notNullable().onUpdate('cascade').onDelete('cascade')
-            table.string('name', 50)
+            table.string('business_name', 50)
+            table.text('description')
             table.text('website')
             table.string('location', 200)
             table.double('latitude')

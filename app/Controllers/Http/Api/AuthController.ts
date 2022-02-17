@@ -128,7 +128,7 @@ export default class AuthController extends ApiBaseController{
         const input = await request.validate(LoginValidator)
         let user = await AuthRepo.findByEmail(input.email)
         if (!user) {
-            return this.globalResponse(response, false, 'User not found.', null, 404)
+            return this.globalResponse(response, false, 'User not found.', null)
         }
 
         /*
@@ -203,11 +203,6 @@ export default class AuthController extends ApiBaseController{
         }
         validate.data.delete()
         return this.globalResponse(response,true,"Password updated successfully !",{user:user})
-    }
-
-    public async profile({auth,response}: HttpContextContract){
-        let { user }:any = auth
-        return this.globalResponse(response,true,"Profile Retrieved Successfully!",user)
     }
 
     public async logout({auth, response}:HttpContextContract){

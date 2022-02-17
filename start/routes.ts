@@ -19,6 +19,7 @@
 */
 import Route from '@ioc:Adonis/Core/Route'
 import './routes/api'
+import './routes/admin'
 
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 

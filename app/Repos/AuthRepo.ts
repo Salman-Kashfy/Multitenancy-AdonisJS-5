@@ -31,6 +31,7 @@ class AuthRepo extends BaseRepo {
     }
 
     async createBusiness(input,businessDetails,request){
+        input.name = businessDetails.business_name
         const user = await this.model.create(input);
         if(!user) return false
         const business = await user.related('business').create(businessDetails)
