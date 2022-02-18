@@ -7,8 +7,8 @@ export default class Attachments extends BaseSchema {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id')
             table.string('path')
-            table.string('instance_id').notNullable()
-            table.string('instance_type').notNullable()
+            table.integer('instance_id').notNullable()
+            table.integer('instance_type').notNullable()
             table.string('mime_type').notNullable()
             table.integer('duration')
             table.string('thumbnail')

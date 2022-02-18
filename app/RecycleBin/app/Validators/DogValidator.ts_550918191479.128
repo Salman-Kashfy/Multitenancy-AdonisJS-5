@@ -1,0 +1,16 @@
+import {schema, rules} from '@ioc:Adonis/Core/Validator'
+import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
+import BaseValidator from "App/Validators/BaseValidator";
+
+export default class AddDogValidator extends BaseValidator {
+    constructor(protected ctx: HttpContextContract) {
+        super()
+    }
+    public schema = schema.create({
+		name: schema.string.optional({trim:true},[rules.maxLength(35),]),
+		breed_id: schema.number([]),
+		gender_id: schema.number([]),
+		size_id: schema.number([]),
+		dob: schema.string.optional({trim:true},[]),
+    })
+}

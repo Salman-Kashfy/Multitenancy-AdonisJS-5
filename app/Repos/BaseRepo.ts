@@ -118,4 +118,12 @@ export default class BaseRepo {
     async find(id) {
         return this.model.find(id)
     }
+
+    async exist(ctx){
+        return await this.model.query().select('id').where({id:ctx.request.param('id')}).limit(1).first();
+    }
+
+    async belonging(ctx,matchColumn = 'user_id'){
+        return await this.model.query().select('id').where({id:ctx.request.param('id')}).where(matchColumn,ctx.auth.user.id).limit(1).first();
+    }
 }

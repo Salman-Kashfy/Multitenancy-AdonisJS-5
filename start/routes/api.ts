@@ -44,6 +44,15 @@ Route.group(() => {
         Route.get('genders/all','Api/GenderController.all')
         Route.get('breeds/all','Api/BreedController.all')
 
+        // Dog Route
+        Route.get('my-dogs','Api/DogController.myDogs')
+        Route.resource('dogs','Api/DogController')
+
+        // Blocked Users Route
+        Route.get('blocked-users','Api/BlockedUserController.blockedUsers')
+        Route.post('blocked-users','Api/BlockedUserController.blockOrUnblock')
+        //Route.resource('blocked-users','Api/BlockedUserController')
+
     }).middleware('auth')
 
 }).prefix('/api')

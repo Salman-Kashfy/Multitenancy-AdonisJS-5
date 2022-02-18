@@ -1,0 +1,18 @@
+import {column} from '@ioc:Adonis/Lucid/Orm'
+import CommonModel from "App/Models/CommonModel";
+
+export default class Dog extends CommonModel {
+    @column()
+    public id: number
+	@column()
+	public name: string
+	@column()
+	public breedId: number
+	@column()
+	public genderId: number
+	@column()
+	public sizeId: number
+	@column()
+	public dob: string
+
+}

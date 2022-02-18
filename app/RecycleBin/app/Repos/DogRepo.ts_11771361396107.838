@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import Dog from "App/Models/Dog";
+
+
+class DogRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(Dog, relations)
+        this.model = Dog
+    }
+}
+
+export default new DogRepo()
