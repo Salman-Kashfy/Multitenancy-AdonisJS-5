@@ -17,7 +17,9 @@ const constants = {
     AUTH_TOKEN_EXPIRY: '30days',
     PARK_RADIUS: 50,
     MAIL_FROM_ADDRESS:'developers@tekrevol.com',
-    DISTANCE_LIMIT: 6371 // For Miles 3959, For KM, use 6371
+    DISTANCE_LIMIT: 6371, // For Miles 3959, For KM, use 6371
+    PLAY_STORE_URL: "http://google.com/",
+    APPLE_STORE_URL: "https://apple.com/"
 }
 
 export default constants

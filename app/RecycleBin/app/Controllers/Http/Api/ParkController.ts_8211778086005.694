@@ -1,0 +1,26 @@
+import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
+import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
+import ParkRepo from "App/Repos/ParkRepo";
+import ParkValidator from "App/Validators/ParkValidator";
+import Attachment from "App/Models/Attachment";
+
+
+export default class ParkController extends ApiBaseController {
+
+    constructor() {
+        super(ParkRepo)
+    }
+
+    async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
+        await ctx.request.validate(ParkValidator)
+        let input = ctx.request.only(this.repo.fillables())
+        let row = await ParkRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
+        return this.apiResponse('Record Added Successfully', row)
+    }
+
+    async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
+        await ctx.request.validate(ParkValidator)
+        return super.update(ctx, instanceType, mediaType)
+    }
+
+}

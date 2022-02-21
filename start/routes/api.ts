@@ -42,6 +42,7 @@ Route.group(() => {
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
         Route.put('change-password', 'Api/UsersController.changePassword')
         Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
+        Route.post('user/invite', 'Api/UsersController.invite')
 
         /*
         |--------------------------------------------------------------------------
@@ -81,3 +82,5 @@ Route.group(() => {
 }).prefix('/api')
 /*API-Notification*/
 Route.resource('notifications','Api/NotificationController')
+/*API-Park*/
+Route.resource('parks','Api/ParkController')

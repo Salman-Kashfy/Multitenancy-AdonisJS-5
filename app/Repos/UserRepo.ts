@@ -1,6 +1,9 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from "App/Models/User";
 import Attachment from "App/Models/Attachment";
+import Database from '@ioc:Adonis/Lucid/Database'
+import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
+import AppInvitation from "App/Mailers/AppInvitation";
 
 class UserRepo extends BaseRepo {
     model
@@ -26,7 +29,7 @@ class UserRepo extends BaseRepo {
     }
 
     async getUsersByPhone(input){
-        let phoneArray,emailArray = []
+        let phoneArray = [],emailArray = []
         if (input.some(contact => contact.phone)) {
             phoneArray = input.map(contact => contact.phone);
         }
@@ -64,6 +67,23 @@ class UserRepo extends BaseRepo {
         }
 
         return {in_app:result, outside_app:outsideApp}
+    }
+
+    async invite(input,user){
+        let result:GlobalResponseInterface = {
+            status:true
+        }
+        if(input.email){
+            const row = await this.model.query().select(Database.raw('COUNT(id) as count')).where('email',input.email).first()
+            if(row.count){
+                result = {status:false,message:"Record already exist"}
+            }else{
+                /* Send Email */
+                const subject:string = 'You have received an invitation.'
+                await new AppInvitation(user, input.email, subject).sendLater()
+            }
+        }
+        return result
     }
 }
 
