@@ -6,7 +6,5 @@ export default class AddParkValidator extends BaseValidator {
     constructor(protected ctx: HttpContextContract) {
         super()
     }
-    public schema = schema.create({
-
-    })
+    public schema = schema.create({})
 }

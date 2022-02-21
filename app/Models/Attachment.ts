@@ -1,11 +1,13 @@
-import {column} from '@ioc:Adonis/Lucid/Orm'
+import { column, computed } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
+import myHelpers from "App/Helpers";
 
 export default class Attachment extends CommonModel {
 
     static TYPE = {
         BUSINESS: 10,
         DOG: 20,
+        PARK: 30,
     }
 
     @column({isPrimary: true})
@@ -28,5 +30,10 @@ export default class Attachment extends CommonModel {
 
     @column()
     public thumbnail: string
+
+    @computed()
+    public get mediaUrl() {
+        return myHelpers.imageWithBaseURLOrNotFound(this.path)
+    }
 
 }

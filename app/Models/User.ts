@@ -13,6 +13,7 @@ import { DateTime } from 'luxon'
 import Business from 'App/Models/Business'
 import myHelpers from 'App/Helpers'
 import Friend from 'App/Models/Friend'
+import Subscription from 'App/Models/Subscription'
 
 export default class User extends CommonModel {
     public serializeExtras = true
@@ -79,6 +80,11 @@ export default class User extends CommonModel {
         pivotTable: 'user_roles'
     })
     public roles: ManyToMany<typeof Role>
+
+    @manyToMany(() => Subscription,{
+        pivotTable: 'user_subscriptions'
+    })
+    public subscription: ManyToMany<typeof Subscription>
 
     @hasMany(() => Friend, {
         foreignKey: 'friendId',

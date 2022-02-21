@@ -45,7 +45,7 @@ export default class Dog extends CommonModel {
 
 	@hasMany(() => Attachment, {
 		foreignKey: 'instanceId',
-		onQuery: query => query.where({ instanceType: Attachment.TYPE.BUSINESS }).select('id','mimeType','path'),
+		onQuery: query => query.where({ instanceType: Attachment.TYPE.DOG }).select('id','mimeType','path'),
 	})
 	public attachments: HasMany<typeof Attachment>
 
@@ -63,6 +63,7 @@ export default class Dog extends CommonModel {
 
 	public static dogMeta = scope((query:Builder) => {
 		return query
+			.preload('attachments')
 			.preload('size',(sizeQuery) =>{
 				sizeQuery.select(...Size.select())
 			})

@@ -76,6 +76,7 @@ class DogRepo extends BaseRepo {
     async myDogs(userId){
         let dogs = await this.model.query()
             .withScopes((scope) => scope.dogMeta())
+            .debug(true)
             .where({userId})
 
         dogs = dogs.map((post) => post.serialize({

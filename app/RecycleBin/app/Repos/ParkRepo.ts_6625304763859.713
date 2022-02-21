@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import Park from "App/Models/Park";
+
+
+class ParkRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(Park, relations)
+        this.model = Park
+    }
+}
+
+export default new ParkRepo()

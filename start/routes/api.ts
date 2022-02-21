@@ -77,10 +77,18 @@ Route.group(() => {
         Route.get('friends/all','Api/FriendController.all')
         Route.resource('friends','Api/FriendController').only(['index','store','destroy'])
 
+        /*
+        |--------------------------------------------------------------------------
+        | Parks API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('my-parks','Api/ParkController.myParks')
+        Route.group(() =>{
+            Route.resource('parks','Api/ParkController')
+        }).middleware('premium')
+
     }).middleware('auth')
 
 }).prefix('/api')
-/*API-Notification*/
-Route.resource('notifications','Api/NotificationController')
-/*API-Park*/
-Route.resource('parks','Api/ParkController')
+/*API-Subscription*/
+Route.resource('subscriptions','Api/SubscriptionController')
