@@ -4,8 +4,8 @@ import CommonModel from "App/Models/CommonModel";
 export default class Attachment extends CommonModel {
 
     static TYPE = {
-        POST: 10,
-        USER: 20
+        BUSINESS: 10,
+        DOG: 20,
     }
 
     @column({isPrimary: true})
@@ -28,4 +28,5 @@ export default class Attachment extends CommonModel {
 
     @column()
     public thumbnail: string
+
 }

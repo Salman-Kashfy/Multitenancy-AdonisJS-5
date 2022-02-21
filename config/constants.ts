@@ -1,5 +1,5 @@
 const constants = {
-    APP_NAME: 'There',
+    APP_NAME: 'Doodl',
     PER_PAGE: 20,
     ORDER_BY_COLUMN: 'id',
     ORDER_BY_VALUE: 'desc',
@@ -7,11 +7,7 @@ const constants = {
     FCM_KEY: 'your key goes here',
     IMAGE_NOT_FOUND: 'not-found.png',
     USER_NOT_FOUND: 'not-found-user.png',
-    SETTINGS: {
-        VIDEO_THUMBNAIL: false,
-        VIDEO_DURATION: false
-    },
-    ADMIN_PER_PAGE: 1000,
+    ADMIN_PER_PAGE: 20,
     IMAGE_RESIZE: {
         MEDIUM: 500,
         SMALL: 100

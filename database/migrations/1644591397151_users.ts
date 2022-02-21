@@ -13,10 +13,11 @@ export default class Users extends BaseSchema {
             table.string('password', 180)
             table.string('bio', 250)
             table.string('zip', 15)
-            table.string('image', 25)
+            table.text('image')
+            table.integer('privacy')
             table.boolean('is_social_login').defaultTo(0)
             table.boolean('push_notify').defaultTo(1)
-            table.boolean('emailVerified').defaultTo(0)
+            table.boolean('email_verified').defaultTo(0)
             table.timestamps();
             table.dateTime('deleted_at');
         })

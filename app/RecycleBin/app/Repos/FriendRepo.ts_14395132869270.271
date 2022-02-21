@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import Friend from "App/Models/Friend";
+
+
+class FriendRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(Friend, relations)
+        this.model = Friend
+    }
+}
+
+export default new FriendRepo()

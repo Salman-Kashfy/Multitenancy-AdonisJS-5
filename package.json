@@ -42,6 +42,7 @@
     "mysql": "^2.18.1",
     "node-image-resizer": "^1.0.0",
     "phc-argon2": "^1.1.1",
+    "pluralize": "^8.0.0",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.28.3",

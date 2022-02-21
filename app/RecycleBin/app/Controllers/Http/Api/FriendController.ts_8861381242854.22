@@ -1,0 +1,26 @@
+import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
+import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
+import FriendRepo from "App/Repos/FriendRepo";
+import FriendValidator from "App/Validators/FriendValidator";
+import Attachment from "App/Models/Attachment";
+
+
+export default class FriendController extends ApiBaseController {
+
+    constructor() {
+        super(FriendRepo)
+    }
+
+    async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
+        await ctx.request.validate(FriendValidator)
+        let input = ctx.request.only(this.repo.fillables())
+        let row = await FriendRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
+        return this.apiResponse('Record Added Successfully', row)
+    }
+
+    async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
+        await ctx.request.validate(FriendValidator)
+        return super.update(ctx, instanceType, mediaType)
+    }
+
+}

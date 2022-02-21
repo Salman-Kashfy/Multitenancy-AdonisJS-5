@@ -1,180 +1,83 @@
-import Route from '@ioc:Adonis/Core/Route'
+import Route from "@ioc:Adonis/Core/Route";
 
-/****************************
- * Route Prefixed with api/v1
- *****************************/
 Route.group(() => {
 
     /*
     |--------------------------------------------------------------------------
-    | Authenticated API Routes
+    | Guest Api Routes
     |--------------------------------------------------------------------------
     */
     Route.group(() => {
-        Route.get('me', 'Api/UsersController.me')
-        Route.post('change-password', 'Api/UsersController.changePassword')
+
+        // Login | Register | Verify email
+        Route.post('signup-parent', 'Api/AuthController.signupParent')
+        Route.post('resend-signup-otp', 'Api/AuthController.resendSignupOtp')
+        Route.post('verify-email', 'Api/AuthController.verifyEmail')
+        Route.post('login', 'Api/AuthController.login')
+        Route.post('social-login', 'Api/AuthController.socialLogin')
+        Route.post('signup-business', 'Api/AuthController.signupBusiness')
+
+        // Reset Password
+        Route.post('forgot-password', 'Api/AuthController.forgotPassword')
+        Route.post('verify-otp', 'Api/AuthController.verifyOtp')
+        Route.post('reset-password', 'Api/AuthController.resetPassword')
+    }).middleware('guest')
+
+    Route.post('logout', 'Api/AuthController.logout')
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authenticated Api Routes
+    |--------------------------------------------------------------------------
+    */
+    Route.group(() => {
 
         /*
         |--------------------------------------------------------------------------
-        | User API Routes
+        | User Related API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('users','Api/UsersController.index')
-        Route.get('users/:id','Api/UsersController.show')
-        Route.put('users/:id','Api/UsersController.update')
+        Route.get('user/:id', 'Api/UsersController.show')
+        Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
+        Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
+        Route.put('change-password', 'Api/UsersController.changePassword')
+        Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
 
         /*
         |--------------------------------------------------------------------------
-        | Categories API Routes
+        | Static Data API Routes
         |--------------------------------------------------------------------------
         */
-        Route.resource('categories', 'Api/CategoryController').only(['index', 'show'])
+        Route.get('sizes/all','Api/SizeController.all')
+        Route.get('genders/all','Api/GenderController.all')
+        Route.get('breeds/all','Api/BreedController.all')
 
         /*
         |--------------------------------------------------------------------------
-        | Post API Routes (Activities/There/Here)
+        | Dogs API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('posts', 'Api/PostController.index')
-        Route.get('newsfeed', 'Api/PostController.newsfeed')
-
-        /* Activity */
-        Route.get('activity', 'Api/PostController.getActivity')
-        Route.get('activity/count', 'Api/PostController.getActivityCount')
-        Route.post('activity', 'Api/PostController.addActivity')
-        Route.put('activity/:id', 'Api/PostController.editActivity')
-        Route.delete('posts/:id', 'Api/PostController.destroy')
-
-        /* There */
-        Route.get('there', 'Api/PostController.there')
-        Route.post('there', 'Api/PostController.addThere')
-        Route.put('there/:id', 'Api/PostController.editThere')
-
-        /* Check-In */
-        Route.post('check-in', 'Api/PostController.addCheckIn')
-        Route.put('check-in/:id', 'Api/PostController.editCheckIn')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Recent Places API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.get('recent-places/all', 'Api/RecentPlaceController.all')
-        Route.delete('recent-places/:id', 'Api/RecentPlaceController.destroy')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Level API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('levels', 'Api/LevelController').only(['index', 'show', 'update'])
-
-        /*
-        |--------------------------------------------------------------------------
-        | Hashtags API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('hashtags', 'Api/HashtagController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Group API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('groups', 'Api/GroupController')
-        Route.post('add-member', 'Api/GroupController.addMember')
-        Route.post('remove-member', 'Api/GroupController.removeMember')
-        Route.get('get-members', 'Api/GroupController.getMembers')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Like API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('likes', 'Api/LikeController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Comments API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('comments', 'Api/CommentController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | User Interests API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('user-interests', 'Api/UserInterestController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Favourites API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('user-favourites', 'Api/UserFavouriteController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Friends API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.put('assign-level', 'Api/FriendController.assignLevel')
-        Route.resource('friends', 'Api/FriendController')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Notifications API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
-        Route.resource('notifications', 'Api/NotificationController')
+        Route.get('my-dogs','Api/DogController.myDogs')
+        Route.resource('dogs','Api/DogController')
 
         /*
         |--------------------------------------------------------------------------
         | Blocked Users API Routes
         |--------------------------------------------------------------------------
         */
-        Route.resource('blocked-users', 'Api/BlockedUserController')
+        Route.get('blocked-users','Api/BlockedUserController.blockedUsers')
+        Route.post('blocked-users','Api/BlockedUserController.blockOrUnblock')
 
         /*
         |--------------------------------------------------------------------------
-        | Report API Routes
+        | Friends API Routes
         |--------------------------------------------------------------------------
         */
-        Route.resource('report-types', 'Api/ReportTypeController')
-        Route.resource('reports', 'Api/ReportController')
+        Route.get('friends/all','Api/FriendController.all')
+        Route.resource('friends','Api/FriendController').only(['index','store','destroy'])
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pages API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.resource('pages', 'Api/PageController').only(['store', 'update', 'destroy'])
+    }).middleware('auth')
 
-    }).middleware(['auth', 'user'])
-
-    /*
-    |--------------------------------------------------------------------------
-    | Guest API Routes
-    |--------------------------------------------------------------------------
-    */
-    Route.post('login', 'Api/UsersController.login')
-    Route.post('register', 'Api/UsersController.register')
-    Route.post('forgot-password', 'Api/UsersController.forgotPassword')
-    Route.post('resend-otp', 'Api/UsersController.resendOTP')
-    Route.post('verify-otp', 'Api/UsersController.verifyOTP')
-    Route.post('reset-password', 'Api/UsersController.resetPassword')
-    Route.post('social-login', 'Api/UsersController.socialLogin')
-    Route.resource('pages', 'Api/PageController').only(['index', 'show'])
-    Route.get('get-page/:slug', 'Api/PageController.getPage')
-    Route.post('/logout', 'Api/UsersController.logout')
-
-    /*
-    |--------------------------------------------------------------------------
-    | Settings API Routes
-    |--------------------------------------------------------------------------
-    */
-    Route.resource('settings', 'Api/SettingController').only(['index'])
-
-}).prefix('/api/v1')
+}).prefix('/api')
+/*API-Notification*/
+Route.resource('notifications','Api/NotificationController')

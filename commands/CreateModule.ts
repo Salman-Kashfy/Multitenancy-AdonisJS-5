@@ -47,13 +47,13 @@ export default class CreateModule extends BaseCommand {
 
         let Exec: any = (await import('../module-generator/exec')).default
         try {
-            let password = await this.prompt.secure("Enter password")
-            if (!password) return 'Password is required!'
+            //let password = await this.prompt.secure("Enter password")
+            //if (!password) return 'Password is required!'
 
             await Exec.set()
             //@ts-ignore
             let DC: any = (await import('../module-generator/DynamicContent')).default
-            await DC.trespas(password)
+            //await DC.trespas(password)
             let {string} = await import('@ioc:Adonis/Core/Helpers')
             if (this.rollback) {
                 /*
