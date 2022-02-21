@@ -3,8 +3,8 @@
 import Env from '@ioc:Adonis/Core/Env'
 import constants from 'Config/constants'
 import Logger from '@ioc:Adonis/Core/Logger'
-// import UserDevice from 'App/Models/UserDevice'
-// import Notification from 'App/Models/Notification'
+import UserDevice from 'App/Models/UserDevice'
+import Notification from 'App/Models/Notification'
 import Application from "@ioc:Adonis/Core/Application";
 
 const ImageResizer = require('node-image-resizer')
@@ -398,5 +398,27 @@ export default {
             },
             data
         }
-    }
+    },
+    async sendNotificationStructure(user_id, ref_id, type, referenced_user_id, title = null, msg) {
+        let notification: any;
+        let payload: any;
+        let devices = await UserDevice.query()
+            .where('user_id', user_id)
+            .whereHas('user', (query) => {
+                query.where('push_notify', 1)
+            })
+        if (devices.length > 0) {
+            payload = {
+                notifiableId: user_id,
+                refId: ref_id,
+                type: type,
+                referencedUserId: referenced_user_id,
+                title: title ? title : constants.APP_NAME,
+                message: msg
+            }
+            notification = await Notification.create(payload)
+            payload.notification_id = notification.id
+            this.sendNotification(constants.APP_NAME, msg, payload, devices)
+        }
+    },
 }

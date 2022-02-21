@@ -24,6 +24,47 @@ class UserRepo extends BaseRepo {
         }
         return user
     }
+
+    async getUsersByPhone(input){
+        let phoneArray,emailArray = []
+        if (input.some(contact => contact.phone)) {
+            phoneArray = input.map(contact => contact.phone);
+        }
+        if (input.some(contact => contact.email)) {
+            emailArray = input.map(contact => contact.email);
+        }
+
+        const query = this.model.query().select('id','name','username','email','phone')
+            .withCount('friends',(friendQuery) =>{
+                friendQuery.as('is_friend')
+            })
+
+        if(phoneArray.length && emailArray.length){
+            query.whereIn('phone',phoneArray).orWhereIn('email', emailArray)
+        }else if(phoneArray.length){
+            query.whereIn('phone',phoneArray)
+        }else if(emailArray.length){
+            query.whereIn('email',emailArray)
+        }
+
+        let result = await query
+        let outsideApp:any = []
+
+        const systemPhoneContacts = result.map(contact => contact.phone);
+        const systemEmailContacts = result.map(contact => contact.email);
+
+        for (let i = 0; i < input.length; i++) {
+            if(
+                (input[i].phone && !systemPhoneContacts.includes(input[i].phone))
+                ||
+                (input[i].email && !systemEmailContacts.includes(input[i].email))
+            ){
+                outsideApp.push(input[i])
+            }
+        }
+
+        return {in_app:result, outside_app:outsideApp}
+    }
 }
 
 export default new UserRepo()

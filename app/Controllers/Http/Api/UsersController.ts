@@ -10,8 +10,15 @@ import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 
 export default class UsersController extends ApiBaseController{
 
-    public async profile( { response, auth }: HttpContextContract ){
-        const { user } = auth
+    constructor() {
+        super(UserRepo)
+    }
+
+    public async show( { request,response }: HttpContextContract ){
+        const user = await this.repo.find(request.param('id'))
+        if(!user){
+            return this.globalResponse(response,true,"User not found!",null,404)
+        }
         const profile = await UserRepo.profile(user)
         return this.globalResponse(response,true,"Profile Retrieved Successfully!",profile)
     }
@@ -46,11 +53,12 @@ export default class UsersController extends ApiBaseController{
         return this.globalResponse(response,true,"Password Changed Successfully")
     }
 
-    /*
-    * API incomplete (Will be completed after friends API)
-    * */
-    async getUserByPhone({request, response}: HttpContextContract){
+    async getUsersByPhone({request, response}: HttpContextContract){
         let input:any = await request.validate(UserPhoneValidator)
-        return this.globalResponse(response,true,"Password Changed Successfully",input)
+        const result = await this.repo.getUsersByPhone(input.contacts)
+        return this.globalResponse(response,true,"Record Fetched Successfully",result)
     }
+
+
+
 }

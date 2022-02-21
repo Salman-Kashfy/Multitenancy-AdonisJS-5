@@ -12,8 +12,10 @@ import Role from 'App/Models/Role'
 import { DateTime } from 'luxon'
 import Business from 'App/Models/Business'
 import myHelpers from 'App/Helpers'
+import Friend from 'App/Models/Friend'
 
 export default class User extends CommonModel {
+    public serializeExtras = true
 
     public static fillables = ['name','email','password','zip','image','push_notify']
 
@@ -77,6 +79,18 @@ export default class User extends CommonModel {
         pivotTable: 'user_roles'
     })
     public roles: ManyToMany<typeof Role>
+
+    @hasMany(() => Friend, {
+        foreignKey: 'friendId',
+        onQuery: query => query.where('status', Friend.STATUSES.ACCEPTED),
+    })
+    public friends: HasMany<typeof Friend>
+
+    @hasMany(() => Friend, {
+        foreignKey: 'friendId',
+        onQuery: query => query.where('status', Friend.STATUSES.REQUESTED),
+    })
+    public requested_friends: HasMany<typeof Friend>
 
     @computed()
     public get imagePath() {

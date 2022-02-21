@@ -8,13 +8,18 @@ export default class UserPhoneValidator extends BaseValidator{
     }
 
     public schema = schema.create({
-		contacts: schema.array.optional().members(
+		contacts: schema.array().members(
 			schema.object.optional().members({
 				name: schema.string(),
-				phone: schema.string({}, [
+				phone: schema.string.optional({}, [
 					rules.minLength(8),
 					rules.maxLength(20),
 					rules.mobile()
+				]),
+				email: schema.string.optional({}, [
+					rules.requiredIfNotExists('phone'),
+					rules.maxLength(100),
+					rules.email(),
 				]),
 			})
 		),

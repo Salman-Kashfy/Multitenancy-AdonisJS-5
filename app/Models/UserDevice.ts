@@ -22,7 +22,7 @@ export default class UserDevice extends BaseModel {
   public updatedAt: DateTime
 
   @belongsTo(() => User,{
-    foreignKey: 'user_id'
+    foreignKey: 'userId'
   })
   public user: BelongsTo<typeof User>
 }

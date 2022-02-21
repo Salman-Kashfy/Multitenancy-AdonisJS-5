@@ -32,27 +32,52 @@ Route.group(() => {
     */
     Route.group(() => {
 
-        // User Related
-        Route.get('user/profile', 'Api/UsersController.profile')
+        /*
+        |--------------------------------------------------------------------------
+        | User Related API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('user/:id', 'Api/UsersController.show')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
         Route.put('change-password', 'Api/UsersController.changePassword')
-        Route.get('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
+        Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
 
-        // Static Data Routes
+        /*
+        |--------------------------------------------------------------------------
+        | Static Data API Routes
+        |--------------------------------------------------------------------------
+        */
         Route.get('sizes/all','Api/SizeController.all')
         Route.get('genders/all','Api/GenderController.all')
         Route.get('breeds/all','Api/BreedController.all')
 
-        // Dog Route
+        /*
+        |--------------------------------------------------------------------------
+        | Dogs API Routes
+        |--------------------------------------------------------------------------
+        */
         Route.get('my-dogs','Api/DogController.myDogs')
         Route.resource('dogs','Api/DogController')
 
-        // Blocked Users Route
+        /*
+        |--------------------------------------------------------------------------
+        | Blocked Users API Routes
+        |--------------------------------------------------------------------------
+        */
         Route.get('blocked-users','Api/BlockedUserController.blockedUsers')
         Route.post('blocked-users','Api/BlockedUserController.blockOrUnblock')
-        //Route.resource('blocked-users','Api/BlockedUserController')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Friends API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('friends/all','Api/FriendController.all')
+        Route.resource('friends','Api/FriendController').only(['index','store','destroy'])
 
     }).middleware('auth')
 
 }).prefix('/api')
+/*API-Notification*/
+Route.resource('notifications','Api/NotificationController')
