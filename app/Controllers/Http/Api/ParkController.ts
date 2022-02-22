@@ -4,8 +4,10 @@ import ParkRepo from "App/Repos/ParkRepo";
 import AddParkValidator from "App/Validators/AddParkValidator";
 import EditParkValidator from "App/Validators/EditParkValidator";
 import JoinParkValidator from "App/Validators/JoinParkValidator";
+import AcceptDeclineParkRequestValidator from "App/Validators/AcceptDeclineParkRequestValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
-import ParkMember from 'App/Models/ParkMember'
+import ParkMemberRepo from 'App/Repos/ParkMemberRepo'
+import ParkRequestRepo from 'App/Repos/ParkRequestRepo'
 
 export default class ParkController extends ApiBaseController {
 
@@ -61,11 +63,50 @@ export default class ParkController extends ApiBaseController {
         const {user}:any = auth
         const input = await request.validate(JoinParkValidator)
         const park = await this.repo.find(input.park_id)
-        const member = park.related('members').query().where({memberId:user.id}).first()
+
+        /*
+        * Check if user is already a park member
+        * */
+        const member = await ParkMemberRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
         if(member){
             return this.globalResponse(response,false,"Already a member!")
         }
-        const result = await this.repo.join(park,user.id,input)
+
+        /*
+        * Check if user has a request already pending
+        * */
+        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
+        if(parkRequest){
+            return this.globalResponse(response,false,"Request already sent!")
+        }
+        const result = await this.repo.join(park,user.id)
+        return this.globalResponse(response,result.status,result.message)
+    }
+
+    async acceptDeclineRequest({request,response,auth}: HttpContextContract){
+        const {user}:any = auth
+        const input = await request.validate(AcceptDeclineParkRequestValidator)
+
+        /*
+        * Check park belonging
+        * */
+        const park = await this.repo.find(input.park_id)
+        if(park.userId !== user.id){
+            return this.globalResponse(response,false,'Permission denied!',null,403)
+        }
+
+        /*
+        * Check if request exist
+        * */
+        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:input.member_id}).first()
+        if(!parkRequest){
+            return this.globalResponse(response,false,"Request not found",null,404)
+        }
+
+        /*
+        * Accept/Decline join request
+        * */
+        const result = await this.repo.acceptDeclineRequest(parkRequest,input.accept)
         return this.globalResponse(response,result.status,result.message)
     }
 

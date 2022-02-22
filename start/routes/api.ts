@@ -88,6 +88,9 @@ Route.group(() => {
             Route.resource('parks','Api/ParkController')
         }).middleware('premium')
         Route.post('parks/join','Api/ParkController.join')
+        Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
+        Route.get('park-requests','Api/ParkRequestController.index')
+
 
     }).middleware('auth')
 

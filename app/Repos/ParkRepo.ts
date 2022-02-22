@@ -19,7 +19,6 @@ class ParkRepo extends BaseRepo {
         let row = await this.model.create(input)
         await ParkMember.create({
             parkId: row.id,
-            userId: input.user_id,
             memberId: input.user_id
         })
         if (request.input('media')) {
@@ -71,31 +70,53 @@ class ParkRepo extends BaseRepo {
             .withScopes((scope) => scope.parkMeta())
             .whereHas('members', (memberQuery) => {
                 memberQuery.where('member_id', userId)
-                    .where('status', this.model.STATUSES.ACCEPTED)
             })
     }
 
     async join(park, userId) {
         let response: GlobalResponseInterface
         if(park.privacy){
-            await ParkMember.create({
-                parkId: row.id,
-                userId: input.user_id,
-                memberId: input.user_id
+            await ParkRequest.create({
+                parkId: park.id,
+                userId: park.userId,
+                memberId: userId
             })
-
-            park.related('requests').crea
+        }else{
+            await ParkMember.create({
+                parkId: park.id,
+                memberId: userId,
+            })
         }
-        await ParkMember.create({
-            parkId: park.id,
-            userId: park.userId,
-            memberId: userId,
-            status: park.privacy ? this.model.STATUSES.REQUESTED : this.model.STATUSES.ACCEPTED
-        })
         response = {
             status: true,
             message: park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
         }
+
+        /*
+        * Send notification here
+        * */
+
+        return response
+    }
+
+    async acceptDeclineRequest(parkRequest,accept){
+        let response: GlobalResponseInterface
+        await ParkRequest.query().where({parkId:parkRequest.parkId,memberId:parkRequest.memberId}).delete()
+        if(accept){
+            await ParkMember.create({
+                parkId: parkRequest.parkId,
+                memberId: parkRequest.memberId,
+            })
+        }
+        response = {
+            status: true,
+            message: accept ? "Request Accepted Successfully!" : "Request Declined Successfully"
+        }
+
+        /*
+        * Send notification here
+        * */
+
         return response
     }
 }

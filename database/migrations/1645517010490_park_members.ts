@@ -5,7 +5,6 @@ export default class ParkMembers extends BaseSchema {
 
     public async up () {
         this.schema.createTable(this.tableName, (table) => {
-            table.integer('user_id').unsigned().references('id').inTable('users').notNullable().onDelete('cascade')
             table.integer('park_id').unsigned().references('id').inTable('parks').notNullable().onDelete('cascade')
             table.integer('member_id').unsigned().references('id').inTable('users').notNullable().onDelete('cascade')
             table.timestamps()

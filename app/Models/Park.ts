@@ -60,11 +60,19 @@ export default class Park extends CommonModel {
 
 	@manyToMany(() => User, {
 		pivotTable: 'park_members',
+		localKey: 'id',
+		pivotForeignKey: 'park_id',
+		relatedKey: 'id',
+		pivotRelatedForeignKey: 'member_id',
 	})
 	public members: ManyToMany<typeof User>
 
 	@manyToMany(() => User, {
 		pivotTable: 'park_requests',
+		localKey: 'id',
+		pivotForeignKey: 'park_id',
+		relatedKey: 'id',
+		pivotRelatedForeignKey: 'member_id',
 	})
 	public requests: ManyToMany<typeof User>
 
