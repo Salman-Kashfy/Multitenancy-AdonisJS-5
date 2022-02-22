@@ -74,20 +74,20 @@ class ParkRepo extends BaseRepo {
             })
     }
 
-    async join(park,userId,input){
-        let response:GlobalResponseInterface = {
-            status:true,
-            message:"Record Updated Successfully!"
-        }
-        let object = {
+    async join(park,userId){
+        let response:GlobalResponseInterface
+        //const members = park.related('members')
+        await ParkMember.create({
             parkId:park.id,
             userId:park.userId,
             memberId:userId,
+            status: park.privacy ? this.model.STATUSES.REQUESTED : this.model.STATUSES.ACCEPTED
+        })
+        response = {
+            status:true,
+            message:park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
         }
-        console.log(object,{...object,status:parseInt(input.status)})
-        await ParkMember.updateOrCreate(object,{...object,status:parseInt(input.status)})
-        return response
+
     }
-}
 
 export default new ParkRepo()

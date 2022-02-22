@@ -53,14 +53,6 @@ class AuthRepo extends BaseRepo {
             return { status:false, message: 'Invalid email or password.' }
         }
 
-        /*
-        * If credentials are valid
-        * */
-        if(!user.emailVerified){
-            await auth.use('api').revoke()
-            response = { status:false, message: 'Please verify your email address.' }
-        }
-
         return response
     }
 }

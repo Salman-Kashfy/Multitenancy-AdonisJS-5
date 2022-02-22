@@ -11,6 +11,9 @@ export default class RegisterParentValidator extends BaseValidator{
         name: schema.string({ trim: true }, [
             rules.maxLength(35)
         ]),
+        username: schema.string.optional({ trim: true }, [
+            rules.maxLength(25)
+        ]),
         email: schema.string({ trim: true }, [
             rules.maxLength(100),
             rules.email(),
