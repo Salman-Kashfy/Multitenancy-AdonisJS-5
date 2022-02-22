@@ -3,6 +3,7 @@ import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import ParkRepo from "App/Repos/ParkRepo";
 import AddParkValidator from "App/Validators/AddParkValidator";
 import EditParkValidator from "App/Validators/EditParkValidator";
+//import JoinParkValidator from "App/Validators/JoinParkValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 
 export default class ParkController extends ApiBaseController {
@@ -43,14 +44,25 @@ export default class ParkController extends ApiBaseController {
         return this.apiResponse('Record Deleted Successfully')
     }
 
+    async hostParks({auth}:HttpContextContract){
+        const {user}:any = auth
+        const row = await this.repo.hostParks(user.id)
+        return this.apiResponse('Record Fetched Successfully',row)
+    }
+
     async myParks({auth}:HttpContextContract){
         const {user}:any = auth
         const row = await this.repo.myParks(user.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
-    async join({ request,auth }: HttpContextContract){
-
+    async join({ request,response,auth }: HttpContextContract){
+        const {user}:any = auth
+        //const input = await request.validate(JoinParkValidator)
+        const input = request.only(['park_id','status'])
+        const park = await this.repo.find(input.park_id)
+        const result = await this.repo.join(park,user.id,input)
+        return this.globalResponse(response,result.status,result.message)
     }
 
 }

@@ -82,11 +82,12 @@ Route.group(() => {
         | Parks API Routes
         |--------------------------------------------------------------------------
         */
+        Route.get('host-parks','Api/ParkController.hostParks')
         Route.get('my-parks','Api/ParkController.myParks')
         Route.group(() =>{
-            Route.post('parks/:id/join','Api/ParkController.join')
             Route.resource('parks','Api/ParkController')
         }).middleware('premium')
+        Route.post('parks/join','Api/ParkController.join')
 
     }).middleware('auth')
 

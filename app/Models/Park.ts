@@ -13,6 +13,12 @@ import User from 'App/Models/User'
 type Builder = ModelQueryBuilderContract<typeof Park>
 export default class Park extends CommonModel {
 
+	public static STATUSES = {
+		REQUESTED: 10,
+		ACCEPTED: 20,
+		CANCELLED: 30
+	}
+
 	public static fillables(){
 		return ['title','description','location','latitude','longitude','city','state','zip','privacy','allowInvite']
 	}
@@ -53,8 +59,13 @@ export default class Park extends CommonModel {
 	})
 
 	@manyToMany(() => User, {
-		pivotTable: 'park_members'
+		pivotTable: 'park_members',
 	})
 	public members: ManyToMany<typeof User>
+
+	@manyToMany(() => User, {
+		pivotTable: 'park_requests',
+	})
+	public requests: ManyToMany<typeof User>
 
 }
