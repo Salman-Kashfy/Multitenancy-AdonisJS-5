@@ -40,16 +40,16 @@ export default class RegisterBusinessValidator extends BaseValidator {
             rules.url()
         ]),
         email: schema.string({}, [
-            rules.maxLength(100),
+            rules.maxLength(255),
             rules.email(),
         ]),
         phone: schema.string({}, [
             rules.minLength(8),
-            rules.maxLength(20),
+            rules.maxLength(15),
             rules.mobile()
         ]),
         password: schema.string({}, [
-            rules.maxLength(180),
+            rules.maxLength(255),
             rules.minLength(6)
         ]),
         category_id: schema.number.optional([

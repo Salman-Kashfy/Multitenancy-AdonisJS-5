@@ -42,6 +42,7 @@ Route.group(() => {
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
         Route.put('change-password', 'Api/UsersController.changePassword')
         Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
+        Route.post('user/invite', 'Api/UsersController.invite')
 
         /*
         |--------------------------------------------------------------------------
@@ -76,8 +77,23 @@ Route.group(() => {
         Route.get('friends/all','Api/FriendController.all')
         Route.resource('friends','Api/FriendController').only(['index','store','destroy'])
 
+        /*
+        |--------------------------------------------------------------------------
+        | Parks API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('host-parks','Api/ParkController.hostParks')
+        Route.get('my-parks','Api/ParkController.myParks')
+        Route.group(() =>{
+            Route.resource('parks','Api/ParkController')
+        }).middleware('premium')
+        Route.post('parks/join','Api/ParkController.join')
+        Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
+        Route.get('park-requests','Api/ParkRequestController.index')
+
+
     }).middleware('auth')
 
 }).prefix('/api')
-/*API-Notification*/
-Route.resource('notifications','Api/NotificationController')
+/*API-Subscription*/
+Route.resource('subscriptions','Api/SubscriptionController')

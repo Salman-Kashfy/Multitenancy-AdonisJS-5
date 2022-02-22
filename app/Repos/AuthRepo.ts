@@ -2,6 +2,7 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
 import Role from 'App/Models/Role';
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface';
+import Subscription from 'App/Models/Subscription'
 
 class AuthRepo extends BaseRepo {
     model
@@ -27,7 +28,9 @@ class AuthRepo extends BaseRepo {
     }
 
     async createParent(input){
-        return this.model.create(input);
+        const user = await this.model.create(input);
+        await user.related('subscription').sync([Subscription.FREE_PLAN])
+        return user
     }
 
     async createBusiness(input,businessDetails,request){
@@ -36,6 +39,7 @@ class AuthRepo extends BaseRepo {
         if(!user) return false
         const business = await user.related('business').create(businessDetails)
         await business.related('categories').sync([request.input('category_id')])
+        await business.related('subscription').sync([Subscription.FREE_PLAN])
         return user
     }
 
@@ -47,14 +51,6 @@ class AuthRepo extends BaseRepo {
             response = { status:true, message: 'Logged in successfully !',data:{user,token,role} }
         } catch {
             return { status:false, message: 'Invalid email or password.' }
-        }
-
-        /*
-        * If credentials are valid
-        * */
-        if(!user.emailVerified){
-            await auth.use('api').revoke()
-            response = { status:false, message: 'Please verify your email address.' }
         }
 
         return response

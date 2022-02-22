@@ -45,5 +45,6 @@ Server.middleware.registerNamed({
     admin: () => import('App/Middleware/Admin'),
     guest: () => import('App/Middleware/Guest'),
     business: () => import('App/Middleware/Business'),
-    parent: () => import('App/Middleware/Parent')
+    parent: () => import('App/Middleware/Parent'),
+    premium: () => import('App/Middleware/Premium')
 })

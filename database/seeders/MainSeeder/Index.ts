@@ -18,5 +18,6 @@ export default class IndexSeeder extends BaseSeeder {
         // Write your database queries inside the run method
         await this.runSeeder(await import('../Role'))
         await this.runSeeder(await import('../User'))
+        await this.runSeeder(await import('../Subscription'))
     }
 }
