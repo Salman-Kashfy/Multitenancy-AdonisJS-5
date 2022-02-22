@@ -14,22 +14,19 @@ class ParkRequestRepo extends BaseRepo {
     }
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
-        console.log('SASAS')
         let query = this.model.query()
             .preload('member',(memberQuery) =>{
                 memberQuery.select(...User.select())
             })
-            .preload('park')
-            .whereHas('park',(parkQuery) =>{
-                parkQuery.where('user_id',ctx.auth.user.id)
+            .preload('park',(parkQuery) =>{
+                parkQuery.select(...Park.select()).preload('attachments')
             })
-        let parkRequests = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
-        return parkRequests
-        // return dogs.serialize({
-        //     fields: {
-        //         pick: [...this.model.select()]
-        //     }
-        // })
+            .whereHas('park',(parkQuery) =>{
+                parkQuery
+                    .where('user_id',ctx.auth.user.id)
+                    .orWhere('member_id',ctx.auth.user.id)
+            })
+        return await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 }
 

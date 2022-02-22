@@ -84,16 +84,29 @@ Route.group(() => {
         */
         Route.get('host-parks','Api/ParkController.hostParks')
         Route.get('my-parks','Api/ParkController.myParks')
+        Route.post('parks/join','Api/ParkController.join')
+        Route.delete('parks/unjoin','Api/ParkController.unjoin')
+        Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
         Route.group(() =>{
             Route.resource('parks','Api/ParkController')
         }).middleware('premium')
-        Route.post('parks/join','Api/ParkController.join')
-        Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
         Route.get('park-requests','Api/ParkRequestController.index')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Parks Blocked Members API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('park-block-user','Api/ParkController.block')
+        Route.get('park-blocked-users/:id','Api/ParkBlockedUserController.index')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Park Members API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('park-members/:id','Api/ParkMemberController.index')
 
     }).middleware('auth')
 
 }).prefix('/api')
-/*API-Subscription*/
-Route.resource('subscriptions','Api/SubscriptionController')

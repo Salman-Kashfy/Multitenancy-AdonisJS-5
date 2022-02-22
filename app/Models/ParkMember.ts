@@ -1,5 +1,6 @@
-import { column } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from 'App/Models/CommonModel'
+import User from 'App/Models/User'
 
 export default class ParkMember extends CommonModel {
     @column({ isPrimary: true })
@@ -11,8 +12,8 @@ export default class ParkMember extends CommonModel {
     @column()
     public memberId: number
 
-    @column()
-    public status: number
-
-
+    @belongsTo(() => User,{
+        foreignKey: 'memberId'
+    })
+    public user: BelongsTo<typeof User>
 }

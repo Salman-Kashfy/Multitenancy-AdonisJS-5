@@ -5,6 +5,7 @@ import Attachment from 'App/Models/Attachment'
 import ParkMember from 'App/Models/ParkMember'
 import ParkRequest from 'App/Models/ParkRequest'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
+import User from 'App/Models/User'
 
 class ParkRepo extends BaseRepo {
     model
@@ -31,6 +32,17 @@ class ParkRepo extends BaseRepo {
                 })
             }
         }
+
+        if(request.input('invite')){
+            for (let i = 0; i < request.input('invite').length; i++) {
+                await ParkRequest.create({
+                    userId:input.user_id,
+                    parkId:row.id,
+                    memberId:request.input('invite')[i],
+                })
+            }
+        }
+
         return row
     }
 
@@ -118,6 +130,23 @@ class ParkRepo extends BaseRepo {
         * */
 
         return response
+    }
+
+    async unjoin(parkId,userId){
+        return ParkMember.query().where('park_id',parkId).where('member_id',userId).delete()
+    }
+
+    async block(park,userId){
+        await this.unjoin(park.id,userId)
+        await park.related('blockedUsers').sync([userId],false)
+    }
+
+    async getBlockList(parkId){
+        return this.model.query().select(...this.model.select())
+            .where('id',parkId)
+            .preload('blockedUsers',(userQuery) =>{
+                userQuery.select(...User.select())
+            })
     }
 }
 export default new ParkRepo()

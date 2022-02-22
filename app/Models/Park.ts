@@ -23,6 +23,10 @@ export default class Park extends CommonModel {
 		return ['title','description','location','latitude','longitude','city','state','zip','privacy','allowInvite']
 	}
 
+	public static select(){
+		return ['id','title','privacy','allowInvite']
+	}
+
     @column()
     public id: number
 	@column()
@@ -75,5 +79,10 @@ export default class Park extends CommonModel {
 		pivotRelatedForeignKey: 'member_id',
 	})
 	public requests: ManyToMany<typeof User>
+
+	@manyToMany(() => User, {
+		pivotTable: 'park_blocked_users',
+	})
+	public blockedUsers: ManyToMany<typeof User>
 
 }

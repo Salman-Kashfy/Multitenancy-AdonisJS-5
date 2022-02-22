@@ -17,7 +17,7 @@ export default class AcceptDeclineParkRequestValidator extends BaseValidator {
         ]),
         member_id: schema.number([
             rules.exists({
-                table: UserRepo.model.table, column: 'id',whereNot:{id:this.ctx?.auth?.user?.id}
+                table: UserRepo.model.table, column: 'id'
             })
         ]),
         accept: schema.boolean()
