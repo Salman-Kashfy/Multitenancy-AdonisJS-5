@@ -13,8 +13,7 @@ export default class JoinParkValidator extends BaseValidator{
 			rules.exists({
                 table: ParkRepo.model.table, column: 'id', whereNot:{user_id:this.ctx?.auth?.user?.id}
 			})
-		]),
-        status: schema.number()
+		])
     })
 
 }

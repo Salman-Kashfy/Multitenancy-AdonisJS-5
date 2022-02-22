@@ -17,16 +17,16 @@ class ParkRepo extends BaseRepo {
     async store(input, request: RequestContract) {
         let row = await this.model.create(input)
         await ParkMember.create({
-            parkId:row.id,
-            userId:input.user_id,
-            memberId:input.user_id
+            parkId: row.id,
+            userId: input.user_id,
+            memberId: input.user_id
         })
         if (request.input('media')) {
             for (let i = 0; i < request.input('media').length; i++) {
                 await row.related('attachments').create({
                     instanceId: row.id,
                     instanceType: Attachment.TYPE.PARK,
-                    path:request.input('media')[i],
+                    path: request.input('media')[i],
                     mimeType: 'image',
                 })
             }
@@ -34,17 +34,17 @@ class ParkRepo extends BaseRepo {
         return row
     }
 
-    async update(id,input, request: RequestContract) {
-        let row = await super.update(id,input)
-        if(request.input('remove_media')){
-            await Attachment.query().whereIn('id',request.input('remove_media')).update({'deleted_at': new Date()})
+    async update(id, input, request: RequestContract) {
+        let row = await super.update(id, input)
+        if (request.input('remove_media')) {
+            await Attachment.query().whereIn('id', request.input('remove_media')).update({ 'deleted_at': new Date() })
         }
         if (request.input('media')) {
             for (let i = 0; i < request.input('media').length; i++) {
                 await row.related('attachments').create({
                     instanceId: row.id,
                     instanceType: Attachment.TYPE.DOG,
-                    path:request.input('media')[i],
+                    path: request.input('media')[i],
                     mimeType: 'image',
                 })
             }
@@ -54,40 +54,42 @@ class ParkRepo extends BaseRepo {
 
     async delete(id) {
         let row = await this.model.findOrFail(id)
-        await row.related('members').query().update({'deleted_at': new Date()})
+        await row.related('members').query().update({ 'deleted_at': new Date() })
         await row.delete()
 
     }
 
-     async hostParks(userId){
+    async hostParks(userId) {
         return this.model.query()
             .withScopes((scope) => scope.parkMeta())
-            .where({userId})
+            .where({ userId })
     }
 
-    async myParks(userId){
+    async myParks(userId) {
         return this.model.query()
             .withScopes((scope) => scope.parkMeta())
-            .whereHas('members',(memberQuery) =>{
-                memberQuery.where('member_id',userId)
-                    .where('status',this.model.STATUSES.ACCEPTED)
+            .whereHas('members', (memberQuery) => {
+                memberQuery.where('member_id', userId)
+                    .where('status', this.model.STATUSES.ACCEPTED)
             })
     }
 
-    async join(park,userId){
-        let response:GlobalResponseInterface
-        //const members = park.related('members')
+    async join(park, userId) {
+        let response: GlobalResponseInterface
+        if(park.privacy){
+            park.related('requests').crea
+        }
         await ParkMember.create({
-            parkId:park.id,
-            userId:park.userId,
-            memberId:userId,
+            parkId: park.id,
+            userId: park.userId,
+            memberId: userId,
             status: park.privacy ? this.model.STATUSES.REQUESTED : this.model.STATUSES.ACCEPTED
         })
         response = {
-            status:true,
-            message:park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
+            status: true,
+            message: park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
         }
-
+        return response
     }
-
+}
 export default new ParkRepo()

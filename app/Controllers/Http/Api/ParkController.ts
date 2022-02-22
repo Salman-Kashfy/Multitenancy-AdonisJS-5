@@ -3,8 +3,9 @@ import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import ParkRepo from "App/Repos/ParkRepo";
 import AddParkValidator from "App/Validators/AddParkValidator";
 import EditParkValidator from "App/Validators/EditParkValidator";
-//import JoinParkValidator from "App/Validators/JoinParkValidator";
+import JoinParkValidator from "App/Validators/JoinParkValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
+import ParkMember from 'App/Models/ParkMember'
 
 export default class ParkController extends ApiBaseController {
 
@@ -58,9 +59,12 @@ export default class ParkController extends ApiBaseController {
 
     async join({ request,response,auth }: HttpContextContract){
         const {user}:any = auth
-        //const input = await request.validate(JoinParkValidator)
-        const input = request.only(['park_id','status'])
+        const input = await request.validate(JoinParkValidator)
         const park = await this.repo.find(input.park_id)
+        const member = park.related('members').query().where({memberId:user.id}).first()
+        if(member){
+            return this.globalResponse(response,false,"Already a member!")
+        }
         const result = await this.repo.join(park,user.id,input)
         return this.globalResponse(response,result.status,result.message)
     }

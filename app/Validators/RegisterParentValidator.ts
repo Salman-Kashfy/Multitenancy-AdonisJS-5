@@ -9,10 +9,10 @@ export default class RegisterParentValidator extends BaseValidator{
 
     public schema = schema.create({
         name: schema.string({ trim: true }, [
-            rules.maxLength(35)
+            rules.maxLength(50)
         ]),
         username: schema.string.optional({ trim: true }, [
-            rules.maxLength(25)
+            rules.maxLength(50)
         ]),
         email: schema.string({ trim: true }, [
             rules.maxLength(100),
