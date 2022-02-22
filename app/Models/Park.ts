@@ -1,6 +1,15 @@
-import { column, HasMany, hasMany, scope, ModelQueryBuilderContract,} from '@ioc:Adonis/Lucid/Orm'
+import {
+	column,
+	HasMany,
+	hasMany,
+	scope,
+	ModelQueryBuilderContract,
+	manyToMany,
+	ManyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
+import User from 'App/Models/User'
 type Builder = ModelQueryBuilderContract<typeof Park>
 export default class Park extends CommonModel {
 
@@ -42,5 +51,10 @@ export default class Park extends CommonModel {
 	public static parkMeta = scope((query:Builder) => {
 		return query.preload('attachments')
 	})
+
+	@manyToMany(() => User, {
+		pivotTable: 'park_members'
+	})
+	public members: ManyToMany<typeof User>
 
 }

@@ -84,6 +84,7 @@ Route.group(() => {
         */
         Route.get('my-parks','Api/ParkController.myParks')
         Route.group(() =>{
+            Route.post('parks/:id/join','Api/ParkController.join')
             Route.resource('parks','Api/ParkController')
         }).middleware('premium')
 

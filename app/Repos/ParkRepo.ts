@@ -14,6 +14,7 @@ class ParkRepo extends BaseRepo {
 
     async store(input, request: RequestContract) {
         let row = await this.model.create(input)
+        await row.related('members').sync([input.user_id])
         if (request.input('media')) {
             for (let i = 0; i < request.input('media').length; i++) {
                 await row.related('attachments').create({
@@ -43,6 +44,13 @@ class ParkRepo extends BaseRepo {
             }
         }
         return row
+    }
+
+    async delete(id) {
+        let row = await this.model.findOrFail(id)
+        await row.related('members').query().update({'deleted_at': new Date()})
+        await row.delete()
+
     }
 
      async myParks(userId){

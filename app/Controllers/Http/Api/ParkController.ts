@@ -49,4 +49,8 @@ export default class ParkController extends ApiBaseController {
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
+    async join({ request,auth }: HttpContextContract){
+
+    }
+
 }
