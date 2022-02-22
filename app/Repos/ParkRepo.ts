@@ -3,6 +3,7 @@ import Park from "App/Models/Park";
 import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import ParkMember from 'App/Models/ParkMember'
+import ParkRequest from 'App/Models/ParkRequest'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 
 class ParkRepo extends BaseRepo {
@@ -77,6 +78,12 @@ class ParkRepo extends BaseRepo {
     async join(park, userId) {
         let response: GlobalResponseInterface
         if(park.privacy){
+            await ParkMember.create({
+                parkId: row.id,
+                userId: input.user_id,
+                memberId: input.user_id
+            })
+
             park.related('requests').crea
         }
         await ParkMember.create({
