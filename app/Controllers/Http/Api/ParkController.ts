@@ -125,4 +125,12 @@ export default class ParkController extends ApiBaseController {
         return this.globalResponse(ctx.response,true,"Record Fetched Successfully!",res)
     }
 
+    async show(ctx: HttpContextContract) {
+        const res = await this.repo.show(ctx.request.param('id'))
+        if(!res){
+            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+        }
+        return this.apiResponse('Record fetched successfully!', res)
+    }
+
 }

@@ -23,10 +23,6 @@ export default class Park extends CommonModel {
 		return ['title','description','location','latitude','longitude','city','state','zip','privacy','allowInvite']
 	}
 
-	public static select(){
-		return ['id','title','privacy','allowInvite']
-	}
-
     @column()
     public id: number
 	@column()

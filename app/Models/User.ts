@@ -20,10 +20,6 @@ export default class User extends CommonModel {
 
     public static fillables = ['name','email','password','zip','image','push_notify']
 
-    public static select(){
-        return ['id','name','username','image']
-    }
-
     @column({ isPrimary: true })
     public id: number
 

@@ -32,12 +32,7 @@ class DogRepo extends BaseRepo {
             query.where('gender_id',ctx.request.input('gender_id'))
         }
 
-        let dogs = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
-        return dogs.serialize({
-            fields: {
-                pick: [...this.model.select()]
-            }
-        })
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 
     async store(input, request: RequestContract) {
@@ -74,17 +69,9 @@ class DogRepo extends BaseRepo {
     }
 
     async myDogs(userId){
-        let dogs = await this.model.query()
+        return this.model.query()
             .withScopes((scope) => scope.dogMeta())
             .where({userId})
-
-        dogs = dogs.map((post) => post.serialize({
-            fields: {
-                pick: [...this.model.select()]
-            }
-        }))
-
-        return dogs
     }
 }
 

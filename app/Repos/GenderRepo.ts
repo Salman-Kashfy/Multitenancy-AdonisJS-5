@@ -12,7 +12,7 @@ class GenderRepo extends BaseRepo {
     }
 
     async all(){
-        return this.model.query().select(...Gender.select()).orderBy(constants.ORDER_BY_COLUMN,'asc')
+        return this.model.query().orderBy(constants.ORDER_BY_COLUMN,'asc')
     }
 }
 

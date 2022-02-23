@@ -8,6 +8,7 @@ export default class ParkRequests extends BaseSchema {
             table.integer('user_id').unsigned().references('id').inTable('users').notNullable().onDelete('cascade')
             table.integer('park_id').unsigned().references('id').inTable('parks').notNullable().onDelete('cascade')
             table.integer('member_id').unsigned().references('id').inTable('users').notNullable().onDelete('cascade')
+            table.integer('type')
             table.timestamps()
             table.dateTime('deleted_at');
         })

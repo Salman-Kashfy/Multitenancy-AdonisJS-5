@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
-import Role from 'App/Models/Role';
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface';
 import Subscription from 'App/Models/Subscription'
 
@@ -47,7 +46,7 @@ class AuthRepo extends BaseRepo {
         let response:GlobalResponseInterface
         try {
             const token = await auth.use('api').attempt(input.email, input.password)
-            const role = await user.related('roles').query().select(...Role.select()).first()
+            const role = await user.related('roles').query().first()
             response = { status:true, message: 'Logged in successfully !',data:{user,token,role} }
         } catch {
             return { status:false, message: 'Invalid email or password.' }
