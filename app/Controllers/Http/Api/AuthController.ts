@@ -12,7 +12,7 @@ import LoginValidator from "App/Validators/LoginValidator";
 import ResetPassword from "App/Mailers/ResetPassword";
 import ResetPasswordValidator from "App/Validators/ResetPasswordValidator";
 import UserRepo from "App/Repos/UserRepo";
-import Role from "App/Models/Role";
+import RoleRepo from "App/Repos/RoleRepo";
 import ForgotPasswordValidator from "App/Validators/ForgotPasswordValidator";
 import VerifyOtpValidator from "App/Validators/VerifyOtpValidator";
 import SocialLoginValidator from "App/Validators/SocialLoginValidator";
@@ -45,7 +45,7 @@ export default class AuthController extends ApiBaseController{
         /*
         * Assign User Role
         * */
-        await user.related('roles').sync([Role.PARENT])
+        await user.related('roles').sync([RoleRepo.model.PARENT])
 
         /*
         * Create OTP
@@ -229,6 +229,9 @@ export default class AuthController extends ApiBaseController{
             }, input)
 
             await user.related('roles').sync([request.input('account_type')])
+            if(request.input('account_type') == RoleRepo.model.BUSINESS){
+                await user.related('business').create({userId:user.id,...request.only(BusinessRepo.model.fillables)})
+            }
             await SocialAccountRepo.store(request, user.id)
         }
         if (input.image) {
@@ -271,7 +274,7 @@ export default class AuthController extends ApiBaseController{
         /*
         * Assign User Role
         * */
-        await user.related('roles').sync([Role.BUSINESS])
+        await user.related('roles').sync([RoleRepo.model.BUSINESS])
 
         /*
         * Create OTP
