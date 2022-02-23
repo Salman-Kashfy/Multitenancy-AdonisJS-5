@@ -13,9 +13,6 @@ export default class RegisterParentValidator extends BaseValidator{
             rules.maxLength(50)
         ]),
         username: schema.string.optional({ trim: true }, [
-            rules.maxLength(50)
-        ]),
-        username: schema.string.optional({ trim: true }, [
             rules.maxLength(50),
             rules.unique({ table: UserRepo.model.table, column: 'username' }),
         ]),
