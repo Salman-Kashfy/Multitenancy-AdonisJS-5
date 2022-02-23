@@ -5,6 +5,8 @@ import Attachment from 'App/Models/Attachment'
 import ParkMember from 'App/Models/ParkMember'
 import ParkRequest from 'App/Models/ParkRequest'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
+import constants from 'Config/constants'
+import Database from "@ioc:Adonis/Lucid/Database"
 
 class ParkRepo extends BaseRepo {
     model
@@ -13,6 +15,32 @@ class ParkRepo extends BaseRepo {
         const relations = []
         super(Park, relations)
         this.model = Park
+    }
+
+    async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
+
+        let coordinates:any = ['*']
+        if(ctx.request.input('latitude') && ctx.request.input('longitude')){
+            const latitude = ctx.request.input('latitude')
+            const longitude = ctx.request.input('longitude')
+            coordinates.push(Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,latitude,longitude,latitude]))
+        }
+
+        let query = this.model.query()
+            .select(...coordinates)
+            .withScopes((scope) => scope.parkMeta(ctx.auth.user.id))
+
+        if(ctx.request.input('keyword')){
+            query.where((dogQuery) =>{
+                dogQuery.where('title','like',`%${ctx.request.input('keyword')}%`)
+                    .orWhere('description','like',`%${ctx.request.input('keyword')}%`)
+            })
+        }
+        if(ctx.request.input('latitude') && ctx.request.input('longitude')){
+            query.having('distance','<=',constants.PARK_DISTANCE_LIMIT)
+        }
+
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 
     async store(input, request: RequestContract) {
