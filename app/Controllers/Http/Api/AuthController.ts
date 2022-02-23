@@ -230,7 +230,7 @@ export default class AuthController extends ApiBaseController{
 
             user = await UserRepo.model.updateOrCreate({
                 email: request.input('email', null)
-            }, input)
+            }, request.only(UserRepo.model.fillables))
 
             await user.related('roles').sync([request.input('account_type')])
             if(request.input('account_type') == RoleRepo.model.BUSINESS){
