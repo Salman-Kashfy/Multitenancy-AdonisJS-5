@@ -119,7 +119,9 @@ export default class AuthController extends ApiBaseController{
         /*
         * Delete OTP and send response
         * */
-        validate.data.delete()
+        if(validate.data){
+            validate.data.delete()
+        }
         return this.globalResponse(response,true,'OTP verified successfully !')
     }
 
@@ -201,7 +203,9 @@ export default class AuthController extends ApiBaseController{
         if( !await user.save() ){
             return this.globalResponse(response,false,"Failed to update password. Please try again.")
         }
-        validate.data.delete()
+        if(validate.data){
+            validate.data.delete()
+        }
         return this.globalResponse(response,true,"Password updated successfully !",{user:user})
     }
 
