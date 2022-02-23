@@ -151,7 +151,7 @@ class ParkRepo extends BaseRepo {
     async parkDetails(id,userId) {
         let row = this.model.query()
             .withScopes((scope) => scope.parkMeta(userId))
-            .where('id',id)
+            .where('id',id).first()
         return row
     }
 }
