@@ -4,6 +4,7 @@ import ParkRepo from "App/Repos/ParkRepo";
 import AddParkValidator from "App/Validators/AddParkValidator";
 import EditParkValidator from "App/Validators/EditParkValidator";
 import JoinParkValidator from "App/Validators/JoinParkValidator";
+import BlockParkMemberValidator from "App/Validators/BlockParkMemberValidator";
 import AcceptDeclineParkRequestValidator from "App/Validators/AcceptDeclineParkRequestValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import ParkMemberRepo from 'App/Repos/ParkMemberRepo'
@@ -83,17 +84,9 @@ export default class ParkController extends ApiBaseController {
         return this.globalResponse(response,result.status,result.message)
     }
 
-    async acceptDeclineRequest({request,response,auth}: HttpContextContract){
-        const {user}:any = auth
+    async acceptDeclineRequest({request,response}: HttpContextContract){
         const input = await request.validate(AcceptDeclineParkRequestValidator)
-
-        /*
-        * Check park belonging
-        * */
         const park = await this.repo.find(input.park_id)
-        if(park.userId !== user.id){
-            return this.globalResponse(response,false,'Permission denied!',null,403)
-        }
 
         /*
         * Check if request exist
@@ -108,6 +101,28 @@ export default class ParkController extends ApiBaseController {
         * */
         const result = await this.repo.acceptDeclineRequest(parkRequest,input.accept)
         return this.globalResponse(response,result.status,result.message)
+    }
+
+    async unjoin({ request,response,auth }: HttpContextContract){
+        const {user}:any = auth
+        const input = await request.validate(JoinParkValidator)
+        await this.repo.unjoin(input.park_id,user.id)
+        return this.globalResponse(response,true,"Park left Successfully!")
+    }
+
+    async block({ request,response }: HttpContextContract){
+        const input = await request.validate(BlockParkMemberValidator)
+        const park = await this.repo.find(input.park_id)
+        await this.repo.block(park,input.user_id)
+        return this.globalResponse(response,true,"User blocked Successfully!")
+    }
+
+    async getBlockList(ctx: HttpContextContract){
+        if(! await this.repo.belonging(ctx)){
+            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+        }
+        const res = await this.repo.getBlockList(ctx.request.param('id'))
+        return this.globalResponse(ctx.response,true,"Record Fetched Successfully!",res)
     }
 
 }

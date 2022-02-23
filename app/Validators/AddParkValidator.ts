@@ -2,6 +2,7 @@ import {schema, rules} from '@ioc:Adonis/Core/Validator'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import BaseValidator from "App/Validators/BaseValidator";
 import ParkRepo from 'App/Repos/ParkRepo'
+import UserRepo from 'App/Repos/UserRepo'
 
 export default class AddParkValidator extends BaseValidator {
     constructor(protected ctx: HttpContextContract) {
@@ -24,5 +25,8 @@ export default class AddParkValidator extends BaseValidator {
 		zip: schema.string.optional({trim:true},[rules.maxLength(20)]),
 		privacy: schema.boolean(),
 		allow_invite: schema.boolean(),
+		invite: schema.array.optional().members(schema.number([
+			rules.exists({table: UserRepo.model.table, column: 'id'})
+		])),
     })
 }

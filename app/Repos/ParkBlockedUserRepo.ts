@@ -1,14 +1,14 @@
 import BaseRepo from 'App/Repos/BaseRepo'
-import ParkMember from "App/Models/ParkMember";
-import User from "App/Models/User";
+import ParkBlockedUser from "App/Models/ParkBlockedUser";
+import User from 'App/Models/User'
 
-class ParkMemberRepo extends BaseRepo {
+class ParkBlockedUserRepo extends BaseRepo {
     model
 
     constructor() {
         const relations = []
-        super(ParkMember, relations)
-        this.model = ParkMember
+        super(ParkBlockedUser, relations)
+        this.model = ParkBlockedUser
     }
 
     async index(ctx){
@@ -29,4 +29,4 @@ class ParkMemberRepo extends BaseRepo {
     }
 }
 
-export default new ParkMemberRepo()
+export default new ParkBlockedUserRepo()
