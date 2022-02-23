@@ -3,6 +3,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BaseValidator from 'App/Validators/BaseValidator'
 import CategoryRepo from 'App/Repos/CategoryRepo'
 import BusinessRepo from 'App/Repos/BusinessRepo'
+import UserRepo from 'App/Repos/UserRepo'
 
 export default class RegisterBusinessValidator extends BaseValidator {
     constructor(protected ctx: HttpContextContract) {
@@ -35,6 +36,10 @@ export default class RegisterBusinessValidator extends BaseValidator {
                 table: BusinessRepo.model.table,
                 column: 'business_name'
             })
+        ]),
+        username: schema.string.optional({ trim: true }, [
+            rules.maxLength(50),
+            rules.unique({ table: UserRepo.model.table, column: 'username' }),
         ]),
         website: schema.string.optional({}, [
             rules.url()
