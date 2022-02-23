@@ -10,6 +10,7 @@ import {
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
 import User from 'App/Models/User'
+import ParkRequest from 'App/Models/ParkRequest'
 type Builder = ModelQueryBuilderContract<typeof Park>
 export default class Park extends CommonModel {
 
@@ -54,8 +55,10 @@ export default class Park extends CommonModel {
 	})
 	public attachments: HasMany<typeof Attachment>
 
-	public static parkMeta = scope((query:Builder) => {
-		return query.preload('attachments')
+	public static parkMeta = scope((query:Builder,userId) => {
+		return query.preload('attachments').preload('parkRequests',(requestQuery) =>{
+			 requestQuery.where('member_id',userId)
+		})
 	})
 
 	@manyToMany(() => User, {
@@ -75,6 +78,9 @@ export default class Park extends CommonModel {
 		pivotRelatedForeignKey: 'member_id',
 	})
 	public requests: ManyToMany<typeof User>
+
+	@hasMany(() => ParkRequest)
+	public parkRequests: HasMany<typeof ParkRequest>
 
 	@manyToMany(() => User, {
 		pivotTable: 'park_blocked_users',

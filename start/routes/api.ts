@@ -88,8 +88,11 @@ Route.group(() => {
         Route.delete('parks/unjoin','Api/ParkController.unjoin')
         Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
         Route.group(() =>{
-            Route.resource('parks','Api/ParkController')
+            Route.post('parks','Api/ParkController.store')
+            Route.put('parks/:id','Api/ParkController.update')
+            Route.delete('parks/:id','Api/ParkController.destroy')
         }).middleware('premium')
+        Route.get('parks/:id','Api/ParkController.show')
         Route.get('park-requests','Api/ParkRequestController.index')
 
         /*

@@ -73,13 +73,13 @@ class ParkRepo extends BaseRepo {
 
     async hostParks(userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkMeta())
+            .withScopes((scope) => scope.parkMeta(userId))
             .where({ userId })
     }
 
     async myParks(userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkMeta())
+            .withScopes((scope) => scope.parkMeta(userId))
             .whereHas('members', (memberQuery) => {
                 memberQuery.where('member_id', userId)
             })
@@ -148,9 +148,10 @@ class ParkRepo extends BaseRepo {
             .preload('blockedUsers')
     }
 
-    async show(id) {
-        let row = await this.model.findOrFail(id)
-        for (let relation of this.relations) await row.load(relation)
+    async parkDetails(id,userId) {
+        let row = this.model.query()
+            .withScopes((scope) => scope.parkMeta(userId))
+            .where('id',id)
         return row
     }
 }
