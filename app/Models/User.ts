@@ -17,7 +17,7 @@ import Friend from 'App/Models/Friend'
 export default class User extends CommonModel {
     public serializeExtras = true
 
-    public static fillables = ['name','email','password','zip','image','push_notify']
+    public static fillables = ['name','username','email','password','zip','image','push_notify']
 
     public static select(){
         return ['id','name','username','image']

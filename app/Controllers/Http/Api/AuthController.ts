@@ -249,7 +249,6 @@ export default class AuthController extends ApiBaseController{
         let token = await auth.use('api').generate(user)
         const role = await user.related('roles').query().first()
         user = user.toJSON()
-        user.access_token = token
         return super.apiResponse(`Your account has been created successfully`, {user,token,role})
     }
 

@@ -1,6 +1,7 @@
 import {rules, schema} from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BaseValidator from "App/Validators/BaseValidator";
+import UserRepo from 'App/Repos/UserRepo'
 
 export default class RegisterParentValidator extends BaseValidator{
     constructor (protected ctx: HttpContextContract) {
@@ -10,6 +11,10 @@ export default class RegisterParentValidator extends BaseValidator{
     public schema = schema.create({
         name: schema.string({ trim: true }, [
             rules.maxLength(35)
+        ]),
+        username: schema.string.optional({ trim: true }, [
+            rules.maxLength(50),
+            rules.unique({ table: UserRepo.model.table, column: 'username' }),
         ]),
         email: schema.string({ trim: true }, [
             rules.maxLength(100),
