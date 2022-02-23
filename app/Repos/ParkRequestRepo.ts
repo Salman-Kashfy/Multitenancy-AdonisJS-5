@@ -2,6 +2,7 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import ParkRequest from 'App/Models/ParkRequest'
 import constants from 'Config/constants'
 import User from 'App/Models/User'
+import Park from '../Models/Park'
 
 class ParkRequestRepo extends BaseRepo {
     model
