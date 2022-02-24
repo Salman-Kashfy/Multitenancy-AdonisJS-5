@@ -20,6 +20,10 @@ export default class User extends CommonModel {
 
     public static fillables = ['name','username','email','password','zip','image','push_notify']
 
+    static PREDEFINED_USERS = {
+        ADMIN:1
+    }
+
     @column({ isPrimary: true })
     public id: number
 

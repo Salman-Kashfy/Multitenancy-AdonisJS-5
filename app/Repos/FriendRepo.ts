@@ -3,7 +3,6 @@ import Friend from "App/Models/Friend";
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import constants from 'Config/constants'
 
-
 class FriendRepo extends BaseRepo {
     model
 

@@ -4,6 +4,8 @@ import Attachment from "App/Models/Attachment";
 import Database from '@ioc:Adonis/Lucid/Database'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import AppInvitation from "App/Mailers/AppInvitation";
+import constants from 'Config/constants'
+import Friend from 'App/Models/Friend'
 
 class UserRepo extends BaseRepo {
     model
@@ -84,6 +86,21 @@ class UserRepo extends BaseRepo {
             }
         }
         return result
+    }
+
+    async suggestedFriends(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx){
+
+        let query = this.model.query()
+            .whereNotIn('id',[...Object.values(this.model.PREDEFINED_USERS),ctx.auth.user.id])
+            .whereNotExists((builder) =>{
+                builder.select('id').from(Friend.table)
+                    .whereRaw(`${Friend.table}.user_id = ${ctx.auth.user.id} AND ${this.model.table}.id = ${Friend.table}.friend_id`)
+            })
+
+        if(ctx.request.input('keyword')){
+            query.where('name','like',`%${ctx.request.input('keyword')}%`)
+        }
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 }
 

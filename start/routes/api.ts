@@ -37,6 +37,7 @@ Route.group(() => {
         | User Related API Routes
         |--------------------------------------------------------------------------
         */
+        Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')

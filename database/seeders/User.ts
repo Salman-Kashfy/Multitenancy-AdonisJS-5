@@ -5,7 +5,7 @@ export default class UserSeeder extends BaseSeeder {
     public async run () {
         await User.createMany([
             {
-                id: 1,
+                id: User.PREDEFINED_USERS.ADMIN,
                 name: 'admin',
                 email: 'admin@doodle.com',
                 username: 'admin',

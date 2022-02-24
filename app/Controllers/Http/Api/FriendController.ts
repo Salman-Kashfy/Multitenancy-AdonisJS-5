@@ -47,7 +47,7 @@ export default class FriendController extends ApiBaseController {
     }
 
     async all(ctx: HttpContextContract) {
-        const res = await FriendRepo.all(ctx)
+        const res = await this.repo.all(ctx)
         return this.apiResponse('Record fetched successfully!', res)
     }
 

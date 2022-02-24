@@ -8,6 +8,7 @@ import Hash from "@ioc:Adonis/Core/Hash"
 import ChangePasswordValidator from 'App/Validators/ChangePasswordValidator'
 import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 import UserInviteValidator from 'App/Validators/UserInviteValidator'
+import constants from 'Config/constants'
 
 export default class UsersController extends ApiBaseController{
 
@@ -65,6 +66,15 @@ export default class UsersController extends ApiBaseController{
         const input = await request.validate(UserInviteValidator)
         await this.repo.invite(input,user)
         return this.globalResponse(response,true,"Invitation Sent Successfully!")
+    }
+
+    async suggestedFriends(ctx: HttpContextContract){
+        const page = ctx.request.input('page', 1)
+        const perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        const res = await this.repo.suggestedFriends(orderByColumn,orderByValue,page,perPage,ctx)
+        return this.apiResponse('Record fetched successfully!', res)
     }
 
 }
