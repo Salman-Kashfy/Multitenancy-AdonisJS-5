@@ -23,8 +23,7 @@ class UserRepo extends BaseRepo {
         let business = await user.related('business').query().first()
         if(business){
             business = business.toJSON()
-            const attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
-            business.attachment = attachment
+            business.attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
             user = {...user.toJSON(),business}
         }
         return user
