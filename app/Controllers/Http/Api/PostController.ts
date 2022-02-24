@@ -15,7 +15,7 @@ export default class PostController extends ApiBaseController {
         const {user}:any = auth
         await request.validate(AddPostValidator)
         const input = request.only(this.repo.model.fillables())
-        let row = await PostRepo.createPost({...input,userId:user.id}, request)
+        let row = await this.repo.createPost({...input,userId:user.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
@@ -29,13 +29,8 @@ export default class PostController extends ApiBaseController {
             return this.globalResponse(ctx.response,false,'Invalid attachment!',null,403)
         }
         const input = ctx.request.only(this.repo.model.fillables())
-        const row = await this.repo.updatePost(ctx.request.param('id'),input, ctx.request)
+        const row = await this.repo.updatePost(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
-    }
-
-    async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
-        await ctx.request.validate(AddPostValidator)
-        return super.update(ctx, instanceType, mediaType)
     }
 
     async destroy(ctx:HttpContextContract){

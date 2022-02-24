@@ -3,6 +3,7 @@ import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import BaseValidator from "App/Validators/BaseValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import PostRepo from 'App/Repos/PostRepo'
+import ParkRepo from 'App/Repos/ParkRepo'
 
 export default class AddPostValidator extends BaseValidator {
     constructor(protected ctx: HttpContextContract) {
@@ -13,12 +14,16 @@ export default class AddPostValidator extends BaseValidator {
 		anonymous: schema.boolean([]),
 		type: schema.enum(Object.values(PostRepo.model.TYPE)),
 		alert_type: schema.enum(Object.values(PostRepo.model.ALERT_TYPE)),
+		pin_profile: schema.boolean(),
 		location: schema.string.optional({trim:true},[rules.maxLength(200),]),
 		latitude: schema.number.optional([]),
 		longitude: schema.number.optional([]),
 		city: schema.string.optional({trim:true},[rules.maxLength(20),]),
 		state: schema.string.optional({trim:true},[rules.maxLength(20),]),
 		zip: schema.string.optional({trim:true},[rules.maxLength(20),]),
+		share_posts: schema.array().members(schema.number([
+			rules.exists({table: ParkRepo.model.table, column: 'id', where:{'deleted_at':null}})
+		])),
 		media: schema.array.optional().members(
 			schema.object.optional().members({
 				mime_type: schema.enum(Object.values(AttachmentRepo.model.MIME_TYPE)),

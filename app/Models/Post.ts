@@ -1,12 +1,13 @@
-import { column, computed, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { column, computed, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
 import {DateTime} from 'luxon'
+import Park from 'App/Models/Park'
 
 export default class Post extends CommonModel {
 
 	public static fillables() {
-		return ['description','anonymous','type','alert_type','location','latitude','longitude','city','state','zip']
+		return ['description','anonymous','type','alert_type','pin_profile','location','latitude','longitude','city','state','zip']
 	}
 
 	public static TYPE = {
@@ -32,6 +33,8 @@ export default class Post extends CommonModel {
 	public type: number
 	@column()
 	public alertType: number
+	@column()
+	public pinProfile: boolean
 	@column()
 	public location: string
 	@column()
@@ -60,5 +63,12 @@ export default class Post extends CommonModel {
 		onQuery: query => query.where({ instanceType: Attachment.TYPE.POST }).select('id','mimeType','path'),
 	})
 	public attachments: HasMany<typeof Attachment>
+
+	@manyToMany(() => Park,{
+        pivotTable: 'shared_posts'
+    })
+    public sharedPosts: ManyToMany<typeof Park>
+
+
 
 }
