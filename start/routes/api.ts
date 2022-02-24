@@ -112,6 +112,15 @@ Route.group(() => {
         */
         Route.get('park-members/:id','Api/ParkMemberController.index')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Posts API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('posts','Api/PostController.createPost')
+        Route.put('posts/:id','Api/PostController.updatePost')
+        Route.delete('posts/:id','Api/PostController.destroy')
+
     }).middleware('auth')
 
 }).prefix('/api')

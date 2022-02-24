@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import Post from "App/Models/Post";
+
+
+class PostRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(Post, relations)
+        this.model = Post
+    }
+}
+
+export default new PostRepo()
