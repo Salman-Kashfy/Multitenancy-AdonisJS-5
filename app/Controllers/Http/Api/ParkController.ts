@@ -138,8 +138,8 @@ export default class ParkController extends ApiBaseController {
     async index(ctx:HttpContextContract){
         const page = ctx.request.input('page', 1)
         const perPage = ctx.request.input('per-page', constants.PER_PAGE)
-        const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
-        const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        const orderByColumn = ctx.request.input('order-column', 'title')
+        const orderByValue = ctx.request.input('order', 'asc')
         const park = await this.repo.index(orderByColumn,orderByValue,page,perPage,ctx);
         return this.globalResponse(ctx.response,true,'Record Fetched Successfully',park)
     }
