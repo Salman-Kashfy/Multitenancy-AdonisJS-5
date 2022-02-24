@@ -18,7 +18,7 @@ import Subscription from 'App/Models/Subscription'
 export default class User extends CommonModel {
     public serializeExtras = true
 
-    public static fillables = ['name','username','email','password','zip','image','push_notify']
+    public static fillables = ['name','username','email','bio','phone','password','zip','image','push_notify']
 
     public static select(){
         return ['id','name','username','image']
