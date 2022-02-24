@@ -7,6 +7,7 @@ import ParkRequest from 'App/Models/ParkRequest'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import constants from 'Config/constants'
 import Database from "@ioc:Adonis/Lucid/Database"
+import myHelpers from "App/Helpers"
 
 class ParkRepo extends BaseRepo {
     model
@@ -19,10 +20,11 @@ class ParkRepo extends BaseRepo {
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
 
-        let coordinates:any = ['*']
+        let coordinates:any = ['*'],latitude,longitude,countQuery
+
         if(ctx.request.input('latitude') && ctx.request.input('longitude')){
-            const latitude = ctx.request.input('latitude')
-            const longitude = ctx.request.input('longitude')
+            latitude = ctx.request.input('latitude')
+            longitude = ctx.request.input('longitude')
             coordinates.push(Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,latitude,longitude,latitude]))
         }
 
@@ -38,10 +40,13 @@ class ParkRepo extends BaseRepo {
             })
         }
         if(ctx.request.input('latitude') && ctx.request.input('longitude')){
-            query.having('distance','<=',constants.PARK_DISTANCE_LIMIT)
+            query.having('distance','<=',constants.PARK_RADIUS)
         }
-
-        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+        countQuery = query
+        const total = await countQuery
+        let offset = (page-1)*perPage
+        let parks = await query.orderBy(orderByColumn, orderByValue).offset(offset).limit(perPage)
+        return myHelpers.formatPages(parks,total.length,page,perPage)
     }
 
     async store(input, request: RequestContract) {

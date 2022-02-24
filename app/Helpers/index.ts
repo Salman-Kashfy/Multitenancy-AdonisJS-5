@@ -421,4 +421,20 @@ export default {
             this.sendNotification(constants.APP_NAME, msg, payload, devices)
         }
     },
+    countPages(totalRecords, limit = constants.PER_PAGE) {
+        let totalPages = totalRecords/limit
+        return totalPages < 1 ? 0 : Math.ceil(totalPages)
+    },
+    formatPages(data,totalRecords,currentPage,perPage = constants.PER_PAGE) {
+        const lastPage = this.countPages(totalRecords,perPage)
+        return {
+            meta :{
+                total:totalRecords,
+                per_page:perPage,
+                current_page:currentPage,
+                last_page:lastPage
+            },
+            data
+        }
+    }
 }
