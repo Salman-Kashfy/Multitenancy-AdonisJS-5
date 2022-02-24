@@ -8,6 +8,8 @@ import Hash from "@ioc:Adonis/Core/Hash"
 import ChangePasswordValidator from 'App/Validators/ChangePasswordValidator'
 import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 import UserInviteValidator from 'App/Validators/UserInviteValidator'
+import UsernameExistValidator from 'App/Validators/UsernameExistValidator'
+import BusinessExistValidator from 'App/Validators/BusinessExistValidator'
 
 export default class UsersController extends ApiBaseController{
 
@@ -65,6 +67,16 @@ export default class UsersController extends ApiBaseController{
         const input = await request.validate(UserInviteValidator)
         await this.repo.invite(input,user)
         return this.globalResponse(response,true,"Invitation Sent Successfully!")
+    }
+
+    async checkUsername({request,response}: HttpContextContract){
+        await request.validate(UsernameExistValidator)
+        return this.globalResponse(response,true,"Username is available",true)
+    }
+
+    async checkBusinessName({request,response}: HttpContextContract){
+        await request.validate(BusinessExistValidator)
+        return this.globalResponse(response,true,"Business name is available",true)
     }
 
 }

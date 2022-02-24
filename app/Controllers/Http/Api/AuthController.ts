@@ -66,6 +66,7 @@ export default class AuthController extends ApiBaseController{
         /* Send Email */
         const subject = 'Please verify your email address.'
         await new VerifyEmail(user, code, subject).sendLater()
+        user = await UserRepo.profile(user.id)
         return this.globalResponse(response,true,"An OTP has been sent to your email address",{user: user})
     }
 
@@ -230,7 +231,7 @@ export default class AuthController extends ApiBaseController{
 
             user = await UserRepo.model.updateOrCreate({
                 email: request.input('email', null)
-            }, input)
+            }, request.only(UserRepo.model.fillables))
 
             await user.related('roles').sync([request.input('account_type')])
             if(request.input('account_type') == RoleRepo.model.BUSINESS){
@@ -299,6 +300,7 @@ export default class AuthController extends ApiBaseController{
         /* Send Email */
         const subject = 'Please verify your email address.'
         await new VerifyEmail(user, code, subject).sendLater()
+        user = await UserRepo.profile(user.id)
         return this.globalResponse(response,true,"An OTP has been sent to your email address",{user: user})
     }
 
