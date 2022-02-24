@@ -29,6 +29,7 @@ class ParkRepo extends BaseRepo {
         let query = this.model.query()
             .select(...coordinates)
             .withScopes((scope) => scope.parkMeta(ctx.auth.user.id))
+            .withScopes((scope) => scope.parkPrivacy(ctx.auth.user.id))
 
         if(ctx.request.input('keyword')){
             query.where((dogQuery) =>{
