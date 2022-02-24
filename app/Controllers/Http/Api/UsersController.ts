@@ -8,6 +8,8 @@ import Hash from "@ioc:Adonis/Core/Hash"
 import ChangePasswordValidator from 'App/Validators/ChangePasswordValidator'
 import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 import UserInviteValidator from 'App/Validators/UserInviteValidator'
+import UsernameExistValidator from 'App/Validators/UsernameExistValidator'
+import BusinessExistValidator from 'App/Validators/BusinessExistValidator'
 import constants from 'Config/constants'
 
 export default class UsersController extends ApiBaseController{
@@ -75,6 +77,16 @@ export default class UsersController extends ApiBaseController{
         const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
         const res = await this.repo.suggestedFriends(orderByColumn,orderByValue,page,perPage,ctx)
         return this.apiResponse('Record fetched successfully!', res)
+    }
+
+    async checkUsername({request,response}: HttpContextContract){
+        await request.validate(UsernameExistValidator)
+        return this.globalResponse(response,true,"Username is available",true)
+    }
+
+    async checkBusinessName({request,response}: HttpContextContract){
+        await request.validate(BusinessExistValidator)
+        return this.globalResponse(response,true,"Business name is available",true)
     }
 
 }

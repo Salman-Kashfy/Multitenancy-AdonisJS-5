@@ -19,6 +19,11 @@ export default class SocialLoginValidator extends BaseValidator {
             rules.maxLength(50),
             rules.unique({ table: UserRepo.model.table, column: 'username' }),
         ]),
+        phone: schema.string({}, [
+            rules.minLength(8),
+            rules.maxLength(20),
+            rules.mobile()
+        ]),
         client_id: schema.string({trim: true}),
         platform: schema.string({trim: true}),
         device_type: schema.string({trim: true}),
@@ -55,3 +60,5 @@ export default class SocialLoginValidator extends BaseValidator {
 
 
 }
+
+
