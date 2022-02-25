@@ -2,7 +2,6 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import User from "App/Models/User";
 import Attachment from "App/Models/Attachment";
 import Database from '@ioc:Adonis/Lucid/Database'
-import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import AppInvitation from "App/Mailers/AppInvitation";
 import constants from 'Config/constants'
 import Friend from 'App/Models/Friend'
@@ -71,9 +70,7 @@ class UserRepo extends BaseRepo {
     }
 
     async invite(input,user){
-        let result:GlobalResponseInterface = {
-            status:true
-        }
+        let result = { status:true,message:'' }
         if(input.email){
             const row = await this.model.query().select(Database.raw('COUNT(id) as count')).where('email',input.email).first()
             if(row.count){

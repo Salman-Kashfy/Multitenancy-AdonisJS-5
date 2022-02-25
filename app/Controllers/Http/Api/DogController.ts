@@ -5,6 +5,7 @@ import AddDogValidator from "App/Validators/AddDogValidator";
 import EditDogValidator from "App/Validators/EditDogValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import constants from 'Config/constants'
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 export default class DogController extends ApiBaseController {
 
@@ -18,7 +19,7 @@ export default class DogController extends ApiBaseController {
         const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
         const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
         const category = await this.repo.index(orderByColumn,orderByValue,page,perPage,ctx);
-        return this.globalResponse(ctx.response,true,'Record Fetched Successfully',category)
+        return this.apiResponse('Record Fetched Successfully',category)
     }
 
     async store({request,auth}: HttpContextContract) {
@@ -33,10 +34,10 @@ export default class DogController extends ApiBaseController {
         const {user}:any = ctx.auth
         await ctx.request.validate(EditDogValidator)
         if(! await this.repo.belonging(ctx)){
-            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
-            return this.globalResponse(ctx.response,false,'Invalid attachment!',null,403)
+            throw new ExceptionWithCode('Invalid attachment!',403)
         }
         const input = ctx.request.only(this.repo.model.fillables())
         const row = await this.repo.update(ctx.request.param('id'),input, ctx.request)
@@ -45,7 +46,7 @@ export default class DogController extends ApiBaseController {
 
     async destroy(ctx:HttpContextContract){
         if(! await this.repo.belonging(ctx)){
-            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.DOG})
         await this.repo.delete(ctx.request.param('id'))

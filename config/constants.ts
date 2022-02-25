@@ -1,6 +1,6 @@
 const constants = {
     APP_NAME: 'Doodl',
-    PER_PAGE: 20,
+    PER_PAGE: 2,
     ORDER_BY_COLUMN: 'id',
     ORDER_BY_VALUE: 'desc',
     OTP_TTL: 5,

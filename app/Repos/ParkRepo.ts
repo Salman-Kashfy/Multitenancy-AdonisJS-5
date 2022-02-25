@@ -4,7 +4,6 @@ import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import ParkMember from 'App/Models/ParkMember'
 import ParkRequest from 'App/Models/ParkRequest'
-import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import constants from 'Config/constants'
 import Database from "@ioc:Adonis/Lucid/Database"
 import myHelpers from "App/Helpers"
@@ -120,7 +119,6 @@ class ParkRepo extends BaseRepo {
     }
 
     async join(park, userId) {
-        let response: GlobalResponseInterface
         if(park.privacy){
             await ParkRequest.create({
                 parkId: park.id,
@@ -134,20 +132,18 @@ class ParkRepo extends BaseRepo {
                 memberId: userId,
             })
         }
-        response = {
-            status: true,
-            message: park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
-        }
 
         /*
         * Send notification here
         * */
 
-        return response
+        return {
+            status: true,
+            message: park.privacy ? "Request Sent Successfully!" : "Park Joined Successfully"
+        }
     }
 
     async acceptDeclineRequest(parkRequest,accept){
-        let response: GlobalResponseInterface
         await ParkRequest.query().where({parkId:parkRequest.parkId,memberId:parkRequest.memberId}).delete()
         if(accept){
             await ParkMember.create({
@@ -155,16 +151,15 @@ class ParkRepo extends BaseRepo {
                 memberId: parkRequest.memberId,
             })
         }
-        response = {
-            status: true,
-            message: accept ? "Request Accepted Successfully!" : "Request Declined Successfully"
-        }
 
         /*
         * Send notification here
         * */
 
-        return response
+        return {
+            status: true,
+            message: accept ? "Request Accepted Successfully!" : "Request Declined Successfully"
+        }
     }
 
     async unjoin(parkId,userId){
