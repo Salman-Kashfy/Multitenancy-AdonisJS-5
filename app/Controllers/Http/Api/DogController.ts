@@ -23,20 +23,20 @@ export default class DogController extends ApiBaseController {
     }
 
     async store({request,auth}: HttpContextContract) {
-        const {user}:any = auth
+        const {user} = auth
         await request.validate(AddDogValidator)
         const input = request.only(this.repo.model.fillables())
-        const row = await this.repo.store({...input,userId:user.id}, request)
+        const row = await this.repo.store({...input,userId:user?.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async update(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
-        const {user}:any = ctx.auth
+        const {user} = ctx.auth
         await ctx.request.validate(EditDogValidator)
         if(! await this.repo.belonging(ctx)){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
+        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)){
             throw new ExceptionWithCode('Invalid attachment!',403)
         }
         const input = ctx.request.only(this.repo.model.fillables())
@@ -54,8 +54,8 @@ export default class DogController extends ApiBaseController {
     }
 
     async myDogs({auth}:HttpContextContract){
-        const {user}:any = auth
-        const row = await this.repo.myDogs(user.id)
+        const {user} = auth
+        const row = await this.repo.myDogs(user?.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 

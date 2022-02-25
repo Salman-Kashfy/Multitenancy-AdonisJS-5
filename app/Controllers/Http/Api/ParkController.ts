@@ -51,26 +51,26 @@ export default class ParkController extends ApiBaseController {
     }
 
     async hostParks({auth}:HttpContextContract){
-        const {user}:any = auth
-        const row = await this.repo.hostParks(user.id)
+        const {user} = auth
+        const row = await this.repo.hostParks(user?.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
     async myParks({auth}:HttpContextContract){
-        const {user}:any = auth
-        const row = await this.repo.myParks(user.id)
+        const {user} = auth
+        const row = await this.repo.myParks(user?.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
     async join({ request,auth }: HttpContextContract){
-        const {user}:any = auth
+        const {user} = auth
         const input = await request.validate(JoinParkValidator)
         const park = await this.repo.find(input.park_id)
 
         /*
         * Check if user is already a park member
         * */
-        const member = await ParkMemberRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
+        const member = await ParkMemberRepo.model.query().where({parkId:park.id,memberId:user?.id}).first()
         if(member){
             throw new ExceptionWithCode("Already a member!",200)
         }
@@ -78,11 +78,11 @@ export default class ParkController extends ApiBaseController {
         /*
         * Check if user has a request already pending
         * */
-        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
+        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:user?.id}).first()
         if(parkRequest){
             throw new ExceptionWithCode("Request already sent!",200)
         }
-        const result = await this.repo.join(park,user.id)
+        const result = await this.repo.join(park,user?.id)
         return this.apiResponse(result.message)
     }
 
@@ -106,9 +106,9 @@ export default class ParkController extends ApiBaseController {
     }
 
     async unjoin({ request,auth }: HttpContextContract){
-        const {user}:any = auth
+        const {user} = auth
         const input = await request.validate(JoinParkValidator)
-        await this.repo.unjoin(input.park_id,user.id)
+        await this.repo.unjoin(input.park_id,user?.id)
         return this.apiResponse("Park left Successfully!")
     }
 
@@ -128,8 +128,8 @@ export default class ParkController extends ApiBaseController {
     }
 
     async show({ request,auth }: HttpContextContract) {
-        const {user}:any = auth
-        const res = await this.repo.parkDetails(request.param('id'),user.id)
+        const {user} = auth
+        const res = await this.repo.parkDetails(request.param('id'),user?.id)
         if(!res){
             throw new ExceptionWithCode('Record not found!',404)
         }
