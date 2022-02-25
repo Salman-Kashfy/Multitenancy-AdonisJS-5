@@ -29,7 +29,7 @@ class ParkRepo extends BaseRepo {
 
         let query = this.model.query()
             .select(...coordinates)
-            .withScopes((scope) => scope.parkMeta(ctx.auth.user.id))
+            .withScopes((scope) => scope.parkRelations(ctx.auth.user.id))
             .withScopes((scope) => scope.parkPrivacy(ctx.auth.user.id))
 
         if(ctx.request.input('keyword')){
@@ -106,13 +106,13 @@ class ParkRepo extends BaseRepo {
 
     async hostParks(userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkMeta(userId))
+            .withScopes((scope) => scope.parkRelations(userId))
             .where({ userId })
     }
 
     async myParks(userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkMeta(userId))
+            .withScopes((scope) => scope.parkRelations(userId))
             .whereHas('members', (memberQuery) => {
                 memberQuery.where('member_id', userId)
             })
@@ -179,7 +179,7 @@ class ParkRepo extends BaseRepo {
 
     async parkDetails(id,userId) {
         let row = this.model.query()
-            .withScopes((scope) => scope.parkMeta(userId))
+            .withScopes((scope) => scope.parkRelations(userId))
             .where('id',id).first()
         return row
     }

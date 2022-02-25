@@ -57,7 +57,7 @@ export default class Park extends CommonModel {
 	})
 	public attachments: HasMany<typeof Attachment>
 
-	public static parkMeta = scope((query:Builder,userId) => {
+	public static parkRelations = scope((query:Builder,userId) => {
 		return query.preload('attachments')
 			.preload('parkRequests',(requestQuery) =>{
 			 	requestQuery.where('member_id',userId)
