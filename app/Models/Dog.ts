@@ -57,7 +57,7 @@ export default class Dog extends CommonModel {
 	@belongsTo(() => Breed)
 	public breed: BelongsTo<typeof Breed>
 
-	public static dogMeta = scope((query:Builder) => {
+	public static dogRelations = scope((query:Builder) => {
 		return query
 			.preload('attachments')
 			.preload('size')
