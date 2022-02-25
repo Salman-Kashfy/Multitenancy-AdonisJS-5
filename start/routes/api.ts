@@ -114,14 +114,20 @@ Route.group(() => {
 
         /*
         |--------------------------------------------------------------------------
-        | Post and Alert API Routes
+        | Post API Routes
         |--------------------------------------------------------------------------
         */
         Route.post('posts','Api/PostController.createPost')
         Route.put('posts/:id','Api/PostController.updatePost')
         Route.delete('posts/:id','Api/PostController.destroy')
 
-        Route.post('alert','Api/PostController.createAlert')
+        /*
+        |--------------------------------------------------------------------------
+        | Alert API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('alerts','Api/PostController.createAlert')
+        Route.put('alerts/:id','Api/PostController.updateAlert')
 
     }).middleware('auth')
 

@@ -1,8 +1,10 @@
 import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import PostRepo from "App/Repos/PostRepo";
-import AddPostValidator from "App/Validators/AddPostValidator";
+import CreatePostValidator from "App/Validators/CreatePostValidator";
 import EditPostValidator from "App/Validators/EditPostValidator";
+import CreateAlertValidator from "App/Validators/CreateAlertValidator";
+import EditAlertValidator from "App/Validators/EditAlertValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 
 export default class PostController extends ApiBaseController {
@@ -13,7 +15,7 @@ export default class PostController extends ApiBaseController {
 
     async createPost({request,auth}: HttpContextContract) {
         const {user}:any = auth
-        await request.validate(AddPostValidator)
+        await request.validate(CreatePostValidator)
         const input = request.only(this.repo.model.fillables())
         let row = await this.repo.createPost({...input,userId:user.id}, request)
         return this.apiResponse('Record Added Successfully', row)
@@ -29,7 +31,7 @@ export default class PostController extends ApiBaseController {
             return this.globalResponse(ctx.response,false,'Invalid attachment!',null,403)
         }
         const input = ctx.request.only(this.repo.model.fillables())
-        const row = await this.repo.updatePost(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
@@ -40,6 +42,28 @@ export default class PostController extends ApiBaseController {
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.POST})
         await this.repo.delete(ctx.request.param('id'))
         return this.apiResponse('Record Deleted Successfully')
+    }
+
+    async createAlert({request,auth}: HttpContextContract){
+        const {user}:any = auth
+        await request.validate(CreateAlertValidator)
+        const input = request.only(this.repo.model.fillables())
+        let row = await this.repo.createAlert({...input,userId:user.id}, request)
+        return this.apiResponse('Record Added Successfully', row)
+    }
+
+    async updateAlert(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
+        const {user}:any = ctx.auth
+        await ctx.request.validate(EditAlertValidator)
+        if(! await this.repo.belonging(ctx)){
+            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+        }
+        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
+            return this.globalResponse(ctx.response,false,'Invalid attachment!',null,403)
+        }
+        const input = ctx.request.only(this.repo.model.fillables())
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        return this.apiResponse('Record Updated Successfully', row)
     }
 
 }

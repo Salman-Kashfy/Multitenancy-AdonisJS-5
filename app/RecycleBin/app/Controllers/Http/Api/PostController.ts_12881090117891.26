@@ -1,7 +1,7 @@
 import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import PostRepo from "App/Repos/PostRepo";
-import AddPostValidator from "App/Validators/AddPostValidator";
+import CreatePostValidator from "App/Validators/CreatePostValidator";
 import Attachment from "App/Models/Attachment";
 
 
@@ -12,14 +12,14 @@ export default class PostController extends ApiBaseController {
     }
 
     async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
-        await ctx.request.validate(AddPostValidator)
+        await ctx.request.validate(CreatePostValidator)
         let input = ctx.request.only(this.repo.fillables())
         let row = await PostRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
-        await ctx.request.validate(AddPostValidator)
+        await ctx.request.validate(CreatePostValidator)
         return super.update(ctx, instanceType, mediaType)
     }
 

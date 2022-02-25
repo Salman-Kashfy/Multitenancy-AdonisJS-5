@@ -2,18 +2,15 @@ import {schema, rules} from '@ioc:Adonis/Core/Validator'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import BaseValidator from "App/Validators/BaseValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
-import PostRepo from 'App/Repos/PostRepo'
 import ParkRepo from 'App/Repos/ParkRepo'
 
-export default class AddPostValidator extends BaseValidator {
+export default class CreatePostValidator extends BaseValidator {
     constructor(protected ctx: HttpContextContract) {
         super()
     }
     public schema = schema.create({
 		description: schema.string.optional({trim:true},[rules.maxLength(250)]),
 		anonymous: schema.boolean([]),
-		type: schema.enum(Object.values(PostRepo.model.TYPE)),
-		alert_type: schema.enum(Object.values(PostRepo.model.ALERT_TYPE)),
 		pin_profile: schema.boolean(),
 		location: schema.string.optional({trim:true},[rules.maxLength(200),]),
 		latitude: schema.number.optional([]),
