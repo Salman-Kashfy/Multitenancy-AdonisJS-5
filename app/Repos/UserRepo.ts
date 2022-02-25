@@ -19,7 +19,7 @@ class UserRepo extends BaseRepo {
         if(typeof user !== "object"){
             user = await this.model.find(user)
         }
-        let business = await user.related('business').query().first()
+        let business = await user.related('business').query().preload('categories').first()
         if(business){
             business = business.toJSON()
             business.attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
