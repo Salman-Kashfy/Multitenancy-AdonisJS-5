@@ -129,6 +129,15 @@ Route.group(() => {
         Route.post('alerts','Api/PostController.createAlert')
         Route.put('alerts/:id','Api/PostController.updateAlert')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Post Criteria API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.group(() =>{
+            Route.resource('post-criteria','Api/PostCriterionController')
+        }).middleware('admin')
+
     }).middleware('auth')
 
 }).prefix('/api')
