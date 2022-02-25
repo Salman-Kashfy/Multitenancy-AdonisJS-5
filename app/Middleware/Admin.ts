@@ -1,7 +1,7 @@
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import Role from 'App/Models/Role'
 import User from 'App/Models/User'
-import ExceptionWithCodeException from "App/Exceptions/ExceptionWithCodeException";
+import ExceptionWithCode from "App/Exceptions/ExceptionWithCode";
 
 export default class Admin {
     public async handle({auth}: HttpContextContract, next: () => Promise<void>) {
@@ -12,7 +12,7 @@ export default class Admin {
         }).where('id', user.id).first()
 
         if (!exists) {
-            throw new ExceptionWithCodeException("Permission Denied", 403)
+            throw new ExceptionWithCode("Permission Denied", 403)
         }
         await next()
 

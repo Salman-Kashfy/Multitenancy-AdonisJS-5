@@ -69,6 +69,4 @@ export default class Post extends CommonModel {
     })
     public sharedPosts: ManyToMany<typeof Park>
 
-
-
 }

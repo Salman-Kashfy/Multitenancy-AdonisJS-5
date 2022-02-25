@@ -6,6 +6,7 @@ import EditPostValidator from "App/Validators/EditPostValidator";
 import CreateAlertValidator from "App/Validators/CreateAlertValidator";
 import EditAlertValidator from "App/Validators/EditAlertValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
+import ParkRepo from 'App/Repos/ParkRepo'
 
 export default class PostController extends ApiBaseController {
 
@@ -17,6 +18,8 @@ export default class PostController extends ApiBaseController {
         const {user}:any = auth
         await request.validate(CreatePostValidator)
         const input = request.only(this.repo.model.fillables())
+        const hostParks = await ParkRepo.hostParks(user.id)
+        await this.repo.applyPostLimits(user,request.input('share_posts'),hostParks)
         let row = await this.repo.createPost({...input,userId:user.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }

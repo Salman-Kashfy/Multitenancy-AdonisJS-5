@@ -2,6 +2,11 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import Post from "App/Models/Post";
 import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
+import { DateTime } from 'luxon'
+import Role from 'App/Models/Role'
+import Database from '@ioc:Adonis/Lucid/Database'
+import PostCriterion from 'App/Models/PostCriterion'
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 class PostRepo extends BaseRepo {
     model
@@ -121,6 +126,43 @@ class PostRepo extends BaseRepo {
             }
         }
         return row
+    }
+
+    async countCurrentMonthPosts(userId){
+        const startDate = DateTime.local().startOf('month').toFormat('yyyy-MM-dd')
+        const endDate = DateTime.local().endOf('month').toFormat('yyyy-MM-dd')
+        let results = await this.model.query()
+            .select(Database.raw('COUNT(id) as count'))
+            .where('user_id',userId)
+            .whereBetween('created_at',[startDate,endDate])
+            .withTrashed()
+            .first()
+        return results.$extras.count
+    }
+
+    async applyPostLimits(user,shareParkIds,hostPark){
+        const userRoles = await user.related('roles').query()
+        const userRoleIds = userRoles.map(function(role) {
+            return role.id;
+        });
+        const roleId = userRoleIds[0]
+        const userSubscription = await user.related('subscription').query().first()
+        const postCriteria = await PostCriterion.query().where('role_id',roleId).where('subscription_id',userSubscription.id).first()
+        if(!postCriteria){ return }
+
+        const hostParkIds = hostPark.map(function(park) {
+            return park.id;
+        });
+        const count = await this.countCurrentMonthPosts(user.id)
+        if(userRoleIds.includes(Role.PARENT)){
+            if(postCriteria.postsPerMonth !== -1 && count>=postCriteria.postsPerMonth){
+                throw new ExceptionWithCode(`${userSubscription.name} for parent account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`,403)
+            }
+        }else if(userRoleIds.includes(Role.BUSINESS)){
+            if(postCriteria.postsPerMonth !== -1 && count>=postCriteria.postsPerMonth && shareParkIds.sort().toString() !== hostParkIds.sort().toString()){
+                throw new ExceptionWithCode(`${userSubscription.name} for business account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`,403)
+            }
+        }
     }
 }
 

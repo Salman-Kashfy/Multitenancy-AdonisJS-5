@@ -13,7 +13,7 @@ import {HttpContextContract} from "@ioc:Adonis/Core/HttpContext";
 | new ExceptionWithCodeException('message', 500, 'E_RUNTIME_EXCEPTION')
 |
 */
-export default class ExceptionWithCodeException extends Exception {
+export default class ExceptionWithCode extends Exception {
     message
     status
 
