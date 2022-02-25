@@ -219,8 +219,7 @@ export default class AuthController extends ApiBaseController{
         if (socialAccount) {
             user = await UserRepo.find(socialAccount.user_id)
         }
-        let fillables:any = UserRepo.fillables()
-        let input = request.only(fillables)
+        let input = request.only(UserRepo.model.fillables)
         if (!user) {
             input.password = Math.random().toString(36).substring(2, 15)
             input.email_verified = 1;
