@@ -19,9 +19,9 @@ export default class BlockedUserController extends ApiBaseController {
 
     async blockOrUnblock({request,auth}: HttpContextContract) {
         await request.validate(BlockedUserValidator)
-        const {user}:any = auth
+        const {user} = auth
         let input = request.only(this.repo.model.fillables())
-        const blockedDetails = {...input,user_id:user.id}
+        const blockedDetails = {...input,user_id:user?.id}
         if (request.input('unblock') == 1) {
             await BlockedUserRepo.model.query().where(blockedDetails).delete()
             return this.apiResponse('UnBlocked Successfully', true)

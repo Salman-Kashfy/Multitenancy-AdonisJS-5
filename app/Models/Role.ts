@@ -7,10 +7,6 @@ export default class Role extends BaseModel {
     static PARENT = 2;
     static BUSINESS = 3;
 
-    static select(){
-        return ['id','name','display_name']
-    }
-
     @column({ isPrimary: true })
     public id: number
 

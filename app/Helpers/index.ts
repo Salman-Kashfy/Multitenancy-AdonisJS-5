@@ -420,5 +420,5 @@ export default {
             payload.notification_id = notification.id
             this.sendNotification(constants.APP_NAME, msg, payload, devices)
         }
-    },
+    }
 }

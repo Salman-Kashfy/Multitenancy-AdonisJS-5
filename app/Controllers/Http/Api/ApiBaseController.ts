@@ -63,12 +63,4 @@ export default class ApiBaseController extends BaseController {
             data: data || null,
         }
     }
-    globalResponse(response,status, message, data:any = null, code:number = 200) {
-        let object:any = {
-            status: status,
-            message: message || "",
-            data: data ? typeof data.toJSON != 'undefined' ? data.toJSON() : data : null
-        }
-        return response.status(code).send(object)
-    }
 }

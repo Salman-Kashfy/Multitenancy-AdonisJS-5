@@ -4,7 +4,6 @@ import CategoryRepo from "App/Repos/CategoryRepo";
 import CategoryValidator from "App/Validators/CategoryValidator";
 import Attachment from "App/Models/Attachment";
 
-
 export default class CategoryController extends ApiBaseController {
 
     constructor() {
@@ -21,6 +20,11 @@ export default class CategoryController extends ApiBaseController {
     async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
         await ctx.request.validate(CategoryValidator)
         return super.update(ctx, instanceType, mediaType)
+    }
+
+    async all(){
+        const size = await this.repo.all()
+        return this.apiResponse('Record fetched Successfully', size)
     }
 
 }

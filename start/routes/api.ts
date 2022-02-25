@@ -37,6 +37,7 @@ Route.group(() => {
         | User Related API Routes
         |--------------------------------------------------------------------------
         */
+        Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
@@ -90,8 +91,12 @@ Route.group(() => {
         Route.delete('parks/unjoin','Api/ParkController.unjoin')
         Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
         Route.group(() =>{
-            Route.resource('parks','Api/ParkController')
+            Route.post('parks','Api/ParkController.store')
+            Route.put('parks/:id','Api/ParkController.update')
+            Route.delete('parks/:id','Api/ParkController.destroy')
         }).middleware('premium')
+        Route.get('parks','Api/ParkController.index')
+        Route.get('parks/:id','Api/ParkController.show')
         Route.get('park-requests','Api/ParkRequestController.index')
 
         /*

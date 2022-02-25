@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import ParkBlockedUser from "App/Models/ParkBlockedUser";
-import User from 'App/Models/User'
 
 class ParkBlockedUserRepo extends BaseRepo {
     model
@@ -14,9 +13,7 @@ class ParkBlockedUserRepo extends BaseRepo {
     async index(ctx){
         let rows = await this.model.query()
             .where('park_id',ctx.request.param('id'))
-            .preload('user',(userQuery) =>{
-                userQuery.select(...User.select())
-            })
+            .preload('user')
         rows = rows.map((user) => {
             return user.serialize({
                 fields: {

@@ -1,7 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
-import Role from 'App/Models/Role';
-import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface';
 import Subscription from 'App/Models/Subscription'
 
 class AuthRepo extends BaseRepo {
@@ -14,17 +12,16 @@ class AuthRepo extends BaseRepo {
     }
 
     async beforeSignup(user){
-        let response:GlobalResponseInterface = {
-            status:true
-        }
+        let status = true,message = ""
         if(user){
             if (user.emailVerified) {
-                response = { status:false, message: 'Email already exist.' }
+                status = false
+                message = 'Email already exist.'
             }else{
                 await user.forceDelete()
             }
         }
-        return response
+        return {status,message}
     }
 
     async createParent(input){
@@ -44,16 +41,9 @@ class AuthRepo extends BaseRepo {
     }
 
     async login(input,user,auth){
-        let response:GlobalResponseInterface
-        try {
-            const token = await auth.use('api').attempt(input.email, input.password)
-            const role = await user.related('roles').query().select(...Role.select()).first()
-            response = { status:true, message: 'Logged in successfully !',data:{user,token,role} }
-        } catch {
-            return { status:false, message: 'Invalid email or password.' }
-        }
-
-        return response
+        const token = await auth.use('api').attempt(input.email, input.password)
+        const role = await user.related('roles').query().first()
+        return { status:true, message: 'Logged in successfully !',data:{user,token,role} }
     }
 }
 

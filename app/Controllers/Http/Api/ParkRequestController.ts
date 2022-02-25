@@ -15,7 +15,7 @@ export default class ParkRequestController extends ApiBaseController {
         const orderByColumn = 'created_at'
         const orderByValue = 'desc'
         const category = await this.repo.index(orderByColumn,orderByValue,page,perPage,ctx);
-        return this.globalResponse(ctx.response,true,'Record Fetched Successfully',category)
+        return this.apiResponse('Record Fetched Successfully',category)
     }
 
 }

@@ -20,8 +20,8 @@ export default class User extends CommonModel {
 
     public static fillables = ['name','username','email','bio','phone','password','zip','image','push_notify']
 
-    public static select(){
-        return ['id','name','username','image']
+    static PREDEFINED_USERS = {
+        ADMIN:1
     }
 
     @column({ isPrimary: true })

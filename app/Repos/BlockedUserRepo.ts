@@ -2,7 +2,6 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import BlockedUser from "App/Models/BlockedUser";
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import constants from 'Config/constants'
-import User from 'App/Models/User'
 
 class BlockedUserRepo extends BaseRepo {
     model
@@ -20,9 +19,7 @@ class BlockedUserRepo extends BaseRepo {
     ) {
         let query = this.model.query()
         query = query.where('user_id', ctx.auth?.user?.id)
-        await query.preload('user',(userQuery) =>{
-            userQuery.select(...User.select())
-        })
+        await query.preload('user')
         let blockedUsers = await query.paginate(page, perPage)
         blockedUsers = blockedUsers.serialize({
             fields: {

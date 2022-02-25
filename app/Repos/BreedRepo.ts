@@ -12,7 +12,7 @@ class BreedRepo extends BaseRepo {
     }
 
     async all(){
-        return this.model.query().select(...Breed.select()).orderBy(constants.ORDER_BY_COLUMN,'asc')
+        return this.model.query().orderBy(constants.ORDER_BY_COLUMN,'asc')
     }
 }
 

@@ -4,6 +4,12 @@ import User from 'App/Models/User'
 import Park from 'App/Models/Park'
 
 export default class ParkRequest extends CommonModel {
+
+    static TYPE = {
+        REQUEST:10,
+        INVITE:20
+    }
+
     @column({ isPrimary: true })
     public id: number
 
@@ -15,6 +21,9 @@ export default class ParkRequest extends CommonModel {
 
     @column()
     public memberId: number
+
+    @column()
+    public type: number
 
     @belongsTo(() => User, {
         foreignKey: 'memberId'

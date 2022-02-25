@@ -21,10 +21,6 @@ export default class Dog extends CommonModel {
 		return ['name','description','breed_id','gender_id','size_id','dob']
 	}
 
-	static select() {
-		return ['id','name','description','dob']
-	}
-
     @column()
     public id: number
 	@column()
@@ -61,21 +57,13 @@ export default class Dog extends CommonModel {
 	@belongsTo(() => Breed)
 	public breed: BelongsTo<typeof Breed>
 
-	public static dogMeta = scope((query:Builder) => {
+	public static dogRelations = scope((query:Builder) => {
 		return query
 			.preload('attachments')
-			.preload('size',(sizeQuery) =>{
-				sizeQuery.select(...Size.select())
-			})
-			.preload('gender',(genderQuery) =>{
-				genderQuery.select(...Gender.select())
-			})
-			.preload('breed',(breedQuery) =>{
-				breedQuery.select(...Breed.select())
-			})
-			.preload('user',(userQuery) =>{
-				userQuery.select(...User.select())
-			})
+			.preload('size')
+			.preload('gender')
+			.preload('breed')
+			.preload('user')
 	})
 
 }

@@ -14,7 +14,7 @@ class DogRepo extends BaseRepo {
     }
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
-        let query = this.model.query().withScopes((scope) => scope.dogMeta())
+        let query = this.model.query().withScopes((scope) => scope.dogRelations())
 
         if(ctx.request.input('keyword')){
             query.where((dogQuery) =>{
@@ -32,12 +32,7 @@ class DogRepo extends BaseRepo {
             query.where('gender_id',ctx.request.input('gender_id'))
         }
 
-        let dogs = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
-        return dogs.serialize({
-            fields: {
-                pick: [...this.model.select()]
-            }
-        })
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 
     async store(input, request: RequestContract) {
@@ -74,17 +69,9 @@ class DogRepo extends BaseRepo {
     }
 
     async myDogs(userId){
-        let dogs = await this.model.query()
-            .withScopes((scope) => scope.dogMeta())
+        return this.model.query()
+            .withScopes((scope) => scope.dogRelations())
             .where({userId})
-
-        dogs = dogs.map((post) => post.serialize({
-            fields: {
-                pick: [...this.model.select()]
-            }
-        }))
-
-        return dogs
     }
 }
 
