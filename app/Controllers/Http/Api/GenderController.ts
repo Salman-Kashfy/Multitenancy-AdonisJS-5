@@ -23,7 +23,7 @@ export default class GenderController extends ApiBaseController {
     }
 
     async all(ctx){
-        const gender = await GenderRepo.all(ctx)
+        const gender = await this.repo.all(ctx)
         return this.apiResponse('Record fetched Successfully', gender)
     }
 

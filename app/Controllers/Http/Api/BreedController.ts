@@ -23,7 +23,7 @@ export default class BreedController extends ApiBaseController {
     }
 
     async all(ctx){
-        const breed = await BreedRepo.all(ctx)
+        const breed = await this.repo.all(ctx)
         return this.apiResponse('Record fetched Successfully', breed)
     }
 

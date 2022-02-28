@@ -23,7 +23,7 @@ export default class SizeController extends ApiBaseController {
     }
 
     async all(ctx){
-        const size = await SizeRepo.all(ctx)
+        const size = await this.repo.all(ctx)
         return this.apiResponse('Record fetched Successfully', size)
     }
 
