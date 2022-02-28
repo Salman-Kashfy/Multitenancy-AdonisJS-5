@@ -10,6 +10,7 @@ import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import ParkMemberRepo from 'App/Repos/ParkMemberRepo'
 import ParkRequestRepo from 'App/Repos/ParkRequestRepo'
 import constants from 'Config/constants'
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 export default class ParkController extends ApiBaseController {
 
@@ -30,10 +31,10 @@ export default class ParkController extends ApiBaseController {
         const {user}:any = ctx.auth
         await ctx.request.validate(EditParkValidator)
         if(! await this.repo.belonging(ctx)){
-            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
-            return this.globalResponse(ctx.response,false,'Invalid attachment!',null,403)
+            throw new ExceptionWithCode('Invalid attachment!',403)
         }
         const input = ctx.request.only(this.repo.model.fillables())
         const row = await this.repo.update(ctx.request.param('id'),input, ctx.request)
@@ -42,7 +43,7 @@ export default class ParkController extends ApiBaseController {
 
     async destroy(ctx:HttpContextContract){
         if(! await this.repo.belonging(ctx)){
-            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.PARK})
         await this.repo.delete(ctx.request.param('id'))
@@ -50,42 +51,42 @@ export default class ParkController extends ApiBaseController {
     }
 
     async hostParks({auth}:HttpContextContract){
-        const {user}:any = auth
-        const row = await this.repo.hostParks(user.id)
+        const {user} = auth
+        const row = await this.repo.hostParks(user?.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
     async myParks({auth}:HttpContextContract){
-        const {user}:any = auth
-        const row = await this.repo.myParks(user.id)
+        const {user} = auth
+        const row = await this.repo.myParks(user?.id)
         return this.apiResponse('Record Fetched Successfully',row)
     }
 
-    async join({ request,response,auth }: HttpContextContract){
-        const {user}:any = auth
+    async join({ request,auth }: HttpContextContract){
+        const {user} = auth
         const input = await request.validate(JoinParkValidator)
         const park = await this.repo.find(input.park_id)
 
         /*
         * Check if user is already a park member
         * */
-        const member = await ParkMemberRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
+        const member = await ParkMemberRepo.model.query().where({parkId:park.id,memberId:user?.id}).first()
         if(member){
-            return this.globalResponse(response,false,"Already a member!")
+            throw new ExceptionWithCode("Already a member!",200)
         }
 
         /*
         * Check if user has a request already pending
         * */
-        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:user.id}).first()
+        const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:user?.id}).first()
         if(parkRequest){
-            return this.globalResponse(response,false,"Request already sent!")
+            throw new ExceptionWithCode("Request already sent!",200)
         }
-        const result = await this.repo.join(park,user.id)
-        return this.globalResponse(response,result.status,result.message)
+        const result = await this.repo.join(park,user?.id)
+        return this.apiResponse(result.message)
     }
 
-    async acceptDeclineRequest({request,response}: HttpContextContract){
+    async acceptDeclineRequest({request}: HttpContextContract){
         const input = await request.validate(AcceptDeclineParkRequestValidator)
         const park = await this.repo.find(input.park_id)
 
@@ -94,43 +95,43 @@ export default class ParkController extends ApiBaseController {
         * */
         const parkRequest = await ParkRequestRepo.model.query().where({parkId:park.id,memberId:input.member_id}).first()
         if(!parkRequest){
-            return this.globalResponse(response,false,"Request not found",null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
 
         /*
         * Accept/Decline join request
         * */
         const result = await this.repo.acceptDeclineRequest(parkRequest,input.accept)
-        return this.globalResponse(response,result.status,result.message)
+        return this.apiResponse(result.message)
     }
 
-    async unjoin({ request,response,auth }: HttpContextContract){
-        const {user}:any = auth
+    async unjoin({ request,auth }: HttpContextContract){
+        const {user} = auth
         const input = await request.validate(JoinParkValidator)
-        await this.repo.unjoin(input.park_id,user.id)
-        return this.globalResponse(response,true,"Park left Successfully!")
+        await this.repo.unjoin(input.park_id,user?.id)
+        return this.apiResponse("Park left Successfully!")
     }
 
-    async block({ request,response }: HttpContextContract){
+    async block({ request }: HttpContextContract){
         const input = await request.validate(BlockParkMemberValidator)
         const park = await this.repo.find(input.park_id)
         await this.repo.block(park,input.user_id)
-        return this.globalResponse(response,true,"User blocked Successfully!")
+        return this.apiResponse("User blocked Successfully!")
     }
 
     async getBlockList(ctx: HttpContextContract){
         if(! await this.repo.belonging(ctx)){
-            return this.globalResponse(ctx.response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         const res = await this.repo.getBlockList(ctx.request.param('id'))
-        return this.globalResponse(ctx.response,true,"Record Fetched Successfully!",res)
+        return this.apiResponse("Record Fetched Successfully!",res)
     }
 
-    async show({ request,response,auth }: HttpContextContract) {
-        const {user}:any = auth
-        const res = await this.repo.parkDetails(request.param('id'),user.id)
+    async show({ request,auth }: HttpContextContract) {
+        const {user} = auth
+        const res = await this.repo.parkDetails(request.param('id'),user?.id)
         if(!res){
-            return this.globalResponse(response,false,'Record not found!',null,404)
+            throw new ExceptionWithCode('Record not found!',404)
         }
         return this.apiResponse('Record fetched successfully!', res)
     }
@@ -141,7 +142,7 @@ export default class ParkController extends ApiBaseController {
         const orderByColumn = ctx.request.input('order-column', 'title')
         const orderByValue = ctx.request.input('order', 'asc')
         const park = await this.repo.index(orderByColumn,orderByValue,page,perPage,ctx);
-        return this.globalResponse(ctx.response,true,'Record Fetched Successfully',park)
+        return this.apiResponse('Record Fetched Successfully',park)
     }
 
 }

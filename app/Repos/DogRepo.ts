@@ -14,7 +14,7 @@ class DogRepo extends BaseRepo {
     }
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
-        let query = this.model.query().withScopes((scope) => scope.dogMeta())
+        let query = this.model.query().withScopes((scope) => scope.dogRelations())
 
         if(ctx.request.input('keyword')){
             query.where((dogQuery) =>{
@@ -70,7 +70,7 @@ class DogRepo extends BaseRepo {
 
     async myDogs(userId){
         return this.model.query()
-            .withScopes((scope) => scope.dogMeta())
+            .withScopes((scope) => scope.dogRelations())
             .where({userId})
     }
 }

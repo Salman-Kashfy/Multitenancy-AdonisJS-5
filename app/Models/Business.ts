@@ -5,7 +5,7 @@ import Attachment from 'App/Models/Attachment'
 
 export default class Business extends CommonModel {
 
-	public static fillables = ['business_name','website','location','latitude','longitude','city','state','zip']
+	public static fillables = ['business_name','description','website','location','latitude','longitude','city','state','zip']
 
     @column()
     public id: number

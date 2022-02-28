@@ -34,9 +34,9 @@ class OtpRepo extends BaseRepo {
     async verifyEmail(input:VerifyEmailInterface){
         const time:any = this.getOtpTTL();
         const otp = await this.model.query().where('email', input.email).where('code', input.code).where('created_at', '>=',time).orderBy('created_at','desc').first();
-        let response:GlobalResponseInterface = { status:true,data:otp }
+        let response = { status:true,message:'',data:otp }
         if(!otp){
-            response = {status:false,message:'OTP not found or is expired.'}
+            response = {status:false,message:'OTP not found or is expired.', data:{}}
         }
         return response
     }
@@ -47,7 +47,7 @@ class OtpRepo extends BaseRepo {
         const otp = await this.model.query().where(input.via, value).where('type', input.type).where('code', input.code).where('created_at', '>=',time).orderBy('created_at','desc').first();
         let response:GlobalResponseInterface = { status:true,message:"OTP is valid.",data:otp }
         if(!otp){
-            response = {status:false,message:'OTP not found or is expired.'}
+            response = {status:false,message:'OTP not found or is expired.',data:{}}
         }
         return response
     }

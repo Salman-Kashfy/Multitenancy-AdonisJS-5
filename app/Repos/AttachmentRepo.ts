@@ -13,7 +13,7 @@ class AttachmentRepo extends BaseRepo {
         this.model = Attachment
     }
 
-    async checkAllBelonging(attachmentId,userId:number,matchColumn:string = 'user_id'){
+    async checkAllBelonging(attachmentId,userId,matchColumn:string = 'user_id'){
         if(typeof attachmentId === "number"){
             attachmentId = [attachmentId]
         }

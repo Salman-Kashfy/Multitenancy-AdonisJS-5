@@ -2,7 +2,6 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import User from "App/Models/User";
 import Attachment from "App/Models/Attachment";
 import Database from '@ioc:Adonis/Lucid/Database'
-import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import AppInvitation from "App/Mailers/AppInvitation";
 import constants from 'Config/constants'
 import Friend from 'App/Models/Friend'
@@ -20,11 +19,10 @@ class UserRepo extends BaseRepo {
         if(typeof user !== "object"){
             user = await this.model.find(user)
         }
-        let business = await user.related('business').query().first()
+        let business = await user.related('business').query().preload('categories').first()
         if(business){
             business = business.toJSON()
-            const attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
-            business.attachment = attachment
+            business.attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
             user = {...user.toJSON(),business}
         }
         return user
@@ -72,9 +70,7 @@ class UserRepo extends BaseRepo {
     }
 
     async invite(input,user){
-        let result:GlobalResponseInterface = {
-            status:true
-        }
+        let result = { status:true,message:'' }
         if(input.email){
             const row = await this.model.query().select(Database.raw('COUNT(id) as count')).where('email',input.email).first()
             if(row.count){
