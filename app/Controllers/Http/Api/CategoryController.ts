@@ -23,8 +23,8 @@ export default class CategoryController extends ApiBaseController {
     }
 
     async all(){
-        const size = await this.repo.all()
-        return this.apiResponse('Record fetched Successfully', size)
+        const categories = await this.repo.all()
+        return this.apiResponse('Record fetched Successfully', categories)
     }
 
 }
