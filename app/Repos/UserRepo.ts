@@ -4,6 +4,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import AppInvitation from "App/Mailers/AppInvitation";
 import constants from 'Config/constants'
 import Friend from 'App/Models/Friend'
+import Role from 'App/Models/Role'
 
 class UserRepo extends BaseRepo {
     model
@@ -18,11 +19,15 @@ class UserRepo extends BaseRepo {
         if(typeof user !== "object"){
             user = await this.model.find(user)
         }
-        user = await user.related('business').query()
-            .preload('categories')
-            .preload('attachments')
-            .first()
-        if(user){
+        const userRoles = await user.related('roles').query()
+        const userRoleIds = userRoles.map(function(role) {
+            return role.id;
+        });
+        if(userRoleIds.includes(Role.BUSINESS)){
+            user = await user.related('business').query()
+                .preload('categories')
+                .preload('attachments')
+                .first()
             user = user.toJSON()
         }
         return user
