@@ -9,6 +9,7 @@ import SharePostValidator from "App/Validators/SharePostValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import ParkRepo from 'App/Repos/ParkRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import constants from 'Config/constants'
 
 export default class PostController extends ApiBaseController {
 
@@ -89,6 +90,15 @@ export default class PostController extends ApiBaseController {
         await this.repo.filterOriginal(ctx.request.param('id'))
         await this.repo.sharePost(ctx.request.param('id'),{...input,user_id:user?.id})
         return this.apiResponse('Post Shared Successfully !')
+    }
+
+    async getShareList(ctx:HttpContextContract){
+        const page = ctx.request.input('page', 1)
+        const perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        const shares = await this.repo.getShareList(orderByColumn,orderByValue,page,perPage,ctx);
+        return this.apiResponse('Record Fetched Successfully',shares)
     }
 
 }

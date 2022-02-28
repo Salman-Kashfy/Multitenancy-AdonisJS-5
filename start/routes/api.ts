@@ -124,6 +124,7 @@ Route.group(() => {
         Route.delete('posts/:id','Api/PostController.destroy')
         Route.get('posts/park-quota/:parkId','Api/PostController.parkQuota')
         Route.post('posts/share/:id','Api/PostController.sharePost')
+        Route.get('posts/share/:id','Api/PostController.getShareList')
 
         /*
         |--------------------------------------------------------------------------
