@@ -65,13 +65,9 @@ export default class Park extends CommonModel {
 	})
 
 	public static parkPrivacy = scope((query:Builder,userId) => {
-		return query.whereNotExists((builder) =>{
-            builder.select('*').from('park_blocked_users')
-            /*
-            * IF current user is blocked in park
-            * */
-            .whereRaw(`park_blocked_users.user_id = ${userId} AND parks.id = park_blocked_users.park_id`)
-        })
+		return query.whereDoesntHave('blockedUsers',(builder) =>{
+			builder.where('id',userId)
+		})
 	})
 
 	@manyToMany(() => User, {
