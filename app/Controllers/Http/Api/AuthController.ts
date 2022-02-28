@@ -15,6 +15,7 @@ import UserRepo from "App/Repos/UserRepo";
 import RoleRepo from "App/Repos/RoleRepo";
 import ForgotPasswordValidator from "App/Validators/ForgotPasswordValidator";
 import VerifyOtpValidator from "App/Validators/VerifyOtpValidator";
+import LogoutValidator from "App/Validators/LogoutValidator";
 import SocialLoginValidator from "App/Validators/SocialLoginValidator";
 import SocialAccountRepo from "App/Repos/SocialAccountRepo";
 import RegisterBusinessValidator from 'App/Validators/RegisterBusinessValidator'
@@ -22,15 +23,19 @@ import BusinessRepo from 'App/Repos/BusinessRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 export default class AuthController extends ApiBaseController{
+    
+    constructor() {
+        super(AuthRepo)
+    }
 
     public async signupParent( { request }: HttpContextContract ){
         let input = await request.validate(RegisterParentValidator)
-        let user = await AuthRepo.findByEmail(input.email)
+        let user = await this.repo.findByEmail(input.email)
 
         /*
         * Verifications before sign-up
         * */
-        const validate = await AuthRepo.beforeSignup(user)
+        const validate = await this.repo.beforeSignup(user)
         if(!validate.status){
             throw new ExceptionWithCode(validate.message,200)
         }
@@ -38,7 +43,7 @@ export default class AuthController extends ApiBaseController{
         /*
         * Create Parent User
         * */
-        user = await AuthRepo.createParent(request.only(UserRepo.model.fillables))
+        user = await this.repo.createParent(request.only(UserRepo.model.fillables))
         if(!user){
             throw new ExceptionWithCode('Failed to register user.',200)
         }
@@ -73,7 +78,7 @@ export default class AuthController extends ApiBaseController{
 
     public async resendSignupOtp( { request }: HttpContextContract ) {
         let input = await request.validate(SendOtpValidator)
-        const user = await AuthRepo.findByEmail(input.email)
+        const user = await this.repo.findByEmail(input.email)
         if(!user){
             throw new ExceptionWithCode('User not found!',200)
         }
@@ -97,7 +102,7 @@ export default class AuthController extends ApiBaseController{
 
     public async verifyEmail( { request }: HttpContextContract ) {
         const input = await request.validate(VerifyEmailValidator)
-        const user = await AuthRepo.findByEmail(input.email)
+        const user = await this.repo.findByEmail(input.email)
         if (!user) {
             throw new ExceptionWithCode('User not found!',200)
         }
@@ -128,7 +133,7 @@ export default class AuthController extends ApiBaseController{
     public async login( { auth, request }: HttpContextContract ){
 
         const input = await request.validate(LoginValidator)
-        let user = await AuthRepo.findByEmail(input.email)
+        let user = await this.repo.findByEmail(input.email)
         if (!user) {
             throw new ExceptionWithCode('User not found!',200)
         }
@@ -136,7 +141,7 @@ export default class AuthController extends ApiBaseController{
         /*
         * Verifications before login
         * */
-        const validate = await AuthRepo.login(input,user,auth)
+        const validate = await this.repo.login(input,user,auth)
 
         /* Create User Device */
         const device = {
@@ -152,7 +157,7 @@ export default class AuthController extends ApiBaseController{
     public async forgotPassword({request}: HttpContextContract) {
 
         const input = await request.validate(ForgotPasswordValidator)
-        let user = await AuthRepo.findByEmail(input.email)
+        let user = await this.repo.findByEmail(input.email)
         if (!user) {
             throw new ExceptionWithCode('User not found!',200)
         }
@@ -189,7 +194,7 @@ export default class AuthController extends ApiBaseController{
     public async resetPassword( { request }: HttpContextContract ){
 
         const input = await request.validate(ResetPasswordValidator)
-        let user = await AuthRepo.findByEmail(input.email)
+        let user = await this.repo.findByEmail(input.email)
         if (!user) {
             throw new ExceptionWithCode('User not found!',200)
         }
@@ -207,8 +212,9 @@ export default class AuthController extends ApiBaseController{
         return this.apiResponse("Password updated successfully !",{user:user})
     }
 
-    public async logout({auth}:HttpContextContract){
-        await auth.use('api').revoke()
+    public async logout({request,auth}:HttpContextContract){
+        const input = await request.validate(LogoutValidator)
+        await this.repo.logout(input,auth)
         return this.apiResponse('Logged out successfully !',{revoked:true})
     }
 
@@ -255,11 +261,11 @@ export default class AuthController extends ApiBaseController{
 
     public async signupBusiness({request}: HttpContextContract){
         const input = await request.validate(RegisterBusinessValidator)
-        let user = await AuthRepo.findByEmail(input.email)
+        let user = await this.repo.findByEmail(input.email)
         /*
         * Verifications before sign-up
         * */
-        const validate = await AuthRepo.beforeSignup(user)
+        const validate = await this.repo.beforeSignup(user)
         if(!validate.status){
             throw new ExceptionWithCode(validate.message,200)
         }
@@ -267,7 +273,7 @@ export default class AuthController extends ApiBaseController{
         /*
         * Create Business User
         * */
-        user = await AuthRepo.createBusiness(request.only(UserRepo.model.fillables),request.only(BusinessRepo.model.fillables),request)
+        user = await this.repo.createBusiness(request.only(UserRepo.model.fillables),request.only(BusinessRepo.model.fillables),request)
         if(!user){
             throw new ExceptionWithCode('Failed to register user.',200)
         }

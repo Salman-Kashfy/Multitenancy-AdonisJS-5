@@ -23,8 +23,6 @@ Route.group(() => {
         Route.post('reset-password', 'Api/AuthController.resetPassword')
     }).middleware('guest')
 
-    Route.post('logout', 'Api/AuthController.logout')
-
     /*
     |--------------------------------------------------------------------------
     | Authenticated Api Routes
@@ -37,6 +35,7 @@ Route.group(() => {
         | User Related API Routes
         |--------------------------------------------------------------------------
         */
+        Route.post('logout', 'Api/AuthController.logout')
         Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
