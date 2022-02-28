@@ -7,6 +7,7 @@ import ParkRequest from 'App/Models/ParkRequest'
 import constants from 'Config/constants'
 import Database from "@ioc:Adonis/Lucid/Database"
 import myHelpers from "App/Helpers"
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 class ParkRepo extends BaseRepo {
     model
@@ -182,6 +183,16 @@ class ParkRepo extends BaseRepo {
             .withScopes((scope) => scope.parkRelations(userId))
             .where('id',id).first()
         return row
+    }
+
+    async filterNonParkMember(user,parkId){
+        if(typeof parkId !== 'object'){
+            parkId = [parkId]
+        }
+        const count = await ParkMember.query().select(Database.raw('COUNT(park_id) as `count`')).where('member_id',user.id).whereIn('park_id',parkId).first()
+        if(!count || !count.$extras.count){
+            throw new ExceptionWithCode('You are not a member of this park',200)
+        }
     }
 }
 export default new ParkRepo()

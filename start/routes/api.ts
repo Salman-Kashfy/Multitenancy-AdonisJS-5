@@ -122,6 +122,7 @@ Route.group(() => {
         Route.post('posts','Api/PostController.createPost')
         Route.put('posts/:id','Api/PostController.updatePost')
         Route.delete('posts/:id','Api/PostController.destroy')
+        Route.get('posts/park-quota/:parkId','Api/PostController.parkQuota')
 
         /*
         |--------------------------------------------------------------------------

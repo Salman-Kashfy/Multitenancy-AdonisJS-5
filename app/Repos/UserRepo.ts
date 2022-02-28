@@ -22,7 +22,10 @@ class UserRepo extends BaseRepo {
             .preload('categories')
             .preload('attachments')
             .first()
-        return user.toJSON()
+        if(user){
+            user = user.toJSON()
+        }
+        return user
     }
 
     async getUsersByPhone(input){

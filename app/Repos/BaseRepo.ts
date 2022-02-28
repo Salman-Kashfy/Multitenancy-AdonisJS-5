@@ -107,7 +107,7 @@ export default class BaseRepo {
         Logger.info(myHelpers.logMsg(`Attachments Uploaded successfully!`))
     }
 
-    fillables() {
+    fillables():string[] {
         return Object.values(this.model.$keys.attributesToColumns.keys)
     }
 

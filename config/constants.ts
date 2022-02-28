@@ -13,7 +13,7 @@ const constants = {
         SMALL: 100
     },
     UPLOAD_CHANNEL: 's3',
-    S3_URL: 'https://there-app.s3.ap-south-1.amazonaws.com/',
+    S3_URL: 'https://doodl.s3.ap-south-1.amazonaws.com/',
     AUTH_TOKEN_EXPIRY: '30days',
     PARK_RADIUS: 50,
     MAIL_FROM_ADDRESS:'developers@tekrevol.com',

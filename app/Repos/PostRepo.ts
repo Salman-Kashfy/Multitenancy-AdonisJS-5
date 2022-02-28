@@ -129,8 +129,8 @@ class PostRepo extends BaseRepo {
     }
 
     async countCurrentMonthPosts(userId){
-        const startDate = DateTime.local().startOf('month').toFormat('yyyy-MM-dd')
-        const endDate = DateTime.local().endOf('month').toFormat('yyyy-MM-dd')
+        const startDate = DateTime.local().startOf('month').toFormat('yyyy-MM-dd HH:mm:ss')
+        const endDate = DateTime.local().endOf('month').toFormat('yyyy-MM-dd HH:mm:ss')
         let results = await this.model.query()
             .select(Database.raw('COUNT(id) as count'))
             .where('user_id',userId)

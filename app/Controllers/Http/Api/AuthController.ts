@@ -43,7 +43,8 @@ export default class AuthController extends ApiBaseController{
         /*
         * Create Parent User
         * */
-        user = await this.repo.createParent(request.only(UserRepo.model.fillables))
+        let fillables:string[] = UserRepo.fillables()
+        user = await this.repo.createParent(request.only(fillables))
         if(!user){
             throw new ExceptionWithCode('Failed to register user.',200)
         }
@@ -225,7 +226,9 @@ export default class AuthController extends ApiBaseController{
         if (socialAccount) {
             user = await UserRepo.find(socialAccount.user_id)
         }
-        let input = request.only(UserRepo.model.fillables)
+        const userFillables:string[] = UserRepo.fillables()
+        const businessFillables:string[] = BusinessRepo.fillables()
+        let input = request.only(userFillables)
         if (!user) {
             input.password = Math.random().toString(36).substring(2, 15)
             input.email_verified = 1;
@@ -233,11 +236,11 @@ export default class AuthController extends ApiBaseController{
 
             user = await UserRepo.model.updateOrCreate({
                 email: request.input('email', null)
-            }, request.only(UserRepo.model.fillables))
+            }, request.only(userFillables))
 
             await user.related('roles').sync([request.input('account_type')])
             if(request.input('account_type') == RoleRepo.model.BUSINESS){
-                await user.related('business').create({userId:user.id,...request.only(BusinessRepo.model.fillables)})
+                await user.related('business').create({userId:user.id,...request.only(businessFillables)})
             }
             await SocialAccountRepo.store(request, user.id)
         }
@@ -273,7 +276,9 @@ export default class AuthController extends ApiBaseController{
         /*
         * Create Business User
         * */
-        user = await this.repo.createBusiness(request.only(UserRepo.model.fillables),request.only(BusinessRepo.model.fillables),request)
+        const userFillables:string[] = UserRepo.fillables()
+        const businessFillables:string[] = BusinessRepo.fillables()
+        user = await this.repo.createBusiness(request.only(userFillables),request.only(businessFillables),request)
         if(!user){
             throw new ExceptionWithCode('Failed to register user.',200)
         }
