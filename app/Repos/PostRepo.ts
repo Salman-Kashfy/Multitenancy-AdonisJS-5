@@ -164,6 +164,40 @@ class PostRepo extends BaseRepo {
             }
         }
     }
+
+    async filterOriginal(postId){
+        const post = await this.model.find(postId)
+        if(!post.type){
+            throw new ExceptionWithCode('You can not share a shared post!',403)
+        }
+    }
+
+    async sharePost(postId,input){
+        console.log({
+            user_id:input.user_id,
+            sharedPostId:postId,
+            pinProfile:input.pin_profile
+        })
+        const post = await this.model.create({
+            userId:input.user_id,
+            sharedPostId:postId,
+            pinProfile:input.pin_profile
+        })
+
+        /*
+        * Share this post to parks
+        * */
+        if(input.share_posts && input.share_posts.length){
+            let sharedPosts = {}
+            for (let i = 0; i < input.share_posts.length; i++) {
+                sharedPosts[input.share_posts[i]] = {
+                    user_id: input.user_id,
+                    created_at: new Date(),
+                }
+            }
+            await post.related('sharedPosts').sync(sharedPosts)
+        }
+    }
 }
 
 export default new PostRepo()
