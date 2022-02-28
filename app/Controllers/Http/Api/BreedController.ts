@@ -22,8 +22,8 @@ export default class BreedController extends ApiBaseController {
         return super.update(ctx, instanceType, mediaType)
     }
 
-    async all(){
-        const breed = await BreedRepo.all()
+    async all(ctx){
+        const breed = await BreedRepo.all(ctx)
         return this.apiResponse('Record fetched Successfully', breed)
     }
 

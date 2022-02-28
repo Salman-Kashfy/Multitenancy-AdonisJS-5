@@ -4,7 +4,6 @@ import GenderRepo from "App/Repos/GenderRepo";
 import GenderValidator from "App/Validators/GenderValidator";
 import Attachment from "App/Models/Attachment";
 
-
 export default class GenderController extends ApiBaseController {
 
     constructor() {
@@ -23,8 +22,8 @@ export default class GenderController extends ApiBaseController {
         return super.update(ctx, instanceType, mediaType)
     }
 
-    async all(){
-        const gender = await GenderRepo.all()
+    async all(ctx){
+        const gender = await GenderRepo.all(ctx)
         return this.apiResponse('Record fetched Successfully', gender)
     }
 
