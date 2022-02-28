@@ -55,6 +55,7 @@ Route.group(() => {
         Route.get('sizes/all','Api/SizeController.all')
         Route.get('genders/all','Api/GenderController.all')
         Route.get('breeds/all','Api/BreedController.all')
+        Route.get('categories/all','Api/CategoryController.all')
 
         /*
         |--------------------------------------------------------------------------

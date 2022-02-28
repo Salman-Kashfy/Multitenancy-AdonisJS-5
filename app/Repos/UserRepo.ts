@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from "App/Models/User";
-import Attachment from "App/Models/Attachment";
 import Database from '@ioc:Adonis/Lucid/Database'
 import AppInvitation from "App/Mailers/AppInvitation";
 import constants from 'Config/constants'
@@ -10,7 +9,7 @@ class UserRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = ['attachments']
+        const relations = []
         super(User, relations)
         this.model = User
     }
@@ -19,13 +18,11 @@ class UserRepo extends BaseRepo {
         if(typeof user !== "object"){
             user = await this.model.find(user)
         }
-        let business = await user.related('business').query().preload('categories').first()
-        if(business){
-            business = business.toJSON()
-            business.attachment = await Attachment.query().where('instance_id', business.id).where('instance_type', Attachment.TYPE.BUSINESS).first()
-            user = {...user.toJSON(),business}
-        }
-        return user
+        user = await user.related('business').query()
+            .preload('categories')
+            .preload('attachments')
+            .first()
+        return user.toJSON()
     }
 
     async getUsersByPhone(input){
