@@ -24,7 +24,25 @@ class LikeRepo extends BaseRepo {
             })
         }
         for (let relation of this.relations) await query.preload(relation)
-        return await query.paginate(page, perPage)
+        let likes = await query.paginate(page, perPage)
+
+        likes = likes.serialize({
+            fields: {
+                pick: [],
+            },
+            relations: {
+                user: {
+                    fields: '*',
+                },
+            }
+        })
+
+        let rows:any = []
+        likes.data.map((blockedUser) =>{
+            rows.push(blockedUser.user)
+        })
+        likes.data = rows
+        return likes
     }
 
     async unlike(input:LikeInterface){
