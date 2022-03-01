@@ -1,4 +1,4 @@
-import { column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import User from "App/Models/User";
 
@@ -30,4 +30,14 @@ export default class Comment extends CommonModel {
 	})
 	public mentions: ManyToMany<typeof User>
 
+	@belongsTo(() => User)
+	public user: BelongsTo<typeof User>
+
+	@hasMany(() => Comment, {
+		foreignKey: 'parentId',
+		onQuery(query) {
+			query.preload('user').preload('mentions').limit(5)
+		}
+	})
+	public childrens: HasMany<typeof Comment>
 }

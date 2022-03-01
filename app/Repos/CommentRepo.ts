@@ -1,12 +1,14 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import Comment from "App/Models/Comment";
 import { RequestContract } from '@ioc:Adonis/Core/Request'
+import constants from 'Config/constants'
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 
 class CommentRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = []
+        const relations = ['childrens', 'user', 'mentions']
         super(Comment, relations)
         this.model = Comment
     }
@@ -39,6 +41,24 @@ class CommentRepo extends BaseRepo {
             await comment.related('mentions').sync(mentions)
         }
         return comment
+    }
+
+    async delete(id){
+        const comment = await this.model.find(id)
+        await comment.delete()
+    }
+
+    async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx: HttpContextContract) {
+        let input = ctx.request.all()
+        let query = this.model.query().orderBy(orderByColumn, orderByValue)
+        if (input.post_id) {
+            query = query.where('post_id', input.post_id).where('parent_id', null)
+        }
+        if (input.parent_id) {
+            query = query.where('parent_id', input.parent_id)
+        }
+        for (let relation of this.relations) await query.preload(relation)
+        return await query.paginate(page, perPage)
     }
 }
 
