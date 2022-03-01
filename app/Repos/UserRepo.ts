@@ -10,7 +10,7 @@ class UserRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = ['attachments']
+        const relations = []
         super(User, relations)
         this.model = User
     }

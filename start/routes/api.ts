@@ -23,8 +23,6 @@ Route.group(() => {
         Route.post('reset-password', 'Api/AuthController.resetPassword')
     }).middleware('guest')
 
-    Route.post('logout', 'Api/AuthController.logout')
-
     /*
     |--------------------------------------------------------------------------
     | Authenticated Api Routes
@@ -37,6 +35,7 @@ Route.group(() => {
         | User Related API Routes
         |--------------------------------------------------------------------------
         */
+        Route.post('logout', 'Api/AuthController.logout')
         Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
@@ -114,6 +113,33 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.get('park-members/:id','Api/ParkMemberController.index')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Post API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('posts','Api/PostController.createPost')
+        Route.put('posts/:id','Api/PostController.updatePost')
+        Route.delete('posts/:id','Api/PostController.destroy')
+        Route.get('posts/park-quota/:parkId','Api/PostController.parkQuota')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Alert API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('alerts','Api/PostController.createAlert')
+        Route.put('alerts/:id','Api/PostController.updateAlert')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Post Criteria API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.group(() =>{
+            Route.resource('post-criteria','Api/PostCriterionController')
+        }).middleware('admin')
 
     }).middleware('auth')
 

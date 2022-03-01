@@ -1,0 +1,8 @@
+import {column} from '@ioc:Adonis/Lucid/Orm'
+import CommonModel from "App/Models/CommonModel";
+
+export default class Post extends CommonModel {
+    @column()
+    public id: number
+
+}

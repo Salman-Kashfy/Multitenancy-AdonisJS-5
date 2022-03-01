@@ -1,6 +1,7 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
 import Subscription from 'App/Models/Subscription'
+import UserDevice from 'App/Models/UserDevice'
 
 class AuthRepo extends BaseRepo {
     model
@@ -44,6 +45,14 @@ class AuthRepo extends BaseRepo {
         const token = await auth.use('api').attempt(input.email, input.password)
         const role = await user.related('roles').query().first()
         return { status:true, message: 'Logged in successfully !',data:{user,token,role} }
+    }
+
+    async logout(input,auth){
+        await auth.use('api').revoke()
+        await UserDevice.query()
+            .where('device_token',input.device_token)
+            .where('device_type',input.device_type)
+            .delete()
     }
 }
 

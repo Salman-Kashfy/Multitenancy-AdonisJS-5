@@ -1,30 +1,26 @@
 import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
-import CategoryRepo from "App/Repos/CategoryRepo";
-import CategoryValidator from "App/Validators/CategoryValidator";
+import PostRepo from "App/Repos/PostRepo";
+import CreatePostValidator from "App/Validators/CreatePostValidator";
 import Attachment from "App/Models/Attachment";
 
-export default class CategoryController extends ApiBaseController {
+
+export default class PostController extends ApiBaseController {
 
     constructor() {
-        super(CategoryRepo)
+        super(PostRepo)
     }
 
     async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
-        await ctx.request.validate(CategoryValidator)
+        await ctx.request.validate(CreatePostValidator)
         let input = ctx.request.only(this.repo.fillables())
-        let row = await CategoryRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
+        let row = await PostRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
-        await ctx.request.validate(CategoryValidator)
+        await ctx.request.validate(CreatePostValidator)
         return super.update(ctx, instanceType, mediaType)
-    }
-
-    async all(ctx){
-        const categories = await this.repo.all(ctx)
-        return this.apiResponse('Record fetched Successfully', categories)
     }
 
 }

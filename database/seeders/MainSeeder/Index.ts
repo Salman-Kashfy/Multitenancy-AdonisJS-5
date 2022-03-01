@@ -19,5 +19,6 @@ export default class IndexSeeder extends BaseSeeder {
         await this.runSeeder(await import('../Role'))
         await this.runSeeder(await import('../User'))
         await this.runSeeder(await import('../Subscription'))
+        await this.runSeeder(await import('../PostCriterion'))
     }
 }
