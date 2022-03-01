@@ -15,7 +15,7 @@ class CommentRepo extends BaseRepo {
 
     async store(input,request:RequestContract){
         const comment = await this.model.create(input)
-        if(request.input('mention') && request.input('mention').length){
+        if(request.input('mention',[]).length){
             let mentions = {}
             for (let i = 0; i < request.input('mention').length; i++) {
                 mentions[request.input('mention')[i]] = {
@@ -30,7 +30,7 @@ class CommentRepo extends BaseRepo {
 
     async update(id,input,request:RequestContract){
         let comment = await super.update(id, input)
-        if(request.input('mention') && request.input('mention').length){
+        if(request.input('mention',[]).length){
             let mentions = {}
             for (let i = 0; i < request.input('mention').length; i++) {
                 mentions[request.input('mention')[i]] = {
