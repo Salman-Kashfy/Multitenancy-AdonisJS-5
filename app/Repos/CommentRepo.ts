@@ -8,7 +8,7 @@ class CommentRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = ['childrens', 'user', 'mentions']
+        const relations = []
         super(Comment, relations)
         this.model = Comment
     }
@@ -57,7 +57,10 @@ class CommentRepo extends BaseRepo {
         if (input.parent_id) {
             query = query.where('parent_id', input.parent_id)
         }
-        for (let relation of this.relations) await query.preload(relation)
+        query.preload('children',(commentQuery) =>{
+            commentQuery.preload('mentions')
+        }).preload('user').preload('mentions')
+
         return await query.paginate(page, perPage)
     }
 }

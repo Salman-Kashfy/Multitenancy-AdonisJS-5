@@ -26,7 +26,6 @@ export default class Comment extends CommonModel {
 		pivotForeignKey: 'instance_id',
 		relatedKey: 'id',
 		pivotRelatedForeignKey: 'user_id',
-		onQuery: query => query.where({ instance_type: Comment.MENTION_TYPE.COMMENT }),
 	})
 	public mentions: ManyToMany<typeof User>
 
@@ -35,9 +34,6 @@ export default class Comment extends CommonModel {
 
 	@hasMany(() => Comment, {
 		foreignKey: 'parentId',
-		onQuery(query) {
-			query.preload('user').preload('mentions').limit(5)
-		}
 	})
-	public childrens: HasMany<typeof Comment>
+	public children: HasMany<typeof Comment>
 }
