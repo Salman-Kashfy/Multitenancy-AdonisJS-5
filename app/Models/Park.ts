@@ -12,6 +12,7 @@ import Attachment from 'App/Models/Attachment'
 import User from 'App/Models/User'
 import ParkRequest from 'App/Models/ParkRequest'
 type Builder = ModelQueryBuilderContract<typeof Park>
+
 export default class Park extends CommonModel {
 
 	public static STATUSES = {

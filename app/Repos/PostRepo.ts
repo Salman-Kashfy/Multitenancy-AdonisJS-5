@@ -24,10 +24,10 @@ class PostRepo extends BaseRepo {
         /*
         * Share this post to parks
         * */
-        if(request.input('share_posts') && request.input('share_posts').length){
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
-            for (let i = 0; i < request.input('share_posts').length; i++) {
-                sharedPosts[request.input('share_posts')[i]] = {
+            for(let sharedPost of request.input('share_posts')){
+                sharedPosts[sharedPost] = {
                     user_id: input.userId
                 }
             }
@@ -44,7 +44,7 @@ class PostRepo extends BaseRepo {
                     instanceType: Attachment.TYPE.POST,
                     path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
-                    duration: request.input('media')[i].duration ? request.input('media')[i].duration : null,
+                    duration: request.input('media')[i]?.duration || null,
                 })
             }
         }
@@ -57,7 +57,7 @@ class PostRepo extends BaseRepo {
         /*
         * Share this post to parks
         * */
-        if(request.input('share_posts') && request.input('share_posts').length){
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
             for (let i = 0; i < request.input('share_posts').length; i++) {
                 sharedPosts[request.input('share_posts')[i]] = {
@@ -86,7 +86,7 @@ class PostRepo extends BaseRepo {
                     instanceType: Attachment.TYPE.POST,
                     path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
-                    duration: request.input('media')[i].duration ? request.input('media')[i].duration : null,
+                    duration: request.input('media')[i]?.duration || null,
                 })
             }
         }
@@ -100,7 +100,7 @@ class PostRepo extends BaseRepo {
         /*
         * Share this post to parks
         * */
-        if(request.input('share_posts') && request.input('share_posts').length){
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
             for (let i = 0; i < request.input('share_posts').length; i++) {
                 sharedPosts[request.input('share_posts')[i]] = {
@@ -121,7 +121,7 @@ class PostRepo extends BaseRepo {
                     instanceType: Attachment.TYPE.POST,
                     path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
-                    duration: request.input('media')[i].duration ? request.input('media')[i].duration : null,
+                    duration: request.input('media')[i]?.duration || null,
                 })
             }
         }

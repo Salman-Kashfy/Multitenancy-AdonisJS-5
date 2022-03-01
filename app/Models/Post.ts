@@ -6,10 +6,6 @@ import Park from 'App/Models/Park'
 
 export default class Post extends CommonModel {
 
-	public static fillables() {
-		return ['description','anonymous','type','alert_type','pin_profile','location','latitude','longitude','city','state','zip']
-	}
-
 	public static TYPE = {
 		POST: 10,
 		ALERT: 20,

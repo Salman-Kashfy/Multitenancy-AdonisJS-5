@@ -27,7 +27,7 @@ export default class LogoutValidator extends BaseValidator {
      *    ```
      */
     public schema = schema.create({
-        device_type: schema.enum.optional( ['android','ios'] as const),
-        device_token: schema.string.optional({}),
+        device_type: schema.enum( ['android','ios'] as const),
+        device_token: schema.string({}),
     })
 }
