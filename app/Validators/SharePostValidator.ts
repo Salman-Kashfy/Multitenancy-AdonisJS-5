@@ -13,5 +13,6 @@ export default class SharePostValidator extends BaseValidator{
 		share_posts: schema.array().members(schema.number([
 			rules.exists({ table: ParkRepo.model.table, column: 'id', where: { 'deleted_at': null } }),
 		])),
+		description: schema.string.optional({trim:true},[rules.maxLength(250)]),
 	})
 }
