@@ -17,8 +17,8 @@ class CommentRepo extends BaseRepo {
         const comment = await this.model.create(input)
         if(request.input('mention',[]).length){
             let mentions = {}
-            for (let i = 0; i < request.input('mention').length; i++) {
-                mentions[request.input('mention')[i]] = {
+            for(let mention of request.input('mention')){
+                mentions[mention] = {
                     instance_id: comment.id,
                     instance_type:this.model.MENTION_TYPE.COMMENT
                 }
@@ -32,8 +32,8 @@ class CommentRepo extends BaseRepo {
         let comment = await super.update(id, input)
         if(request.input('mention',[]).length){
             let mentions = {}
-            for (let i = 0; i < request.input('mention').length; i++) {
-                mentions[request.input('mention')[i]] = {
+            for(let mention of request.input('mention')){
+                mentions[mention] = {
                     instance_id: comment.id,
                     instance_type:this.model.MENTION_TYPE.COMMENT
                 }
