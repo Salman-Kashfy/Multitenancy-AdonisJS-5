@@ -9,6 +9,7 @@ import SharePostValidator from "App/Validators/SharePostValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import ParkRepo from 'App/Repos/ParkRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import constants from 'Config/constants'
 
 export default class PostController extends ApiBaseController {
@@ -18,32 +19,34 @@ export default class PostController extends ApiBaseController {
     }
 
     async createPost({request,auth}: HttpContextContract) {
-        const {user}:any = auth
+        const {user} = auth
         await request.validate(CreatePostValidator)
-        const input = request.only(this.repo.model.fillables())
+        const input = request.only(this.repo.fillables())
         await ParkRepo.filterNonParkMember(user,request.input('share_posts'))
-        const hostParks = await ParkRepo.hostParks(user.id)
+        const hostParks = await ParkRepo.hostParks(user?.id)
         await this.repo.applyPostLimits(user,request.input('share_posts'),hostParks)
-        let row = await this.repo.createPost({...input,userId:user.id}, request)
+        let row = await this.repo.createPost({...input,userId:user?.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
-    async updatePost(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
+    async updatePost(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user}:any = ctx.auth
         await ctx.request.validate(EditPostValidator)
-        if(! await this.repo.belonging(ctx)){
+        const belonging = await this.repo.belonging(ctx)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
             throw new ExceptionWithCode('Permission denied!',403)
         }
-        const input = ctx.request.only(this.repo.model.fillables())
+        const input = ctx.request.only(this.repo.fillables())
         const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
     async destroy(ctx:HttpContextContract){
-        if(! await this.repo.belonging(ctx)){
+        const belonging = await this.repo.belonging(ctx)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.POST})
@@ -54,21 +57,24 @@ export default class PostController extends ApiBaseController {
     async createAlert({request,auth}: HttpContextContract){
         const {user}:any = auth
         await request.validate(CreateAlertValidator)
-        const input = request.only(this.repo.model.fillables())
+        const input = request.only(this.repo.fillables())
         let row = await this.repo.createAlert({...input,userId:user.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
-    async updateAlert(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
+    async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user}:any = ctx.auth
         await ctx.request.validate(EditAlertValidator)
-        if(! await this.repo.belonging(ctx)){
+        const belonging = await this.repo.belonging(ctx)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
+        if(ctx.request.input('remove_media')){
+            const checkAllBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)
+            if(!checkAllBelonging)
             throw new ExceptionWithCode('Permission denied!',403)
         }
-        const input = ctx.request.only(this.repo.model.fillables())
+        const input = ctx.request.only(this.repo.fillables())
         const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }

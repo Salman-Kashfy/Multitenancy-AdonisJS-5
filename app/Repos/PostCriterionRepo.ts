@@ -11,7 +11,7 @@ class PostCriterionRepo extends BaseRepo {
         this.model = PostCriterion
     }
 
-    async restrictIfExist(subscriptionId,roleId,excludeId){
+    async restrictIfExist(subscriptionId,roleId,excludeId = null){
         let query = this.model.query().select('id').where('role_id',roleId).where('subscription_id',subscriptionId)
         if(excludeId){
             query = query.where('id','!=',excludeId)
@@ -20,6 +20,16 @@ class PostCriterionRepo extends BaseRepo {
         if(postCriteria){
             throw new ExceptionWithCode('A criteria for this role and subscription already exists.',200)
         }
+    }
+
+    async store(input) {
+        await this.restrictIfExist(input.subscription_id,input.role_id)
+        return await this.model.create(input)
+    }
+
+    async update(id,input) {
+        await this.restrictIfExist(input.subscription_id,input.role_id,id)
+        await super.update(id,input)
     }
 }
 

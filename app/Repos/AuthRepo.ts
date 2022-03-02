@@ -49,12 +49,10 @@ class AuthRepo extends BaseRepo {
 
     async logout(input,auth){
         await auth.use('api').revoke()
-        if(input.device_token && input.device_type){
-            await UserDevice.query()
-                .where('device_token',input.device_token)
-                .where('device_type',input.device_type)
-                .delete()
-        }
+        await UserDevice.query()
+            .where('device_token',input.device_token)
+            .where('device_type',input.device_type)
+            .delete()
     }
 }
 

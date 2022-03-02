@@ -22,8 +22,8 @@ export default class SizeController extends ApiBaseController {
         return super.update(ctx, instanceType, mediaType)
     }
 
-    async all(){
-        const size = await SizeRepo.all()
+    async all(ctx){
+        const size = await this.repo.all(ctx)
         return this.apiResponse('Record fetched Successfully', size)
     }
 

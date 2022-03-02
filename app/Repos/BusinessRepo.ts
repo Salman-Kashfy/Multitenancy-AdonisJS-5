@@ -14,6 +14,7 @@ class BusinessRepo extends BaseRepo {
     async update(user,input,request){
         await user.related('business').query().update(input)
         const business = await user.related('business').query().first()
+        await business.related('categories').sync([request.input('category_id')])
         const attachment = {
             instanceId: business.id,
             instanceType: Attachment.TYPE.BUSINESS
