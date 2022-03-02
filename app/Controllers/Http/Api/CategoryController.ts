@@ -22,8 +22,8 @@ export default class CategoryController extends ApiBaseController {
         return super.update(ctx, instanceType, mediaType)
     }
 
-    async all(){
-        const categories = await this.repo.all()
+    async all(ctx){
+        const categories = await this.repo.all(ctx)
         return this.apiResponse('Record fetched Successfully', categories)
     }
 
