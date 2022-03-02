@@ -155,6 +155,7 @@ Route.group(() => {
         | Like API Routes
         |--------------------------------------------------------------------------
         */
+        Route.post('likes/count-likes','Api/LikeController.countLikes')
         Route.resource('likes','Api/LikeController').only(['index', 'store'])
 
     }).middleware('auth')

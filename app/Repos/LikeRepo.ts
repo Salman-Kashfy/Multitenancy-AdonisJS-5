@@ -23,12 +23,14 @@ class LikeRepo extends BaseRepo {
                 instance_id: ctx.request.input('instance_id')
             })
         }
+        if(ctx.request.input('reaction')){
+            query.where('reaction',ctx.request.input('reaction'))
+        }
         for (let relation of this.relations) await query.preload(relation)
         let likes = await query.paginate(page, perPage)
-
         likes = likes.serialize({
             fields: {
-                pick: [],
+                pick: ['reaction'],
             },
             relations: {
                 user: {
@@ -36,12 +38,6 @@ class LikeRepo extends BaseRepo {
                 },
             }
         })
-
-        let rows:any = []
-        likes.data.map((blockedUser) =>{
-            rows.push(blockedUser.user)
-        })
-        likes.data = rows
         return likes
     }
 
@@ -65,6 +61,14 @@ class LikeRepo extends BaseRepo {
             throw new ExceptionWithCode('Record not found',404)
         }
     }
+
+    async countLikes(input){
+        return await this.model.query().where({
+            instance_type: input.instance_type,
+            instance_id: input.instance_id
+        }).groupBy('reaction')
+    }
+
 }
 
 export default new LikeRepo()
