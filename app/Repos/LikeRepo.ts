@@ -63,10 +63,10 @@ class LikeRepo extends BaseRepo {
     }
 
     async countLikes(input){
-        return await this.model.query().where({
+        return await this.model.query().select('reaction').where({
             instance_type: input.instance_type,
             instance_id: input.instance_id
-        }).groupBy('reaction')
+        }).groupBy('reaction').getCount('reaction as count')
     }
 
 }

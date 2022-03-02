@@ -1,5 +1,14 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
 
+declare module '@ioc:Adonis/Lucid/Orm' {
+  interface ModelQueryBuilderContract<
+      Model extends LucidModel,
+      Result = InstanceType<Model>
+      > {
+    getCount(param)
+  }
+}
+
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
 
@@ -9,6 +18,10 @@ export default class AppProvider {
 
   public async boot() {
     // IoC container is ready
+    const { ModelQueryBuilder } = this.app.container.use('Adonis/Lucid/Database')
+    ModelQueryBuilder.macro('getCount', async function (param) {
+      return this.count(param)
+    })
   }
 
   public async ready() {
