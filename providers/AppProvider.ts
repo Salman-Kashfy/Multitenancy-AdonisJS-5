@@ -5,7 +5,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
       Model extends LucidModel,
       Result = InstanceType<Model>
       > {
-    getCount(param): Promise<BigInt>
+    getCount(param)
   }
 }
 
@@ -19,9 +19,8 @@ export default class AppProvider {
   public async boot() {
     // IoC container is ready
     const { ModelQueryBuilder } = this.app.container.use('Adonis/Lucid/Database')
-    ModelQueryBuilder.macro('getCount', async function (param) {
-      const result = await this.count(param)
-      return result[0].$extras.count
+    ModelQueryBuilder.macro('getCount',function (param) {
+      return this.count(param)
     })
   }
 
