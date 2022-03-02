@@ -6,6 +6,7 @@ export default class Notification extends CommonModel {
     static TYPES = {
         FRIEND_REQUEST: 5,
         FRIEND_ACCEPTED: 10,
+        BADGE_EARNED: 15,
     }
 
     @column({ isPrimary: true })

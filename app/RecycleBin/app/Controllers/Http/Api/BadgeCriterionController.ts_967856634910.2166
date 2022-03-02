@@ -1,0 +1,26 @@
+import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
+import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
+import BadgeCriterionRepo from "App/Repos/BadgeCriterionRepo";
+import BadgeCriterionValidator from "App/Validators/BadgeCriterionValidator";
+import Attachment from "App/Models/Attachment";
+
+
+export default class BadgeCriterionController extends ApiBaseController {
+
+    constructor() {
+        super(BadgeCriterionRepo)
+    }
+
+    async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
+        await ctx.request.validate(BadgeCriterionValidator)
+        let input = ctx.request.only(this.repo.fillables())
+        let row = await BadgeCriterionRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
+        return this.apiResponse('Record Added Successfully', row)
+    }
+
+    async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
+        await ctx.request.validate(BadgeCriterionValidator)
+        return super.update(ctx, instanceType, mediaType)
+    }
+
+}

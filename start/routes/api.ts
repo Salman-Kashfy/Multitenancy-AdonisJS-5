@@ -151,6 +151,17 @@ Route.group(() => {
         */
         Route.resource('comments', 'Api/CommentController')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Badge and Criteria API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.group(() =>{
+            Route.resource('badges','Api/BadgeController').except(['show'])
+            Route.resource('badge-criteria','Api/BadgeCriterionController')
+        }).middleware('admin')
+        Route.get('badges/:id','Api/BadgeController.show')
+
     }).middleware('auth')
 
 }).prefix('/api')
