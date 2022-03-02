@@ -144,6 +144,13 @@ Route.group(() => {
             Route.resource('post-criteria','Api/PostCriterionController')
         }).middleware('admin')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Comment API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.resource('comments', 'Api/CommentController')
+
     }).middleware('auth')
 
 }).prefix('/api')
