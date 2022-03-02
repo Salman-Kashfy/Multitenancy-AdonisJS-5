@@ -4,9 +4,11 @@ import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import { DateTime } from 'luxon'
 import Role from 'App/Models/Role'
-import Database from '@ioc:Adonis/Lucid/Database'
+import Database  from '@ioc:Adonis/Lucid/Database'
 import PostCriterion from 'App/Models/PostCriterion'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import SharedPost from 'App/Models/SharedPost'
+import constants from 'Config/constants'
 
 class PostRepo extends BaseRepo {
     model
@@ -163,6 +165,56 @@ class PostRepo extends BaseRepo {
                 throw new ExceptionWithCode(`${userSubscription.name} for business account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`,403)
             }
         }
+    }
+
+    async filterOriginal(postId) {
+        const post = await this.model.find(postId)
+        if (!post.type) {
+            throw new ExceptionWithCode('You can not share a shared post!', 403)
+        }
+    }
+
+    async sharePost(postId, input) {
+        const post = await this.model.create({
+            userId: input.user_id,
+            sharedPostId: postId,
+            pinProfile: input.pin_profile,
+            description: input.description || null,
+        })
+
+        /*
+        * Share this post to parks
+        * */
+        if (input.share_posts?.length) {
+            let sharedPosts = {}
+            for(let sharedPost of input.share_posts){
+                sharedPosts[sharedPost] = {
+                    user_id: input.user_id,
+                    created_at: new Date(),
+                }
+            }
+            await post.related('sharedPosts').sync(sharedPosts)
+        }
+    }
+
+    async getShareList(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue: any = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx) {
+        let posts = await SharedPost.query()
+            .where('post_id', ctx.request.param('id'))
+            .preload('user')
+            .orderBy(orderByColumn, orderByValue)
+            .paginate(page, perPage)
+
+        let serializedObj = posts.serialize({
+            fields: {
+                pick: [],
+            }
+        })
+
+        let rows:string[] = []
+        serializedObj.data.map((post) =>{
+            rows.push(post.user)
+        })
+        return rows
     }
 }
 

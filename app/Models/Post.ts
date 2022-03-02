@@ -43,6 +43,8 @@ export default class Post extends CommonModel {
 	public state: string
 	@column()
 	public zip: string
+	@column()
+	public sharedPostId: number
 
 	@computed()
 	public get created_ago() {
