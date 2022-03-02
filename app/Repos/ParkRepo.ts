@@ -189,8 +189,8 @@ class ParkRepo extends BaseRepo {
         if(typeof parkId !== 'object'){
             parkId = [parkId]
         }
-        const count = await ParkMember.query().where('member_id',user.id).whereIn('park_id',parkId).getCount('park_id as count')
-        if(!count){
+        const count = await ParkMember.query().where('member_id',user.id).whereIn('park_id',parkId).getCount('park_id as count').first()
+        if(!count.$extras.count){
             throw new ExceptionWithCode('You are not a member of this park',200)
         }
     }
