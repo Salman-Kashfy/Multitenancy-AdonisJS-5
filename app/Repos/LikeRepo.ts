@@ -46,6 +46,7 @@ class LikeRepo extends BaseRepo {
     }
 
     async store(input) {
+        await this.validateInstance(input)
         const data = {
             userId: input.user_id,
             instanceType: input.instance_type,
@@ -63,6 +64,7 @@ class LikeRepo extends BaseRepo {
     }
 
     async countLikes(input){
+        await this.validateInstance(input)
         let likes = await this.model.query().select('reaction').where({
             instance_type: input.instance_type,
             instance_id: input.instance_id

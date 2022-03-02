@@ -21,7 +21,6 @@ export default class LikeController extends ApiBaseController {
 
     async store(ctx: HttpContextContract) {
         let input:any = await ctx.request.validate(LikeValidator)
-        await this.repo.validateInstance(input)
         const {user} = ctx.auth
         input.user_id = user?.id
         if (ctx.request.input('unlike',0)) {
@@ -34,11 +33,8 @@ export default class LikeController extends ApiBaseController {
 
     async countLikes({request}:HttpContextContract){
         let input:any = await request.validate(CountLikeValidator)
-        await this.repo.validateInstance(input)
         const likes = await this.repo.countLikes(input)
         return this.apiResponse('Record Fetched Successfully!',likes)
     }
-
-
 
 }
