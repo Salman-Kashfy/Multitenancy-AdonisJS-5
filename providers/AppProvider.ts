@@ -19,7 +19,7 @@ export default class AppProvider {
   public async boot() {
     // IoC container is ready
     const { ModelQueryBuilder } = this.app.container.use('Adonis/Lucid/Database')
-    ModelQueryBuilder.macro('getCount', async function (param) {
+    ModelQueryBuilder.macro('getCount',function (param) {
       return this.count(param)
     })
   }
