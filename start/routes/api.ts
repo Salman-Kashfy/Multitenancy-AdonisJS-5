@@ -23,6 +23,8 @@ Route.group(() => {
         Route.post('reset-password', 'Api/AuthController.resetPassword')
     }).middleware('guest')
 
+    Route.get('categories/all','Api/CategoryController.all')
+
     /*
     |--------------------------------------------------------------------------
     | Authenticated Api Routes
@@ -54,7 +56,6 @@ Route.group(() => {
         Route.get('sizes/all','Api/SizeController.all')
         Route.get('genders/all','Api/GenderController.all')
         Route.get('breeds/all','Api/BreedController.all')
-        Route.get('categories/all','Api/CategoryController.all')
 
         /*
         |--------------------------------------------------------------------------
