@@ -4,7 +4,7 @@ import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import { DateTime } from 'luxon'
 import Role from 'App/Models/Role'
-import Database from '@ioc:Adonis/Lucid/Database'
+import Database  from '@ioc:Adonis/Lucid/Database'
 import PostCriterion from 'App/Models/PostCriterion'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import SharedPost from 'App/Models/SharedPost'
@@ -19,8 +19,8 @@ class PostRepo extends BaseRepo {
         this.model = Post
     }
 
-    async createPost(input, request: RequestContract) {
-        input = { ...input, type: this.model.TYPE.POST }
+    async createPost(input,request:RequestContract){
+        input = {...input,type:this.model.TYPE.POST}
         let row = await this.model.create(input)
 
         /*
@@ -175,24 +175,20 @@ class PostRepo extends BaseRepo {
     }
 
     async sharePost(postId, input) {
-        console.log({
-            user_id: input.user_id,
-            sharedPostId: postId,
-            pinProfile: input.pin_profile,
-        })
         const post = await this.model.create({
             userId: input.user_id,
             sharedPostId: postId,
             pinProfile: input.pin_profile,
+            description: input.description || null,
         })
 
         /*
         * Share this post to parks
         * */
-        if (input.share_posts && input.share_posts.length) {
+        if (input.share_posts?.length) {
             let sharedPosts = {}
-            for (let i = 0; i < input.share_posts.length; i++) {
-                sharedPosts[input.share_posts[i]] = {
+            for(let sharedPost of input.share_posts){
+                sharedPosts[sharedPost] = {
                     user_id: input.user_id,
                     created_at: new Date(),
                 }
@@ -202,20 +198,20 @@ class PostRepo extends BaseRepo {
     }
 
     async getShareList(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue: any = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx) {
-        let posts:any = await SharedPost.query()
+        let posts = await SharedPost.query()
             .where('post_id', ctx.request.param('id'))
             .preload('user')
             .orderBy(orderByColumn, orderByValue)
             .paginate(page, perPage)
 
-        posts = posts.serialize({
+        let serializedObj = posts.serialize({
             fields: {
                 pick: [],
             }
         })
 
-        let rows:any = []
-        posts.data.map((post) =>{
+        let rows:string[] = []
+        serializedObj.data.map((post) =>{
             rows.push(post.user)
         })
         return rows
