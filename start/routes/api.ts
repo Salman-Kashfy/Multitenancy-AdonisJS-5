@@ -151,6 +151,20 @@ Route.group(() => {
         */
         Route.resource('comments', 'Api/CommentController')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Report API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.resource('reports', 'Api/ReportController')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistics API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('statistics', 'Api/UsersController.statistics')
+
     }).middleware('auth')
 
 }).prefix('/api')

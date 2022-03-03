@@ -1,8 +1,9 @@
-import { column, computed, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column, computed, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
 import {DateTime} from 'luxon'
 import Park from 'App/Models/Park'
+import User from 'App/Models/User'
 
 export default class Post extends CommonModel {
 
@@ -66,5 +67,8 @@ export default class Post extends CommonModel {
         pivotTable: 'shared_posts'
     })
     public sharedPosts: ManyToMany<typeof Park>
+
+	@belongsTo(() => User)
+	public user: BelongsTo<typeof User>
 
 }
