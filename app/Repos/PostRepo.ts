@@ -262,8 +262,6 @@ class PostRepo extends BaseRepo {
                     }
                 }
             }
-        } else if(role.id === Role.BUSINESS) {
-
         }
     }
 }
