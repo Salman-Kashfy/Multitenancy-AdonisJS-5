@@ -1,5 +1,6 @@
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
+import { DateTime } from 'luxon'
 
 export default class Like extends BaseModel {
 
@@ -23,6 +24,8 @@ export default class Like extends BaseModel {
 	public instanceType: number
 	@column()
 	public reaction: number
+	@column.dateTime({autoCreate: true})
+	public createdAt: DateTime
 
 	@belongsTo(() => User)
 	public user: BelongsTo<typeof User>

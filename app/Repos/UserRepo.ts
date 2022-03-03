@@ -23,14 +23,18 @@ class UserRepo extends BaseRepo {
         const userRoleIds = userRoles.map(function(role) {
             return role.id;
         });
+        const badges = await user.related('badges').query()
         if(userRoleIds.includes(Role.BUSINESS)){
-            user = await user.related('business').query()
+            const business = await user.related('business').query()
                 .preload('categories')
                 .preload('attachments')
                 .first()
+            user = {...user.toJSON(),business}
+        }else{
             user = user.toJSON()
         }
-        return user
+
+        return {...user,badges}
     }
 
     async getUsersByPhone(input){
@@ -90,7 +94,6 @@ class UserRepo extends BaseRepo {
     }
 
     async suggestedFriends(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx){
-
         let query = this.model.query()
             .whereNotIn('id',[...Object.values(this.model.PREDEFINED_USERS),ctx.auth.user.id])
             .whereNotExists((builder) =>{

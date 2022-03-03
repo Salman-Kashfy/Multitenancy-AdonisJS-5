@@ -17,4 +17,6 @@ export default class BadgeCriterion extends CommonModel {
     public reactionType: number
     @column()
     public duration: DurationUnit
+    @column()
+    public hostMemberCount: number
 }

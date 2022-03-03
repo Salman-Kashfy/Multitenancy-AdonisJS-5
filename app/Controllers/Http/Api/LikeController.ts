@@ -27,7 +27,7 @@ export default class LikeController extends ApiBaseController {
             await this.repo.unlike(input)
             return this.apiResponse('Unlike successfully!')
         }
-        await this.repo.store(input)
+        await this.repo.store(input,ctx.request)
         return this.apiResponse('Liked Successfully')
     }
 

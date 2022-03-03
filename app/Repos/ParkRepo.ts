@@ -8,6 +8,10 @@ import constants from 'Config/constants'
 import Database from "@ioc:Adonis/Lucid/Database"
 import myHelpers from "App/Helpers"
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import User from 'App/Models/User'
+import Role from 'App/Models/Role'
+import BadgeCriterion from 'App/Models/BadgeCriterion'
+import Notification from 'App/Models/Notification'
 
 class ParkRepo extends BaseRepo {
     model
@@ -132,6 +136,8 @@ class ParkRepo extends BaseRepo {
                 parkId: park.id,
                 memberId: userId,
             })
+            /* Send badge to park owner (If applicable) */
+            await this.sendBadge(park.id)
         }
 
         /*
@@ -152,6 +158,14 @@ class ParkRepo extends BaseRepo {
                 memberId: parkRequest.memberId,
             })
         }
+
+        /*
+        * Send badge to park owner (If applicable)
+        * */
+        if(accept){
+            await this.sendBadge(parkRequest.parkId)
+        }
+
 
         /*
         * Send notification here
@@ -192,6 +206,38 @@ class ParkRepo extends BaseRepo {
         const count = await ParkMember.query().where('member_id',user.id).whereIn('park_id',parkId).getCount('park_id as count').first()
         if(!count.$extras.count){
             throw new ExceptionWithCode('You are not a member of this park',200)
+        }
+    }
+
+    async sendBadge(parkId) {
+        const park = await this.model.find(parkId)
+        const user = await User.find(park.userId)
+        if(!user) return
+        const role = await user.related('roles').query().first()
+        if(!role) return
+
+        let userBadges = await user.related('badges').query()
+        let userBadgeIds = userBadges.map(function(badge) {
+            return badge.id
+        })
+
+        if (role.id === Role.BUSINESS) {
+            let query = BadgeCriterion.query().where('role_id', role.id).where('host_member_count', '>', 0)
+            if (userBadgeIds.length) {
+                query.whereNotIn('badge_id', userBadgeIds)
+            }
+            const badgeCriteria = await query
+            if (badgeCriteria.length) {
+                const count = await ParkMember.query().where({ parkId: parkId }).getCount('member_id as count').first()
+                for (let badgeCriterion of badgeCriteria) {
+                    if(count.$extras.count >= badgeCriterion.hostMemberCount){
+                        await user.related('badges').sync([badgeCriterion.badgeId],false)
+                        const notification_message = "Congratulation! You have earned a new badge!"
+                        myHelpers.sendNotificationStructure(user.id, badgeCriterion.badgeId, Notification.TYPES.BADGE_EARNED, user.id, null, notification_message)
+                        break;
+                    }
+                }
+            }
         }
     }
 }

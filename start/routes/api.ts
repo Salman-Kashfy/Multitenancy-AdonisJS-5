@@ -170,6 +170,14 @@ Route.group(() => {
         }).middleware('admin')
         Route.get('badges/:id','Api/BadgeController.show')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Notifications API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
+        Route.resource('notifications', 'Api/NotificationController')
+
     }).middleware('auth')
 
 }).prefix('/api')
