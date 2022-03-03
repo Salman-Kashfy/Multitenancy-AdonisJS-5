@@ -13,7 +13,7 @@ export default class Attachment extends CommonModel {
         BUSINESS: 10,
         DOG: 20,
         PARK: 30,
-        POST: 40,
+        POST: 40
     }
 
     @column({isPrimary: true})

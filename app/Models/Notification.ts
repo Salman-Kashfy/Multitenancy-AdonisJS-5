@@ -1,11 +1,13 @@
-import { column, scope } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column, scope } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from 'App/Models/CommonModel'
+import User from 'App/Models/User'
 
 export default class Notification extends CommonModel {
 
     static TYPES = {
         FRIEND_REQUEST: 5,
         FRIEND_ACCEPTED: 10,
+        BADGE_EARNED: 15,
     }
 
     @column({ isPrimary: true })
@@ -36,6 +38,11 @@ export default class Notification extends CommonModel {
     public read_at: string
 
     public static unreadCount = scope((query, user_id) => {
-        query.count('id', 'unread_count').where('user_id', user_id).whereNull('read_at')
+        query.count('id', 'unread_count').where('notifiable_id', user_id).whereNull('read_at')
     })
+
+    @belongsTo(() => User, {
+        foreignKey: 'referencedUserId'
+    })
+    public user: BelongsTo<typeof User>
 }

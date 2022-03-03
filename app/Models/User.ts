@@ -14,6 +14,7 @@ import Business from 'App/Models/Business'
 import myHelpers from 'App/Helpers'
 import Friend from 'App/Models/Friend'
 import Subscription from 'App/Models/Subscription'
+import Badge from 'App/Models/Badge'
 
 export default class User extends CommonModel {
     public serializeExtras = true
@@ -97,6 +98,11 @@ export default class User extends CommonModel {
         onQuery: query => query.where('status', Friend.STATUSES.REQUESTED),
     })
     public requested_friends: HasMany<typeof Friend>
+
+    @manyToMany(() => Badge,{
+        pivotTable: 'user_badges'
+    })
+    public badges: ManyToMany<typeof Badge>
 
     @computed()
     public get imagePath() {

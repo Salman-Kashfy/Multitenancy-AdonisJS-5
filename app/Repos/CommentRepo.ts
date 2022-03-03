@@ -57,10 +57,7 @@ class CommentRepo extends BaseRepo {
         if (input.parent_id) {
             query = query.where('parent_id', input.parent_id)
         }
-        query.preload('children',(commentQuery) =>{
-            commentQuery.preload('mentions')
-        }).preload('user').preload('mentions')
-
+        query.withScopes((scope) => scope.commentRelations(ctx?.auth?.user?.id))
         return await query.paginate(page, perPage)
     }
 }

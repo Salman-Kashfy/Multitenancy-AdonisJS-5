@@ -25,14 +25,18 @@ class UserRepo extends BaseRepo {
         const userRoleIds = userRoles.map(function(role) {
             return role.id;
         });
+        const badges = await user.related('badges').query()
         if(userRoleIds.includes(Role.BUSINESS)){
-            user = await user.related('business').query()
+            const business = await user.related('business').query()
                 .preload('categories')
                 .preload('attachments')
                 .first()
+            user = {...user.toJSON(),business}
+        }else{
             user = user.toJSON()
         }
-        return user
+
+        return {...user,badges}
     }
 
     async getUsersByPhone(input){
