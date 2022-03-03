@@ -7,6 +7,9 @@ import Friend from 'App/Models/Friend'
 import Role from 'App/Models/Role'
 import Dog from 'App/Models/Dog'
 import SharedPost from 'App/Models/SharedPost'
+import Post from 'App/Models/Post'
+import { DateTime } from 'luxon'
+import Like from 'App/Models/Like'
 
 class UserRepo extends BaseRepo {
     model
@@ -121,6 +124,57 @@ class UserRepo extends BaseRepo {
         /*
         * Interactions
         * */
+        const startDate = DateTime.local().startOf('month').toFormat('yyyy-MM-dd HH:mm:ss')
+        const endDate = DateTime.local().endOf('month').toFormat('yyyy-MM-dd HH:mm:ss')
+        let posts = await Post.query().select('id')
+            .where('user_id', userId)
+            .whereBetween('created_at', [startDate, endDate])
+            .withScopes((scope) => scope.postLikeReactionsCount())
+
+        let obj = {};
+        Object.values(Like.REACTION).forEach((value) =>{
+            obj[`${value}`] = 0
+        })
+        if(posts.length){
+            let likeCount = posts.map((post) =>{
+                return post.$extras
+            })
+            for (let i = 0; i < likeCount.length; i++) {
+                if(!i){
+                    obj = likeCount[i]
+                    continue
+                }
+                for (const [key, value] of Object.entries(likeCount[i])) {
+                    obj[key] = obj[key]+value
+                }
+            }
+        }
+
+        /*
+        * Post Shares
+        * */
+        let shareCount = 0
+        let postsShares = await Post.query().select('id')
+            .where('user_id', userId)
+            .whereBetween('created_at', [startDate, endDate])
+            .withCount('sharedPosts',(sharePostQuery) =>{ sharePostQuery.as('shareCount') })
+
+        postsShares.map((postsShare) =>{
+            shareCount+=postsShare.$extras.shareCount
+        })
+
+        /*
+        * Comment Shares
+        * */
+        let commentsCount = 0
+        let postComments = await Post.query().select('id')
+            .where('user_id', userId)
+            .whereBetween('created_at', [startDate, endDate])
+            .withCount('comments',(commentQuery) =>{ commentQuery.as('commentsCount') })
+
+        postComments.map((postComment) =>{
+            commentsCount+=postComment.$extras.commentsCount
+        })
 
         return {
             profile_health:{
@@ -128,9 +182,9 @@ class UserRepo extends BaseRepo {
                 friend_exist: !!friendExist,
                 share_exist: !!shareExist,
             },
-            interactions:{
-
-            }
+            interactions:{ ...obj },
+            shares:shareCount,
+            comments:commentsCount
         }
     }
 }

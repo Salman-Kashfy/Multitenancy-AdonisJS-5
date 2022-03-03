@@ -1,9 +1,23 @@
-import { BelongsTo, belongsTo, column, computed, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+	BelongsTo,
+	belongsTo,
+	column,
+	computed,
+	HasMany,
+	hasMany,
+	ManyToMany,
+	manyToMany, ModelQueryBuilderContract,
+	scope,
+} from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
 import {DateTime} from 'luxon'
 import Park from 'App/Models/Park'
 import User from 'App/Models/User'
+import Like from 'App/Models/Like'
+import Comment from 'App/Models/Comment'
+
+type Builder = ModelQueryBuilderContract<typeof Post>
 
 export default class Post extends CommonModel {
 
@@ -70,5 +84,30 @@ export default class Post extends CommonModel {
 
 	@belongsTo(() => User)
 	public user: BelongsTo<typeof User>
+
+	@hasMany(() => Like, {
+		foreignKey: 'instanceId',
+		onQuery: query => query.where({ instanceType: Like.TYPE.POST })
+	})
+	public likes: HasMany<typeof Like>
+
+	@hasMany(() => Comment)
+	public comments: HasMany<typeof Comment>
+
+	public static postLikeReactionsCount = scope((query:Builder) => {
+		Object.values(Like.REACTION).forEach((value:any) => {
+			query.withCount('likes',(likesCount) =>{
+				likesCount.as(`${value}`).where('reaction',value)
+			}).withCount('likes',(likesCount) =>{
+				likesCount.as(`${value}`).where('reaction',value)
+			})
+		});
+		return query
+	})
+
+	@hasMany(() => Post, {
+		foreignKey: 'sharedPostId',
+	})
+	public sharedToProfile: HasMany<typeof Post>
 
 }
