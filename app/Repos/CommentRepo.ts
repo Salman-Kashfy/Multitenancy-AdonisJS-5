@@ -42,7 +42,6 @@ class CommentRepo extends BaseRepo {
         const commentAuthor = await this.model.find(commentId)
         if(!commentor || !commentAuthor || commentAuthor.userId === commentor.id) return
         const notification_message = `${commentor.name} replied to your comment.`
-        console.log(notification_message)
         myHelpers.sendNotificationStructure(commentAuthor.userId, commentId, Notification.TYPES.SOMEONE_REPLIED_COMMENT, commentor.id, null, notification_message)
     }
 
