@@ -3,6 +3,9 @@ import Comment from "App/Models/Comment";
 import { RequestContract } from '@ioc:Adonis/Core/Request'
 import constants from 'Config/constants'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import myHelpers from 'App/Helpers'
+import Notification from 'App/Models/Notification'
+import User from 'App/Models/User'
 
 class CommentRepo extends BaseRepo {
     model
@@ -25,8 +28,32 @@ class CommentRepo extends BaseRepo {
             }
             await comment.related('mentions').sync(mentions)
         }
+
+        // Send notification of comment reply
+        if(input.parent_id){
+            await this.notifyCommentRespond(input.user_id,input.parent_id)
+        }
+
         return comment
     }
+
+    async notifyCommentRespond(userId,commentId){
+        const commentor = await User.find(userId)
+        const commentAuthor = await this.model.find(commentId)
+        if(!commentor || !commentAuthor || commentAuthor.userId === commentor.id) return
+        const notification_message = `${commentor.name} replied to your comment.`
+        console.log(notification_message)
+        myHelpers.sendNotificationStructure(commentAuthor.userId, commentId, Notification.TYPES.SOMEONE_REPLIED_COMMENT, commentor.id, null, notification_message)
+    }
+
+    // async notifyMentions(userId,commentId,mentions){
+    //     const commentor = await User.find(userId)
+    //     const commentAuthor = await this.model.find(commentId)
+    //     if(!commentor || !commentAuthor || commentAuthor.userId === commentor.id) return
+    //     const notification_message = `${commentor.name} replied to your comment.`
+    //     console.log(notification_message)
+    //     myHelpers.sendNotificationStructure(commentAuthor.userId, commentId, Notification.TYPES.SOMEONE_REPLIED_COMMENT, commentor.id, null, notification_message)
+    // }
 
     async update(id,input,request:RequestContract){
         let comment = await super.update(id, input)

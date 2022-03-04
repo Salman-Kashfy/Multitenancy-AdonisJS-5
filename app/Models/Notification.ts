@@ -8,6 +8,9 @@ export default class Notification extends CommonModel {
         FRIEND_REQUEST: 5,
         FRIEND_ACCEPTED: 10,
         BADGE_EARNED: 15,
+        ALERT: 20,
+        SOMEONE_LIKE_COMMENT: 25,
+        SOMEONE_REPLIED_COMMENT: 30,
     }
 
     @column({ isPrimary: true })
