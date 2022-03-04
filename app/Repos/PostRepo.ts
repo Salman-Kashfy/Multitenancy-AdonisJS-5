@@ -13,6 +13,7 @@ import { DurationUnit } from 'App/Interfaces/DurationObjectUnits'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
 import User from 'App/Models/User'
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 
 class PostRepo extends BaseRepo {
     model
@@ -267,6 +268,54 @@ class PostRepo extends BaseRepo {
                 }
             }
         }
+    }
+
+    async newsfeed(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        page = 1,
+        perPage = constants.PER_PAGE,
+        ctx: HttpContextContract
+    ): Promise<void>
+    {
+        let posts
+        let query = this.model.query()
+            .withScopes((scope) => scope.fetchPost(ctx.auth?.user?.id));
+
+        if(ctx.request.input('user_id')){
+            query.where('user_id', ctx.request.input('user_id'))
+        }
+        if(!ctx.request.input('user_id') || ctx.auth?.user?.id !== parseInt(ctx.request.input('user_id'))){
+            query.withScopes((scope) => scope.globalPrivacy(ctx.auth?.user?.id))
+        }
+
+        query.where((postQuery) =>{
+            postQuery.where('user_id', ctx.auth?.user?.id)
+            .orWhere((postQuery) =>{
+                postQuery.withScopes((scopes) => scopes.privacy(ctx.auth?.user?.id))
+            })
+        })
+
+        posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+        posts = this.addPostMetaKeys(posts)
+        return posts
+    }
+
+    addPostMetaKeys(posts){
+        let rows:any[] = [];
+        if(posts.rows.length){
+            posts.rows.map(post =>{
+                console.log(post.$extras)
+                return rows.push({
+                    ...post.toJSON(),
+                    likes_count:post.$extras.likes_count,
+                    comments_count:post.$extras.comments_count,
+                    is_liked:post.$extras.is_liked
+                })
+            })
+            posts.rows = rows
+        }
+        return posts
     }
 }
 

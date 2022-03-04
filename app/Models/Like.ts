@@ -26,7 +26,6 @@ export default class Like extends BaseModel {
 	public reaction: number
 	@column.dateTime({autoCreate: true})
 	public createdAt: DateTime
-
 	@belongsTo(() => User)
 	public user: BelongsTo<typeof User>
 
