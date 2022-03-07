@@ -158,13 +158,9 @@ class PostRepo extends BaseRepo {
     }
 
     async applyPostLimits(user, shareParkIds, hostPark) {
-        const userRoles = await user.related('roles').query()
-        const userRoleIds = userRoles.map(function(role) {
-            return role.id
-        })
-        const roleId = userRoleIds[0]
+        const role = await user.related('roles').query().first()
         const userSubscription = await user.related('subscription').query().first()
-        const postCriteria = await PostCriterion.query().where('role_id', roleId).where('subscription_id', userSubscription.id).first()
+        const postCriteria = await PostCriterion.query().where('role_id', role.id).where('subscription_id', userSubscription.id).first()
         if (!postCriteria) {
             return
         }
@@ -173,11 +169,11 @@ class PostRepo extends BaseRepo {
             return park.id
         })
         const count = await this.countCurrentDurationPosts(user.id)
-        if (userRoleIds.includes(Role.PARENT)) {
+        if (role.id === Role.PARENT) {
             if (postCriteria.postsPerMonth !== -1 && count >= postCriteria.postsPerMonth) {
                 throw new ExceptionWithCode(`${userSubscription.name} for parent account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`, 403)
             }
-        } else if (userRoleIds.includes(Role.BUSINESS)) {
+        } else if (role.id === Role.BUSINESS) {
             if (postCriteria.postsPerMonth !== -1 && count >= postCriteria.postsPerMonth && shareParkIds.sort().toString() !== hostParkIds.sort().toString()) {
                 throw new ExceptionWithCode(`${userSubscription.name} for business account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`, 403)
             }

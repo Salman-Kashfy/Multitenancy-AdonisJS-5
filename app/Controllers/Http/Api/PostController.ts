@@ -39,17 +39,17 @@ export default class PostController extends ApiBaseController {
     }
 
     async updatePost(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
-        const {user}:any = ctx.auth
+        const {user} = ctx.auth
         await ctx.request.validate(EditPostValidator)
         const belonging = await this.repo.belonging(ctx)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
+        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)){
             throw new ExceptionWithCode('Permission denied!',403)
         }
         const input = ctx.request.only(this.repo.fillables())
-        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user?.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
@@ -64,22 +64,22 @@ export default class PostController extends ApiBaseController {
     }
 
     async createAlert({request,auth}: HttpContextContract){
-        const {user}:any = auth
+        const {user} = auth
         await request.validate(CreateAlertValidator)
         const input = request.only(this.repo.fillables())
-        let row = await this.repo.createAlert({...input,userId:user.id}, request)
+        let row = await this.repo.createAlert({...input,userId:user?.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
-        const {user}:any = ctx.auth
+        const {user} = ctx.auth
         await ctx.request.validate(EditAlertValidator)
         const belonging = await this.repo.belonging(ctx)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media')){
-            const checkAllBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)
+            const checkAllBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
             if(!checkAllBelonging)
             throw new ExceptionWithCode('Permission denied!',403)
         }
