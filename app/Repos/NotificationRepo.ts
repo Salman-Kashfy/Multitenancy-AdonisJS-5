@@ -20,8 +20,8 @@ class NotificationRepo extends BaseRepo {
             .preload('user',(userQuery) =>{
                 userQuery.select('id','name','image')
             })
-        const notifications:any = await query.orderBy(orderBy, sortBy).paginate(offset, limit)
-        const unreadCount:any = await this.model.query().withScopes((scopes) => scopes.unreadCount(userID)).first()
+        const notifications = await query.orderBy(orderBy, sortBy).paginate(offset, limit)
+        const unreadCount = await this.model.query().withScopes((scopes) => scopes.unreadCount(userID)).first()
         return {
             unreadCount:unreadCount.$extras.unread_count ? unreadCount.$extras.unread_count : 0,
             notifications: notifications
