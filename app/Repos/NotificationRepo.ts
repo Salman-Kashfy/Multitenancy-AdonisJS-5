@@ -2,6 +2,8 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import Notification from "App/Models/Notification";
 import constants from "Config/constants";
 import {DateTime} from "luxon";
+import myHelpers from 'App/Helpers'
+import UserDevice from 'App/Models/UserDevice'
 
 class NotificationRepo extends BaseRepo {
     model
@@ -32,6 +34,15 @@ class NotificationRepo extends BaseRepo {
             read_at:date
         }
         return this.model.query().where('notifiable_id',userId).update(data)
+    }
+
+    async customPush(input){
+        const devices = await UserDevice.query()
+            .where('user_id',input.receiver_id)
+            .whereHas('user',(userQuery) =>{
+                userQuery.where('push_notify',1)
+            })
+        await myHelpers.sendNotification('',input.message,{},devices)
     }
 }
 

@@ -18,7 +18,8 @@ const constants = {
     PARK_RADIUS: 50,
     PARK_DISTANCE_LIMIT: 6371, // For Miles 3959, For KM, use 6371
     PLAY_STORE_URL: "http://google.com/",
-    APPLE_STORE_URL: "https://apple.com/"
+    APPLE_STORE_URL: "https://apple.com/",
+    NOTIFY_TRENDING: 10
 }
 
 export default constants
