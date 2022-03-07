@@ -84,7 +84,7 @@ export default class PostController extends ApiBaseController {
             throw new ExceptionWithCode('Permission denied!',403)
         }
         const input = ctx.request.only(this.repo.fillables())
-        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user?.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
