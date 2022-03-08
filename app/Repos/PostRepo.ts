@@ -278,17 +278,38 @@ class PostRepo extends BaseRepo {
         let query = this.model.query()
             .withScopes((scope) => scope.fetchPost(ctx.auth?.user?.id));
 
-        if(ctx.request.input('user_id')){
-            query.where('user_id', ctx.request.input('user_id'))
-        }
-        if(!ctx.request.input('user_id') || ctx.auth?.user?.id !== parseInt(ctx.request.input('user_id'))){
-            query.withScopes((scope) => scope.globalPrivacy(ctx.auth?.user?.id))
+        // if(ctx.request.input('user_id')){
+        //     query.where('user_id', ctx.request.input('user_id'))
+        // }
+        //
+        // if(!ctx.request.input('user_id') || ctx.auth?.user?.id !== parseInt(ctx.request.input('user_id'))){
+        //     query.withScopes((scope) => scope.globalPrivacy(ctx.auth?.user?.id))
+        // }
+
+        if(ctx.request.input('park_id')){
+            query.whereHas('sharedPosts', (sharedPostQuery) =>{
+                sharedPostQuery.where('park_id',ctx.request.input('park_id'))
+            })
         }
 
         query.where((postQuery) =>{
             postQuery.where('user_id', ctx.auth?.user?.id)
-            .orWhere((postQuery) =>{
-                postQuery.withScopes((scopes) => scopes.privacy(ctx.auth?.user?.id))
+                .orWhere((postQuery) =>{
+                    postQuery.withScopes((scopes) => scopes.privacy(ctx.auth?.user?.id))
+                })
+        })
+
+        query.whereHas('sharedPosts', (sharedPostQuery) =>{
+            sharedPostQuery.whereExists((builder) =>{
+                builder.select('*').from('park_members')
+                    .whereRaw(`shared_posts.park_id = park_members.park_id AND park_members.member_id = ${ctx.auth?.user?.id}`)
+            })
+        }).preload('originalPost',(postQuery) =>{
+            postQuery.preload('user')
+        }).preload('sharedPosts',(sharedPostQuery) =>{
+            sharedPostQuery.whereExists((builder) =>{
+                builder.select('*').from('park_members')
+                    .whereRaw(`shared_posts.park_id = park_members.park_id AND park_members.member_id = ${ctx.auth?.user?.id}`)
             })
         })
 
@@ -301,7 +322,6 @@ class PostRepo extends BaseRepo {
         let rows:any[] = [];
         if(posts.rows.length){
             posts.rows.map(post =>{
-                console.log(post.$extras)
                 return rows.push({
                     ...post.toJSON(),
                     likes_count:post.$extras.likes_count,

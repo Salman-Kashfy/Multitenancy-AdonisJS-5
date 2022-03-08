@@ -107,10 +107,10 @@ export default class Post extends CommonModel {
 		return query
 	})
 
-	@hasMany(() => Post, {
+	@belongsTo(() => Post, {
 		foreignKey: 'sharedPostId',
 	})
-	public sharedToProfile: HasMany<typeof Post>
+	public originalPost: BelongsTo<typeof Post>
 
 	public static fetchPost = scope((query:Builder,userID) => {
 		query.withScopes((scope) => scope.postMeta(userID)).preload('user')
@@ -143,8 +143,8 @@ export default class Post extends CommonModel {
                         * */
 						.orWhereRaw(`blocked_users.user_id = comments.user_id AND blocked_users.blocked_user_id = ${userID}`)
 				})
-		}).withCount('likes', (postFavouritesQuery) =>{
-			postFavouritesQuery.as('is_liked')
+		}).withCount('likes', (likeQuery) =>{
+			likeQuery.as('is_liked')
 				.where('user_id', userID)
 				.where('instance_type', Like.TYPE.POST)
 		})
@@ -165,9 +165,6 @@ export default class Post extends CommonModel {
 	})
 
 	public static globalPrivacy = scope((query:Builder,userID) =>{
-
-
-
         query.whereHas('user',(userQuery) =>{
             /*
             * For POST (Not Alert)

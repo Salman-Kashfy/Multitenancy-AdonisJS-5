@@ -116,4 +116,13 @@ export default class PostController extends ApiBaseController {
         return this.apiResponse('Record Fetched Successfully',shares)
     }
 
+    async parkPost(ctx:HttpContextContract){
+        const page = ctx.request.input('page', 1)
+        const perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        const shares = await this.repo.parkPost(orderByColumn,orderByValue,page,perPage,ctx);
+        return this.apiResponse('Record Fetched Successfully',shares)
+    }
+
 }
