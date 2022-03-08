@@ -151,6 +151,13 @@ Route.group(() => {
         */
         Route.resource('comments', 'Api/CommentController')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Like API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.resource('likes','Api/LikeController').only(['index', 'store'])
+
     }).middleware('auth')
 
 }).prefix('/api')
