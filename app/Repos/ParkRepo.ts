@@ -213,7 +213,7 @@ class ParkRepo extends BaseRepo {
         const park = await this.model.find(parkId)
         const user = await User.find(park.userId)
         if(!user) return
-        const role = await user.related('roles').query().first()
+        const role = await user.related('roles').query().where('role_id',Role.BUSINESS).first()
         if(!role) return
 
         let userBadges = await user.related('badges').query()
@@ -221,21 +221,19 @@ class ParkRepo extends BaseRepo {
             return badge.id
         })
 
-        if (role.id === Role.BUSINESS) {
-            let query = BadgeCriterion.query().where('role_id', role.id).where('host_member_count', '>', 0)
-            if (userBadgeIds.length) {
-                query.whereNotIn('badge_id', userBadgeIds)
-            }
-            const badgeCriteria = await query
-            if (badgeCriteria.length) {
-                const count = await ParkMember.query().where({ parkId: parkId }).getCount('member_id as count').first()
-                for (let badgeCriterion of badgeCriteria) {
-                    if(count.$extras.count >= badgeCriterion.hostMemberCount){
-                        await user.related('badges').sync([badgeCriterion.badgeId],false)
-                        const notification_message = "Congratulation! You have earned a new badge!"
-                        myHelpers.sendNotificationStructure(user.id, badgeCriterion.badgeId, Notification.TYPES.BADGE_EARNED, user.id, null, notification_message)
-                        break;
-                    }
+        let query = BadgeCriterion.query().where('role_id', role.id).where('host_member_count', '>', 0)
+        if (userBadgeIds.length) {
+            query.whereNotIn('badge_id', userBadgeIds)
+        }
+        const badgeCriteria = await query
+        if (badgeCriteria.length) {
+            const count = await ParkMember.query().where({ parkId: parkId }).getCount('member_id as count').first()
+            for (let badgeCriterion of badgeCriteria) {
+                if(count.$extras.count >= badgeCriterion.hostMemberCount){
+                    await user.related('badges').sync([badgeCriterion.badgeId],false)
+                    const notification_message = "Congratulation! You have earned a new badge!"
+                    myHelpers.sendNotificationStructure(user.id, badgeCriterion.badgeId, Notification.TYPES.BADGE_EARNED, user.id, null, notification_message)
+                    break;
                 }
             }
         }
