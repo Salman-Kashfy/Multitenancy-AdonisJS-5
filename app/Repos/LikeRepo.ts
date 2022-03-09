@@ -66,7 +66,7 @@ class LikeRepo extends BaseRepo {
         await this.model.updateOrCreate(data, input)
 
         // Send Badge on Like (If applicable)
-        if(request.input('like')){
+        if(request.input('like',null)){
             await this.sendBadge(input.user_id)
         }
     }

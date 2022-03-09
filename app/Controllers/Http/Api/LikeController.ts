@@ -21,7 +21,7 @@ export default class LikeController extends ApiBaseController {
     async store(ctx: HttpContextContract) {
         let input = await ctx.request.validate(LikeValidator)
         const {user} = ctx.auth
-        if (!ctx.request.input('like')) {
+        if (!ctx.request.input('like',null)) {
             await this.repo.unlike({...input,user_id:user?.id })
             return this.apiResponse('Unlike successfully!')
         }
