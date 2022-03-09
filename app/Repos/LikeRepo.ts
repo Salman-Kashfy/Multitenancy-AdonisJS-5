@@ -5,6 +5,13 @@ import Post from "App/Models/Post";
 import {LikeInterface} from "App/Interfaces/LikeInterface";
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import constants from 'Config/constants'
+import { DurationUnit } from 'App/Interfaces/DurationObjectUnits'
+import { DateTime } from 'luxon'
+import User from 'App/Models/User'
+import Role from 'App/Models/Role'
+import BadgeCriterion from 'App/Models/BadgeCriterion'
+import Notification from 'App/Models/Notification'
+import myHelpers from 'App/Helpers'
 
 class LikeRepo extends BaseRepo {
     model
@@ -48,14 +55,20 @@ class LikeRepo extends BaseRepo {
         return this.model.query().where(input).delete()
     }
 
-    async store(input) {
+    async store(input,request) {
         await this.validateInstance(input)
         const data = {
             userId: input.user_id,
             instanceType: input.instance_type,
             instanceId: input.instance_id,
         }
-        return await this.model.updateOrCreate(data, input)
+
+        await this.model.updateOrCreate(data, input)
+
+        // Send Badge on Like (If applicable)
+        if(request.input('like',null)){
+            await this.sendBadge(input.user_id)
+        }
     }
 
     getModelInstance(instanceType){
@@ -106,6 +119,50 @@ class LikeRepo extends BaseRepo {
         return likesCount
     }
 
+    async countCurrentDurationLikes(userId, duration:DurationUnit = 'month',reactionType ) {
+        const startDate = DateTime.local().startOf(duration).toFormat('yyyy-MM-dd HH:mm:ss')
+        const endDate = DateTime.local().endOf(duration).toFormat('yyyy-MM-dd HH:mm:ss')
+        let query = this.model.query()
+            .where('user_id', userId)
+            .whereBetween('created_at', [startDate, endDate])
+        if(reactionType){
+            query.where('reaction', reactionType)
+        }
+        const results = await query.getCount('id as count').first()
+        return results.$extras.count
+    }
+
+    async sendBadge(userId) {
+        const user = await User.find(userId)
+        if(!user) return
+        const role = await user.related('roles').query().where('role_id',Role.PARENT).first()
+        if(!role) return
+
+        let userBadges = await user.related('badges').query()
+        let userBadgeIds = userBadges.map(function(badge) {
+            return badge.id
+        })
+
+        let query = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '>=', 0)
+        if (userBadgeIds.length) {
+            query.whereNotIn('badge_id', userBadgeIds)
+        }
+        const badgeCriteria = await query
+        for (let badgeCriterion of badgeCriteria) {
+            const count = await this.countCurrentDurationLikes(userId, badgeCriterion.duration,badgeCriterion.reactionType)
+            let badgeCriterionQuery = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '<=', count).orderBy('likes_count','asc')
+            if (userBadgeIds.length>0) {
+                badgeCriterionQuery.whereNotIn('badge_id', userBadgeIds)
+            }
+            const earned = await badgeCriterionQuery.first()
+            if(earned){
+                await user.related('badges').sync([earned.badgeId],false)
+                const notification_message = "Congratulation! You have earned a new badge!"
+                myHelpers.sendNotificationStructure(userId, earned.badgeId, Notification.TYPES.BADGE_EARNED, userId, null, notification_message)
+                break;
+            }
+        }
+    }
 }
 
 export default new LikeRepo()

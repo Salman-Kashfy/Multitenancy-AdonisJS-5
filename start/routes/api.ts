@@ -158,6 +158,25 @@ Route.group(() => {
         */
         Route.resource('likes','Api/LikeController').only(['index', 'store'])
 
+        /*
+        |--------------------------------------------------------------------------
+        | Badge and Criteria API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.group(() =>{
+            Route.resource('badges','Api/BadgeController').except(['show'])
+            Route.resource('badge-criteria','Api/BadgeCriterionController')
+        }).middleware('admin')
+        Route.get('badges/:id','Api/BadgeController.show')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notifications API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
+        Route.resource('notifications', 'Api/NotificationController')
+
     }).middleware('auth')
 
 }).prefix('/api')

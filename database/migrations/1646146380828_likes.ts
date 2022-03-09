@@ -10,6 +10,7 @@ export default class Likes extends BaseSchema {
             table.integer('instance_id').notNullable()
             table.integer('instance_type').notNullable()
             table.integer('reaction').notNullable()
+            table.dateTime('created_at')
         })
     }
 

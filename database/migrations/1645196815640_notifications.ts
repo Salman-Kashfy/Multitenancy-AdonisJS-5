@@ -12,8 +12,9 @@ export default class Notifications extends BaseSchema {
             table.integer('referenced_user_id').unsigned().references('id').inTable('users').notNullable().onDelete('cascade')
             table.integer('ref_id')
             table.integer('type')
-            table.timestamp('read_at')
+            table.dateTime('read_at')
             table.timestamps()
+            table.dateTime('deleted_at');
         })
     }
 
