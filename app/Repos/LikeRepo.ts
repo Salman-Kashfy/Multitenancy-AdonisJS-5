@@ -66,7 +66,7 @@ class LikeRepo extends BaseRepo {
         await this.model.updateOrCreate(data, input)
 
         // Send Badge on Like (If applicable)
-        if(!request.input('unlike',0)){
+        if(request.input('like')){
             await this.sendBadge(input.user_id)
         }
     }
@@ -135,7 +135,7 @@ class LikeRepo extends BaseRepo {
     async sendBadge(userId) {
         const user = await User.find(userId)
         if(!user) return
-        const role = await user.related('roles').query().first()
+        const role = await user.related('roles').query().where('role_id',Role.PARENT).first()
         if(!role) return
 
         let userBadges = await user.related('badges').query()
@@ -143,27 +143,23 @@ class LikeRepo extends BaseRepo {
             return badge.id
         })
 
-        if (role.id === Role.PARENT) {
-            let query = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '>=', 0)
-            if (userBadgeIds.length) {
-                query.whereNotIn('badge_id', userBadgeIds)
+        let query = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '>=', 0)
+        if (userBadgeIds.length) {
+            query.whereNotIn('badge_id', userBadgeIds)
+        }
+        const badgeCriteria = await query
+        for (let badgeCriterion of badgeCriteria) {
+            const count = await this.countCurrentDurationLikes(userId, badgeCriterion.duration,badgeCriterion.reactionType)
+            let badgeCriterionQuery = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '<=', count).orderBy('likes_count','asc')
+            if (userBadgeIds.length>0) {
+                badgeCriterionQuery.whereNotIn('badge_id', userBadgeIds)
             }
-            const badgeCriteria = await query
-            if (badgeCriteria.length) {
-                for (let badgeCriterion of badgeCriteria) {
-                    const count = await this.countCurrentDurationLikes(userId, badgeCriterion.duration,badgeCriterion.reactionType)
-                    let badgeCriterionQuery = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '<=', count).orderBy('likes_count','asc')
-                    if (userBadgeIds.length) {
-                        badgeCriterionQuery.whereNotIn('badge_id', userBadgeIds)
-                    }
-                    const earned = await badgeCriterionQuery.first()
-                    if(earned){
-                        await user.related('badges').sync([earned.badgeId],false)
-                        const notification_message = "Congratulation! You have earned a new badge!"
-                        myHelpers.sendNotificationStructure(userId, earned.badgeId, Notification.TYPES.BADGE_EARNED, userId, null, notification_message)
-                        break;
-                    }
-                }
+            const earned = await badgeCriterionQuery.first()
+            if(earned){
+                await user.related('badges').sync([earned.badgeId],false)
+                const notification_message = "Congratulation! You have earned a new badge!"
+                myHelpers.sendNotificationStructure(userId, earned.badgeId, Notification.TYPES.BADGE_EARNED, userId, null, notification_message)
+                break;
             }
         }
     }
