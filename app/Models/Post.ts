@@ -201,7 +201,9 @@ export default class Post extends CommonModel {
         })
     })
 
-	@manyToMany(() => User)
+	@manyToMany(() => User,{
+		pivotTable:'hidden_posts'
+	})
 	public hidden: ManyToMany<typeof User>
 
 }

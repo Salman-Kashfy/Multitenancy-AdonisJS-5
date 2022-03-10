@@ -129,7 +129,7 @@ Route.group(() => {
         Route.get('posts/share/:id','Api/PostController.getShareList')
         Route.get('newsfeed','Api/PostController.newsfeed')
         Route.get('posts/park/:parkId','Api/PostController.parkPost')
-        Route.post('posts/hide-post/:id','Api/PostController.hidePost')
+        Route.post('posts/hide-post','Api/PostController.hidePost')
 
         /*
         |--------------------------------------------------------------------------

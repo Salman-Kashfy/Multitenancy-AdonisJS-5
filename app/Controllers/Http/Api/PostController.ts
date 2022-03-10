@@ -119,10 +119,6 @@ export default class PostController extends ApiBaseController {
 
     async hidePost(ctx:HttpContextContract){
         let input = await ctx.request.validate(HidePostValidator)
-        const exist = await this.repo.exist(ctx)
-        if(!exist){
-            throw new ExceptionWithCode('Record not found!',404)
-        }
         const user = ctx.auth.user
         const shares = await this.repo.hidePost({postId:input.post_id,hide:input.hide,userId:user?.id});
         return this.apiResponse('Record Fetched Successfully',shares)

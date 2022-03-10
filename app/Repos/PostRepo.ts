@@ -5,7 +5,6 @@ import Attachment from 'App/Models/Attachment'
 import { DateTime } from 'luxon'
 import Role from 'App/Models/Role'
 import HidePostInterface from 'App/Interfaces/HidePostInterface'
-import Database  from '@ioc:Adonis/Lucid/Database'
 import PostCriterion from 'App/Models/PostCriterion'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import SharedPost from 'App/Models/SharedPost'
@@ -313,6 +312,8 @@ class PostRepo extends BaseRepo {
                 builder.select('*').from('park_members')
                     .whereRaw(`shared_posts.park_id = park_members.park_id AND park_members.member_id = ${ctx.auth?.user?.id}`)
             })
+        }).whereDoesntHave('hidden',(builder) =>{
+            builder.where('id',ctx.auth.user?.id)
         })
 
         posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
@@ -337,11 +338,11 @@ class PostRepo extends BaseRepo {
     }
 
     async hidePost(input:HidePostInterface){
-        const post = this.model.find(input.postId)
+        const post = await this.model.find(input.postId)
         if(input.hide){
-            post.related('hidden').sync([input.userId],false)
+            await post.related('hidden').sync([input.userId],false)
         }else{
-            post.related('hidden').detach([input.userId])
+            await post.related('hidden').detach([input.userId])
         }
     }
 }
