@@ -6,6 +6,7 @@ import EditPostValidator from "App/Validators/EditPostValidator";
 import CreateAlertValidator from "App/Validators/CreateAlertValidator";
 import EditAlertValidator from "App/Validators/EditAlertValidator";
 import SharePostValidator from "App/Validators/SharePostValidator";
+import HidePostValidator from "App/Validators/HidePostValidator";
 import AttachmentRepo from 'App/Repos/AttachmentRepo'
 import ParkRepo from 'App/Repos/ParkRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
@@ -104,6 +105,17 @@ export default class PostController extends ApiBaseController {
         const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
         const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
         const shares = await this.repo.getShareList(orderByColumn,orderByValue,page,perPage,ctx);
+        return this.apiResponse('Record Fetched Successfully',shares)
+    }
+
+    async hidePost(ctx:HttpContextContract){
+        let input = await ctx.request.validate(HidePostValidator)
+        const exist = await this.repo.exist(ctx)
+        if(!exist){
+            throw new ExceptionWithCode('Record not found!',404)
+        }
+        const user = ctx.auth.user
+        const shares = await this.repo.hidePost({postId:input.post_id,hide:input.hide,userId:user?.id});
         return this.apiResponse('Record Fetched Successfully',shares)
     }
 

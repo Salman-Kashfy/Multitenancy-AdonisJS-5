@@ -4,6 +4,7 @@ import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import { DateTime } from 'luxon'
 import Role from 'App/Models/Role'
+import HidePostInterface from 'App/Interfaces/HidePostInterface'
 import Database  from '@ioc:Adonis/Lucid/Database'
 import PostCriterion from 'App/Models/PostCriterion'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
@@ -215,6 +216,15 @@ class PostRepo extends BaseRepo {
             rows.push(post.user)
         })
         return rows
+    }
+
+    async hidePost(input:HidePostInterface){
+        const post = this.model.find(input.postId)
+        if(input.hide){
+            post.related('hidden').sync([input.userId],false)
+        }else{
+            post.related('hidden').detach([input.userId])
+        }
     }
 }
 

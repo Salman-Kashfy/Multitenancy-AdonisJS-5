@@ -127,6 +127,7 @@ Route.group(() => {
         Route.get('posts/park-quota/:parkId','Api/PostController.parkQuota')
         Route.post('posts/share/:id','Api/PostController.sharePost')
         Route.get('posts/share/:id','Api/PostController.getShareList')
+        Route.post('posts/hide-post/:id','Api/PostController.hidePost')
 
         /*
         |--------------------------------------------------------------------------

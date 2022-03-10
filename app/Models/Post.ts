@@ -3,6 +3,7 @@ import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
 import {DateTime} from 'luxon'
 import Park from 'App/Models/Park'
+import User from 'App/Models/User'
 
 export default class Post extends CommonModel {
 
@@ -66,5 +67,8 @@ export default class Post extends CommonModel {
         pivotTable: 'shared_posts'
     })
     public sharedPosts: ManyToMany<typeof Park>
+
+	@manyToMany(() => User)
+	public hidden: ManyToMany<typeof User>
 
 }

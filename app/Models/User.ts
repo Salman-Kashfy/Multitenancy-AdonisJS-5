@@ -24,6 +24,23 @@ export default class User extends CommonModel {
         ADMIN:1
     }
 
+    static MARITAL_STATUS = {
+        SINGLE:10,
+        MARRIED:20,
+    }
+
+    static GENDER = {
+        MALE:10,
+        FEMALE:20,
+        OTHER:30,
+    }
+
+    static IDENTIFICATION = {
+        STRAIGHT:10,
+        GAY:20,
+        BI:30,
+    }
+
     public static distanceQuery = '( ? * acos ( cos ( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin ( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance'
 
     @column({ isPrimary: true })
@@ -55,6 +72,15 @@ export default class User extends CommonModel {
 
     @column()
     public longitude: number
+
+    @column()
+    public maritalStatus: number
+
+    @column()
+    public gender: number
+
+    @column()
+    public identification: number
 
     @column()
     public image: string
@@ -109,6 +135,21 @@ export default class User extends CommonModel {
     @computed()
     public get imagePath() {
         return myHelpers.userImageWithBaseURLOrNotFound(this.image)
+    }
+
+    @computed()
+    public get maritalStatusText() {
+        return this.maritalStatus ? (Object.keys(User.MARITAL_STATUS).find(key => User.MARITAL_STATUS[key] === this.maritalStatus)) : 'N/A'
+    }
+
+    @computed()
+    public get genderText() {
+        return this.gender ? (Object.keys(User.GENDER).find(key => User.GENDER[key] === this.gender)) : 'N/A'
+    }
+
+    @computed()
+    public get identificationText() {
+        return this.identification ? (Object.keys(User.IDENTIFICATION).find(key => User.IDENTIFICATION[key] === this.identification)) : 'N/A'
     }
 
 }
