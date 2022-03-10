@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import User from 'App/Models/User'
 
 export default class Users extends BaseSchema {
     protected tableName = 'users'
@@ -20,7 +21,7 @@ export default class Users extends BaseSchema {
             table.integer('gender')
             table.integer('identification')
             table.text('image')
-            table.integer('privacy')
+            table.integer('privacy').defaultTo(User.PROFILE.PUBLIC)
             table.boolean('is_social_login').defaultTo(0)
             table.boolean('push_notify').defaultTo(1)
             table.boolean('email_verified').defaultTo(0)

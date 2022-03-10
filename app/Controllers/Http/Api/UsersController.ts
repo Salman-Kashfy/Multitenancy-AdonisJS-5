@@ -91,6 +91,12 @@ export default class UsersController extends ApiBaseController{
         return this.apiResponse("Business name is available",true)
     }
 
+    async statistics({auth}: HttpContextContract){
+        const {user} = auth
+        const stats = await this.repo.statistics(user?.id)
+        return this.apiResponse('Record fetched successfully!', stats)
+    }
+
     async sendAlerts({request}:HttpContextContract){
         const input = await request.validate(CustomAlertNotifyValidator)
         await this.repo.sendAlerts(input)

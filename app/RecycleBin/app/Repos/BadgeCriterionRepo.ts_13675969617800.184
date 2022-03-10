@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import BadgeCriterion from "App/Models/BadgeCriterion";
+
+
+class BadgeCriterionRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(BadgeCriterion, relations)
+        this.model = BadgeCriterion
+    }
+}
+
+export default new BadgeCriterionRepo()

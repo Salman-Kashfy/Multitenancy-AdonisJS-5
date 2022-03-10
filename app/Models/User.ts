@@ -14,11 +14,19 @@ import Business from 'App/Models/Business'
 import myHelpers from 'App/Helpers'
 import Friend from 'App/Models/Friend'
 import Subscription from 'App/Models/Subscription'
+import Badge from 'App/Models/Badge'
 
 export default class User extends CommonModel {
+
+    static PROFILE = {
+        PUBLIC: 10,
+        FRIENDS: 20,
+        ONLY_ME: 30
+    }
+
     public serializeExtras = true
 
-    public static fillables = ['name','username','email','bio','phone','password','zip','image','push_notify']
+    public static fillables = ['name','username','email','bio','phone','password','zip','privacy','image','push_notify']
 
     static PREDEFINED_USERS = {
         ADMIN:1
@@ -83,6 +91,9 @@ export default class User extends CommonModel {
     public identification: number
 
     @column()
+    public privacy: number
+
+    @column()
     public image: string
 
     @column()
@@ -131,6 +142,11 @@ export default class User extends CommonModel {
         onQuery: query => query.where('status', Friend.STATUSES.REQUESTED),
     })
     public requested_friends: HasMany<typeof Friend>
+
+    @manyToMany(() => Badge,{
+        pivotTable: 'user_badges'
+    })
+    public badges: ManyToMany<typeof Badge>
 
     @computed()
     public get imagePath() {
