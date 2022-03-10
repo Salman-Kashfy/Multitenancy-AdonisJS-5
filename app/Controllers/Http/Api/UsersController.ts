@@ -10,6 +10,7 @@ import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 import UserInviteValidator from 'App/Validators/UserInviteValidator'
 import UsernameExistValidator from 'App/Validators/UsernameExistValidator'
 import BusinessExistValidator from 'App/Validators/BusinessExistValidator'
+import CustomAlertNotifyValidator from 'App/Validators/CustomAlertNotifyValidator'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
@@ -88,6 +89,12 @@ export default class UsersController extends ApiBaseController{
     async checkBusinessName({request}: HttpContextContract){
         await request.validate(BusinessExistValidator)
         return this.apiResponse("Business name is available",true)
+    }
+
+    async sendAlerts({request}:HttpContextContract){
+        const input = await request.validate(CustomAlertNotifyValidator)
+        await this.repo.sendAlerts(input)
+        return this.apiResponse("Notifications Sent!",true)
     }
 
 }
