@@ -227,7 +227,6 @@ export default class AuthController extends ApiBaseController{
             user = await UserRepo.find(socialAccount.user_id)
         }
         const userFillables:string[] = UserRepo.fillables()
-        const businessFillables:string[] = BusinessRepo.fillables()
         let input = request.only(userFillables)
         if (!user) {
             input.password = Math.random().toString(36).substring(2, 15)
@@ -239,9 +238,6 @@ export default class AuthController extends ApiBaseController{
             }, request.only(userFillables))
 
             await user.related('roles').sync([request.input('account_type')])
-            if(request.input('account_type') == RoleRepo.model.BUSINESS){
-                await user.related('business').create({userId:user.id,...request.only(businessFillables)})
-            }
             await SocialAccountRepo.store(request, user.id)
         }
         if (input.image) {

@@ -37,7 +37,7 @@ class AuthRepo extends BaseRepo {
         if(!user) return false
         await user.related('subscription').sync([Subscription.FREE_PLAN])
         const business = await user.related('business').create(businessDetails)
-        await business.related('categories').sync([request.input('category_id')])
+        await business.related('categories').sync(request.input('category'))
         return user
     }
 

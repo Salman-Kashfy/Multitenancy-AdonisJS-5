@@ -24,11 +24,12 @@ class UserRepo extends BaseRepo {
             return role.id;
         });
         if(userRoleIds.includes(Role.BUSINESS)){
-            user = await user.related('business').query()
+            let business = await user.related('business').query()
                 .preload('categories')
                 .preload('attachments')
                 .first()
             user = user.toJSON()
+            user.business = business || null
         }
         return user
     }

@@ -49,6 +49,12 @@ export default class User extends CommonModel {
     public zip: string
 
     @column()
+    public latitude: number
+
+    @column()
+    public longitude: number
+
+    @column()
     public image: string
 
     @column()

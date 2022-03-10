@@ -13,6 +13,8 @@ export default class Users extends BaseSchema {
             table.string('password', 255)
             table.string('bio', 250)
             table.string('zip', 15)
+            table.double('latitude')
+            table.double('longitude')
             table.text('image')
             table.integer('privacy')
             table.boolean('is_social_login').defaultTo(0)
