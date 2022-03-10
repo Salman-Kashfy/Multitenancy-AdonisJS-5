@@ -95,11 +95,11 @@ export default class Post extends CommonModel {
 	public comments: HasMany<typeof Comment>
 
 	public static postLikeReactionsCount = scope((query:Builder) => {
-		Object.values(Like.REACTION).forEach((value:any) => {
+		Object.keys(Like.REACTION).forEach((key:any) => {
 			query.withCount('likes',(likesCount) =>{
-				likesCount.as(`${value}`).where('reaction',value)
+				likesCount.as(`${key}`).where('reaction',Like.REACTION[key])
 			}).withCount('likes',(likesCount) =>{
-				likesCount.as(`${value}`).where('reaction',value)
+				likesCount.as(`${key}`).where('reaction',Like.REACTION[key])
 			})
 		});
 		return query
