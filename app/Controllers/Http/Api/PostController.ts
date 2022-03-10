@@ -11,6 +11,7 @@ import ParkRepo from 'App/Repos/ParkRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import constants from 'Config/constants'
+import UserRepo from 'App/Repos/UserRepo'
 
 export default class PostController extends ApiBaseController {
 
@@ -58,8 +59,13 @@ export default class PostController extends ApiBaseController {
         const {user}:any = auth
         await request.validate(CreateAlertValidator)
         const input = request.only(this.repo.fillables())
-        let row = await this.repo.createAlert({...input,userId:user.id}, request)
-        return this.apiResponse('Record Added Successfully', row)
+        //let row = await this.repo.createAlert({...input,userId:user.id}, request)
+        await UserRepo.sendAlerts({
+            postId:2,
+            latitude:input.latitude,
+            longitude:input.longitude
+        })
+        return this.apiResponse('Record Added Successfully', [])
     }
 
     async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {

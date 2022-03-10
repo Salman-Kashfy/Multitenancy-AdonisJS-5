@@ -24,6 +24,8 @@ export default class User extends CommonModel {
         ADMIN:1
     }
 
+    public static distanceQuery = '( ? * acos ( cos ( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin ( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance'
+
     @column({ isPrimary: true })
     public id: number
 

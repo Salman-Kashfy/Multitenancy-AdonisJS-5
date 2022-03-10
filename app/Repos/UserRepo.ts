@@ -5,6 +5,8 @@ import AppInvitation from "App/Mailers/AppInvitation";
 import constants from 'Config/constants'
 import Friend from 'App/Models/Friend'
 import Role from 'App/Models/Role'
+import SendAlerts from 'App/Interfaces/SendAlerts'
+import myHelpers from 'App/Helpers'
 
 class UserRepo extends BaseRepo {
     model
@@ -103,6 +105,20 @@ class UserRepo extends BaseRepo {
             query.where('name','like',`%${ctx.request.input('keyword')}%`)
         }
         return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+    }
+
+    async sendAlerts(input:SendAlerts){
+        if(!input.latitude || !input.longitude) return
+        let users = await this.model.query()
+            .whereNotNull('latitude')
+            .whereNotNull('longitude')
+            .select('*',Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,input.latitude,input.longitude,input.latitude]))
+            .having('distance','<=',constants.PARK_RADIUS)
+        users = users.map((user) =>{
+            myHelpers.sendNotificationStructure('','','','','')
+            return user.id
+        })
+        console.log(users)
     }
 }
 
