@@ -177,6 +177,20 @@ Route.group(() => {
         Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
         Route.resource('notifications', 'Api/NotificationController')
 
+        /*
+        |--------------------------------------------------------------------------
+        | Report API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.resource('reports', 'Api/ReportController')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistics API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.get('statistics', 'Api/UsersController.statistics')
+
     }).middleware('auth')
 
 }).prefix('/api')

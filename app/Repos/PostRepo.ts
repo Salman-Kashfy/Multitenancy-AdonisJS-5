@@ -32,9 +32,11 @@ class PostRepo extends BaseRepo {
         * */
         if (request.input('share_posts', []).length) {
             let sharedPosts = {}
+            const dateObj = new Date()
             for (let sharedPost of request.input('share_posts')) {
                 sharedPosts[sharedPost] = {
                     user_id: input.userId,
+                    created_at: dateObj
                 }
             }
             await row.related('sharedPosts').sync(sharedPosts)
@@ -71,9 +73,11 @@ class PostRepo extends BaseRepo {
         * */
         if (request.input('share_posts', []).length) {
             let sharedPosts = {}
-            for (let i = 0; i < request.input('share_posts').length; i++) {
-                sharedPosts[request.input('share_posts')[i]] = {
+            const dateObj = new Date()
+            for (let sharedPost of request.input('share_posts')) {
+                sharedPosts[sharedPost] = {
                     user_id: input.userId,
+                    created_at: dateObj
                 }
             }
             await row.related('sharedPosts').sync(sharedPosts)
