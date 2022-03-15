@@ -45,7 +45,8 @@ export default class PostController extends ApiBaseController {
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)){
+        const attachmentBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
+        if(ctx.request.input('remove_media') && !attachmentBelonging){
             throw new ExceptionWithCode('Permission denied!',403)
         }
         const input = ctx.request.only(this.repo.fillables())
