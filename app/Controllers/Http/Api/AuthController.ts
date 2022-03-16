@@ -140,10 +140,8 @@ export default class AuthController extends ApiBaseController{
             throw new ExceptionWithCode('User not found!',200)
         }
 
-        /*
-        * Verifications before login
-        * */
-        const validate = await this.repo.login(input,user,auth)
+        const token = await this.repo.login(input,auth)
+        user = await UserRepo.profile(user)
 
         /* Create User Device */
         const device = {
@@ -152,8 +150,7 @@ export default class AuthController extends ApiBaseController{
             deviceToken:input.device_token,
         }
         await UserDeviceRepo.updateOrCreate(device)
-
-        return this.apiResponse(validate.message,validate.data)
+        return this.apiResponse('Logged in successfully !',{user,token})
     }
 
     public async forgotPassword({request}: HttpContextContract) {
@@ -229,6 +226,11 @@ export default class AuthController extends ApiBaseController{
         let user;
         if (socialAccount) {
             user = await UserRepo.find(socialAccount.user_id)
+            const roles = await user.related('roles').query()
+            const roleIds = roles.map(role => role.id)
+            if(!roleIds.includes(request.input('account_type'))){
+                throw new ExceptionWithCode('Invalid role',false)
+            }
         }
         const userFillables:string[] = UserRepo.fillables()
         let input = request.only(userFillables)

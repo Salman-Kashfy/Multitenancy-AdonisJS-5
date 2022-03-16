@@ -38,6 +38,8 @@ class UserRepo extends BaseRepo {
                 .first()
             user = user.toJSON()
             user.business = business || null
+        }else{
+            user = user.toJSON()
         }
 
         return {...user,badges}
