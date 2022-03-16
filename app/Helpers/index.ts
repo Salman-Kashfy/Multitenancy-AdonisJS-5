@@ -6,6 +6,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import UserDevice from 'App/Models/UserDevice'
 import Notification from 'App/Models/Notification'
 import Application from "@ioc:Adonis/Core/Application";
+import BlockedUser from 'App/Models/BlockedUser'
 
 const ImageResizer = require('node-image-resizer')
 const FCM = require('fcm-node')
@@ -420,5 +421,17 @@ export default {
             payload.notification_id = notification.id
             this.sendNotification(constants.APP_NAME, msg, payload, devices)
         }
+    },
+    async getBlockedUserIds(userId){
+        let userIds:number[] = []
+        let users = await BlockedUser.query().where('user_id',userId).orWhere('blocked_user_id',userId)
+        users.map((user) =>{
+            if(user.userId === userId){
+                userIds.push(user.blockedUserId)
+            }else if(user.blockedUserId === userId){
+                userIds.push(user.userId)
+            }
+        })
+        return userIds
     }
 }
