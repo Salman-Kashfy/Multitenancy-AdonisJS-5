@@ -13,7 +13,7 @@ export default class ReportController extends ApiBaseController {
         await ctx.request.validate(ReportValidator)
         let input = ctx.request.only(this.repo.fillables())
         input.user_id = ctx.auth?.user?.id
-        let row = await ReportRepo.store(input)
+        let row = await this.repo.store(input)
         return this.apiResponse('Record Added Successfully', row)
     }
 

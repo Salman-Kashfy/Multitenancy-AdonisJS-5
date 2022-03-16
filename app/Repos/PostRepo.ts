@@ -15,6 +15,8 @@ import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
 import User from 'App/Models/User'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import Database from "@ioc:Adonis/Lucid/Database"
+import myHelper from 'App/Helpers'
 
 class PostRepo extends BaseRepo {
     model
@@ -273,18 +275,19 @@ class PostRepo extends BaseRepo {
         page = 1,
         perPage = constants.PER_PAGE,
         ctx: HttpContextContract
-    ): Promise<void>
+    )
     {
+        let res = await Database.rawQuery(`CALL newsfeed(${ctx.auth?.user?.id})`)
+        let postIds = res ? res[0][0] : []
+        let postIdsArray = postIds.map(postId => postId.id)
+        postIdsArray = postIdsArray.filter((value,index) => postIdsArray.indexOf(value) === index)
+
         let posts
-        let query = this.model.query()
+        let query = this.model.query().whereIn('id',postIdsArray)
             .withScopes((scope) => scope.fetchPost(ctx.auth?.user?.id));
 
         // if(ctx.request.input('user_id')){
         //     query.where('user_id', ctx.request.input('user_id'))
-        // }
-        //
-        // if(!ctx.request.input('user_id') || ctx.auth?.user?.id !== parseInt(ctx.request.input('user_id'))){
-        //     query.withScopes((scope) => scope.globalPrivacy(ctx.auth?.user?.id))
         // }
 
         if(ctx.request.input('park_id')){
@@ -293,26 +296,10 @@ class PostRepo extends BaseRepo {
             })
         }
 
-        query.where((postQuery) =>{
-            postQuery.where('user_id', ctx.auth?.user?.id)
-                .orWhere((postQuery) =>{
-                    postQuery.withScopes((scopes) => scopes.privacy(ctx.auth?.user?.id))
-                })
-        })
-
-        query.whereHas('sharedPosts', (sharedPostQuery) =>{
-            sharedPostQuery.whereExists((builder) =>{
-                builder.select('*').from('park_members')
-                    .whereRaw(`shared_posts.park_id = park_members.park_id AND park_members.member_id = ${ctx.auth?.user?.id}`)
-            })
-        }).preload('originalPost',(postQuery) =>{
+        query.preload('originalPost',(postQuery) =>{
             postQuery.preload('user')
-        }).preload('sharedPosts',(sharedPostQuery) =>{
-            sharedPostQuery.whereExists((builder) =>{
-                builder.select('*').from('park_members')
-                    .whereRaw(`shared_posts.park_id = park_members.park_id AND park_members.member_id = ${ctx.auth?.user?.id}`)
-            })
-        }).whereDoesntHave('hidden',(builder) =>{
+        }).preload('sharedPosts')
+        .whereDoesntHave('hidden',(builder) =>{
             builder.where('id',ctx.auth.user?.id)
         })
 
@@ -322,7 +309,7 @@ class PostRepo extends BaseRepo {
     }
 
     addPostMetaKeys(posts){
-        let rows:any[] = [];
+        let rows:object[] = [];
         if(posts.rows.length){
             posts.rows.map(post =>{
                 return rows.push({
@@ -335,6 +322,33 @@ class PostRepo extends BaseRepo {
             posts.rows = rows
         }
         return posts
+    }
+
+    async sendAlert(post){
+        if(typeof post !== "object"){
+            post = await this.model.find(post)
+        }
+        let blockedUsers = await myHelper.getBlockedUserIds(post.userId)
+        let query = User.query()
+            .select('*',Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,post.latitude,post.longitude,post.latitude]))
+            .having('distance','<=',constants.PARK_RADIUS)
+        if(blockedUsers.length>0){
+            query.whereNotIn('id', blockedUsers)
+        }
+        const users = await query
+        if(users.length){
+            let notification_message
+            users.map((user) => {
+                if(post.alertType === this.model.ALERT_TYPE.LOST_DOG){
+                    notification_message = 'A dog is lost nearby your area. Can you help them find it?'
+                }else if(post.alertType === this.model.ALERT_TYPE.FOUND_DOG){
+                    notification_message = 'A lost dog was found nearby your location.'
+                }else if(post.alertType === this.model.ALERT_TYPE.HEALTH_AND_SAFETY){
+                    notification_message = 'A healthy alert for your dog safety'
+                }
+                myHelpers.sendNotificationStructure(user.id, post.id, Notification.TYPES.ALERT, post.userId, null, notification_message)
+            })
+        }
     }
 
     async hidePost(input:HidePostInterface){

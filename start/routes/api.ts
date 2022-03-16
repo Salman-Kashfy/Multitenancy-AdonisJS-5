@@ -160,7 +160,6 @@ Route.group(() => {
         | Like API Routes
         |--------------------------------------------------------------------------
         */
-        Route.post('likes/count-likes','Api/LikeController.countLikes')
         Route.resource('likes','Api/LikeController').only(['index', 'store'])
 
         /*
@@ -180,6 +179,7 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
+        Route.post('notifications/custom-push', 'Api/NotificationController.customPush').middleware('admin')
         Route.resource('notifications', 'Api/NotificationController')
 
         /*

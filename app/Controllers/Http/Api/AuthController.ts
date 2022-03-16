@@ -19,6 +19,7 @@ import LogoutValidator from "App/Validators/LogoutValidator";
 import SocialLoginValidator from "App/Validators/SocialLoginValidator";
 import SocialAccountRepo from "App/Repos/SocialAccountRepo";
 import RegisterBusinessValidator from 'App/Validators/RegisterBusinessValidator'
+import PasswordUpdated from 'App/Mailers/PasswordUpdated'
 import BusinessRepo from 'App/Repos/BusinessRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
@@ -169,7 +170,7 @@ export default class AuthController extends ApiBaseController{
         const otp:OtpInterface = {email:input.email,userId:user.id,type:'reset-password'}
         const code = await OtpRepo.sendOTP(otp)
 
-        let message:any
+        let message
         if(input.via == 'email'){
             /* Send Email */
             const subject = 'Reset Password OTP'
@@ -210,6 +211,9 @@ export default class AuthController extends ApiBaseController{
             throw new ExceptionWithCode("Failed to update password. Please try again.",200)
         }
         validate.data.delete()
+        /* Send Email */
+        const subject = 'Password Changed'
+        await new PasswordUpdated(user, subject).sendLater()
         return this.apiResponse("Password updated successfully !",{user:user})
     }
 

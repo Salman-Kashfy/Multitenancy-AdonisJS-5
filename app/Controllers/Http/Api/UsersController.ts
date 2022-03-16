@@ -37,12 +37,12 @@ export default class UsersController extends ApiBaseController{
     }
 
     async updateBusinessProfile( { request,auth }: HttpContextContract ){
-        const { user }:any = auth
+        const { user } = auth
         const input = await request.validate(EditBusinessProfileValidator)
-        let userDetails = {...request.only(this.repo.model.fillables),name:input.business_name}
-        await this.repo.update(user.id,userDetails)
+        let userDetails = {...request.only(this.repo.fillables()),name:input.business_name}
+        await this.repo.update(user?.id,userDetails)
         await BusinessRepo.update(user,request.only(BusinessRepo.fillables()),request)
-        const profile = await this.repo.profile(user.id)
+        const profile = await this.repo.profile(user?.id)
         return this.apiResponse("Profile Updated Successfully!",profile)
     }
 

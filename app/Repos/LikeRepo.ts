@@ -1,8 +1,8 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import Like from "App/Models/Like";
+import Comment from "App/Models/Comment";
+import Post from "App/Models/Post";
 import {LikeInterface} from "App/Interfaces/LikeInterface";
-import Database from "@ioc:Adonis/Lucid/Database"
-import Pluralize from 'pluralize';
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import constants from 'Config/constants'
 import { DurationUnit } from 'App/Interfaces/DurationObjectUnits'
@@ -12,6 +12,7 @@ import Role from 'App/Models/Role'
 import BadgeCriterion from 'App/Models/BadgeCriterion'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
+import Comment from 'App/Models/Comment'
 
 class LikeRepo extends BaseRepo {
     model
@@ -24,7 +25,9 @@ class LikeRepo extends BaseRepo {
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx) {
         let query = this.model.query().orderBy(orderByColumn, orderByValue)
-        if (ctx.request.input('post_id', null)) {
+        let likesCount:object[] =[]
+        if (ctx.request.input('instance_id', null)  && ctx.request.input('instance_type', null)) {
+            likesCount = await this.countLikes(ctx.request.only(['instance_id','instance_type']))
             query = query.where({
                 instance_type: ctx.request.input('instance_type'),
                 instance_id: ctx.request.input('instance_id')
@@ -45,6 +48,7 @@ class LikeRepo extends BaseRepo {
                 },
             }
         })
+        likes.data = {likesCount:likesCount,likes:likes.data}
         return likes
     }
 
@@ -63,17 +67,44 @@ class LikeRepo extends BaseRepo {
         await this.model.updateOrCreate(data, input)
 
         // Send Badge on Like (If applicable)
-        if(!request.input('unlike',0)){
+        if(request.input('like',null)){
             await this.sendBadge(input.user_id)
+
+            // Send Push notification
+            await this.handleNotifications(data)
+        }
+    }
+
+    async handleNotifications(data){
+        if(parseInt(data.instanceType) === this.model.TYPE.COMMENT){
+            const liker = await User.find(data.userId)
+            const commentor = await Comment.find(data.instanceId)
+            if(!liker || !commentor) return
+            const notification_message = `${liker.name} likes on your comment.`
+            myHelpers.sendNotificationStructure(commentor.userId, data.instanceId, Notification.TYPES.SOMEONE_LIKE_COMMENT, data.userId, null, notification_message)
+        }
+    }
+
+    getModelInstance(instanceType){
+        switch (instanceType) {
+            case this.model.TYPE.COMMENT:
+                return Comment
+            case this.model.TYPE.POST:
+                return Post
+            default:
+                return false
         }
     }
 
     async validateInstance(input){
-        const key = Object.keys(this.model.TYPE)[Object.values(this.model.TYPE).indexOf(input.instance_type)];
-        const record:any = await Database.query().from(Pluralize(key).toLowerCase()).select('id').where('id', input.instance_id).limit(1).first()
-        if(!record){
-            throw new ExceptionWithCode('Record not found',404)
+        const model = this.getModelInstance(parseInt(input.instance_type))
+        if(model){
+            const record = await model.query().select('id').where('id', input.instance_id).limit(1).getCount('id as count').first()
+            if(record.$extras.count){
+                return
+            }
         }
+        throw new ExceptionWithCode('Record not found',404)
     }
 
     async countLikes(input){
@@ -82,12 +113,24 @@ class LikeRepo extends BaseRepo {
             instance_type: input.instance_type,
             instance_id: input.instance_id
         }).groupBy('reaction').getCount('reaction as count')
-        return likes.map((like) => {
+        let likesCount = likes.map((like) => {
             return {
                 reaction:like.reaction,
                 count:like.$extras.count,
             }
         })
+        let allLikes = Object.values(this.model.REACTION)
+        if(likes.length !== allLikes.length){
+            for(let singleLike of allLikes){
+                if (! (likes.some(e => e.reaction === singleLike))) {
+                    likesCount.push({
+                        reaction:singleLike,
+                        count:0,
+                    })
+                }
+            }
+        }
+        return likesCount
     }
 
     async countCurrentDurationLikes(userId, duration:DurationUnit = 'month',reactionType ) {
@@ -106,7 +149,7 @@ class LikeRepo extends BaseRepo {
     async sendBadge(userId) {
         const user = await User.find(userId)
         if(!user) return
-        const role = await user.related('roles').query().first()
+        const role = await user.related('roles').query().where('role_id',Role.PARENT).first()
         if(!role) return
 
         let userBadges = await user.related('badges').query()
@@ -114,27 +157,23 @@ class LikeRepo extends BaseRepo {
             return badge.id
         })
 
-        if (role.id === Role.PARENT) {
-            let query = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '>=', 0)
-            if (userBadgeIds.length) {
-                query.whereNotIn('badge_id', userBadgeIds)
+        let query = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '>=', 0)
+        if (userBadgeIds.length) {
+            query.whereNotIn('badge_id', userBadgeIds)
+        }
+        const badgeCriteria = await query
+        for (let badgeCriterion of badgeCriteria) {
+            const count = await this.countCurrentDurationLikes(userId, badgeCriterion.duration,badgeCriterion.reactionType)
+            let badgeCriterionQuery = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '<=', count).orderBy('likes_count','asc')
+            if (userBadgeIds.length>0) {
+                badgeCriterionQuery.whereNotIn('badge_id', userBadgeIds)
             }
-            const badgeCriteria = await query
-            if (badgeCriteria.length) {
-                for (let badgeCriterion of badgeCriteria) {
-                    const count = await this.countCurrentDurationLikes(userId, badgeCriterion.duration,badgeCriterion.reactionType)
-                    let badgeCriterionQuery = BadgeCriterion.query().where('role_id', role.id).where('likes_count', '<=', count).orderBy('likes_count','asc')
-                    if (userBadgeIds.length) {
-                        badgeCriterionQuery.whereNotIn('badge_id', userBadgeIds)
-                    }
-                    const earned = await badgeCriterionQuery.first()
-                    if(earned){
-                        await user.related('badges').sync([earned.badgeId],false)
-                        const notification_message = "Congratulation! You have earned a new badge!"
-                        myHelpers.sendNotificationStructure(userId, earned.badgeId, Notification.TYPES.BADGE_EARNED, userId, null, notification_message)
-                        break;
-                    }
-                }
+            const earned = await badgeCriterionQuery.first()
+            if(earned){
+                await user.related('badges').sync([earned.badgeId],false)
+                const notification_message = "Congratulation! You have earned a new badge!"
+                myHelpers.sendNotificationStructure(userId, earned.badgeId, Notification.TYPES.BADGE_EARNED, userId, null, notification_message)
+                break;
             }
         }
     }

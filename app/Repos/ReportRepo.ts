@@ -2,8 +2,6 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import Report from 'App/Models/Report'
 import Post from 'App/Models/Post'
 import User from 'App/Models/User'
-import Pluralize from 'pluralize'
-import Database from '@ioc:Adonis/Lucid/Database'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 class ReportRepo extends BaseRepo {
@@ -15,23 +13,44 @@ class ReportRepo extends BaseRepo {
         this.model = Report
     }
 
-    async instanceBelonging(instanceId,instanceType) {
-        const key = Object.keys(this.model.INSTANCE_TYPES)[Object.values(this.model.INSTANCE_TYPES).indexOf(parseInt(instanceType))]
-        const record: any = await Database.query().from(Pluralize(key).toLowerCase()).select('id').where('id', instanceId).limit(1).first()
-        if(!record)
+    async validateInstance(input){
+        const model = this.getModelInstance(parseInt(input.instance_type))
+        if(model){
+            const record = await model.query().select('id').where('id', input.instance_id).limit(1).getCount('id as count').first()
+            if(record.$extras.count){
+                return
+            }
+        }
         throw new ExceptionWithCode('Record not found',404)
     }
 
-    async restrictIfExist(instanceId,instanceType,userId) {
-        const key = Object.keys(this.model.INSTANCE_TYPES)[Object.values(this.model.INSTANCE_TYPES).indexOf(parseInt(instanceType))].toLowerCase()
-        const record: any = await this.model.query().select('id').where('user_id', userId).where('instance_id', instanceId).where('instance_type', instanceType).limit(1).first()
-        if(record)
-        throw new ExceptionWithCode(`You have already reported this ${key}.`,200)
+    getModelInstance(instanceType){
+        switch (instanceType) {
+            case this.model.INSTANCE_TYPES.USER:
+                return User
+            case this.model.INSTANCE_TYPES.POST:
+                return Post
+            default:
+                return false
+        }
+    }
+
+    async restrictIfExist(input) {
+        const model = this.getModelInstance(parseInt(input.instance_type))
+        if(model){
+            const record = await this.model.query().where('instance_id', input.instance_id).where('instance_type', input.instance_type).getCount('id as count').first()
+            if(record.$extras.count){
+                throw new ExceptionWithCode('You have already reported this content.',200)
+            }else{
+                return
+            }
+        }
+        throw new ExceptionWithCode('Record not found',404)
     }
 
     async store(input) {
-        await this.instanceBelonging(input.instance_id,input.instance_type)
-        await this.restrictIfExist(input.instance_id,input.instance_type,input.user_id)
+        await this.validateInstance(input)
+        await this.restrictIfExist(input)
         return this.model.create(input)
     }
 

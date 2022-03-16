@@ -34,6 +34,8 @@ export default class Post extends CommonModel {
 		HEALTH_AND_SAFETY: 30,
 	}
 
+	public static distanceQuery = '( ? * acos ( cos ( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin ( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance'
+
     @column()
     public id: number
 	@column()
@@ -97,11 +99,11 @@ export default class Post extends CommonModel {
 	public comments: HasMany<typeof Comment>
 
 	public static postLikeReactionsCount = scope((query:Builder) => {
-		Object.values(Like.REACTION).forEach((value:any) => {
+		Object.keys(Like.REACTION).forEach((key:any) => {
 			query.withCount('likes',(likesCount) =>{
-				likesCount.as(`${value}`).where('reaction',value)
+				likesCount.as(`${key}`).where('reaction',Like.REACTION[key])
 			}).withCount('likes',(likesCount) =>{
-				likesCount.as(`${value}`).where('reaction',value)
+				likesCount.as(`${key}`).where('reaction',Like.REACTION[key])
 			})
 		});
 		return query
@@ -119,48 +121,12 @@ export default class Post extends CommonModel {
 	public static postMeta = scope((query:Builder,userID) => {
 		query.withCount('likes', (likeQuery) =>{
 			likeQuery.as('likes_count')
-				.whereNotExists((builder) =>{
-					builder.select('*').from('blocked_users')
-						/*
-                        * IF author have blocked post liker.
-                        * */
-						.whereRaw(`blocked_users.user_id = ${userID} AND likes.user_id = blocked_users.blocked_user_id`)
-						/*
-                        * IF post liker have blocked author.
-                        * */
-						.orWhereRaw(`blocked_users.user_id = likes.user_id AND blocked_users.blocked_user_id = ${userID}`)
-				})
 		}).withCount('comments', (commentQuery) =>{
 			commentQuery.as('comments_count')
-				.whereNotExists((builder) =>{
-					builder.select('*').from('blocked_users')
-						/*
-                        * IF author have blocked commenter.
-                        * */
-						.whereRaw(`blocked_users.user_id = ${userID} AND comments.user_id = blocked_users.blocked_user_id`)
-						/*
-                        * IF commenter have blocked author.
-                        * */
-						.orWhereRaw(`blocked_users.user_id = comments.user_id AND blocked_users.blocked_user_id = ${userID}`)
-				})
 		}).withCount('likes', (likeQuery) =>{
 			likeQuery.as('is_liked')
 				.where('user_id', userID)
 				.where('instance_type', Like.TYPE.POST)
-		})
-	})
-
-	public static privacy = scope((query:Builder, userID) => {
-		query.whereNotExists((builder) =>{
-			builder.select('*').from('blocked_users')
-				/*
-				* IF current user have blocked author
-				* */
-				.whereRaw(`blocked_users.user_id = ${userID} AND posts.user_id = blocked_users.blocked_user_id`)
-				/*
-				* IF author have blocked current user
-				* */
-				.orWhereRaw(`blocked_users.user_id = posts.user_id AND blocked_users.blocked_user_id = ${userID}`)
 		})
 	})
 

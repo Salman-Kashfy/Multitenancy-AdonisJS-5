@@ -136,7 +136,7 @@ class UserRepo extends BaseRepo {
         Object.values(Like.REACTION).forEach((value) =>{
             obj[`${value}`] = 0
         })
-        if(posts.length){
+        if(posts.length>0){
             let likeCount = posts.map((post) =>{
                 return post.$extras
             })
