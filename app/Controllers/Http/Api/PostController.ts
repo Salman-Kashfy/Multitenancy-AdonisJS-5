@@ -18,6 +18,15 @@ export default class PostController extends ApiBaseController {
         super(PostRepo)
     }
 
+    async newsfeed(ctx: HttpContextContract){
+        let page = ctx.request.input('page', 1)
+        let perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        let orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        let rows = await this.repo.newsfeed(orderByColumn, orderByValue, page, perPage, ctx)
+        return this.apiResponse('Posts fetched successfully', rows)
+    }
+
     async createPost({request,auth}: HttpContextContract) {
         const {user} = auth
         await request.validate(CreatePostValidator)
@@ -30,17 +39,18 @@ export default class PostController extends ApiBaseController {
     }
 
     async updatePost(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
-        const {user}:any = ctx.auth
+        const {user} = ctx.auth
         await ctx.request.validate(EditPostValidator)
         const belonging = await this.repo.belonging(ctx)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)){
+        const attachmentBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
+        if(ctx.request.input('remove_media') && !attachmentBelonging){
             throw new ExceptionWithCode('Permission denied!',403)
         }
         const input = ctx.request.only(this.repo.fillables())
-        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user?.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
@@ -55,27 +65,27 @@ export default class PostController extends ApiBaseController {
     }
 
     async createAlert({request,auth}: HttpContextContract){
-        const {user}:any = auth
+        const {user} = auth
         await request.validate(CreateAlertValidator)
         const input = request.only(this.repo.fillables())
-        let row = await this.repo.createAlert({...input,userId:user.id}, request)
+        let row = await this.repo.createAlert({...input,userId:user?.id}, request)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
-        const {user}:any = ctx.auth
+        const {user} = ctx.auth
         await ctx.request.validate(EditAlertValidator)
         const belonging = await this.repo.belonging(ctx)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media')){
-            const checkAllBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user.id)
+            const checkAllBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
             if(!checkAllBelonging)
             throw new ExceptionWithCode('Permission denied!',403)
         }
         const input = ctx.request.only(this.repo.fillables())
-        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user.id}, ctx.request)
+        const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user?.id}, ctx.request)
         return this.apiResponse('Record Updated Successfully', row)
     }
 
@@ -104,6 +114,15 @@ export default class PostController extends ApiBaseController {
         const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
         const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
         const shares = await this.repo.getShareList(orderByColumn,orderByValue,page,perPage,ctx);
+        return this.apiResponse('Record Fetched Successfully',shares)
+    }
+
+    async parkPost(ctx:HttpContextContract){
+        const page = ctx.request.input('page', 1)
+        const perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        const orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        const orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        const shares = await this.repo.parkPost(orderByColumn,orderByValue,page,perPage,ctx);
         return this.apiResponse('Record Fetched Successfully',shares)
     }
 

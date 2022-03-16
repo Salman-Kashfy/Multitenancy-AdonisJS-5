@@ -16,6 +16,8 @@ import Park from 'App/Models/Park'
 import User from 'App/Models/User'
 import Like from 'App/Models/Like'
 import Comment from 'App/Models/Comment'
+import Friend from 'App/Models/Friend'
+import Report from 'App/Models/Report'
 
 type Builder = ModelQueryBuilderContract<typeof Post>
 
@@ -105,9 +107,62 @@ export default class Post extends CommonModel {
 		return query
 	})
 
-	@hasMany(() => Post, {
+	@belongsTo(() => Post, {
 		foreignKey: 'sharedPostId',
 	})
-	public sharedToProfile: HasMany<typeof Post>
+	public originalPost: BelongsTo<typeof Post>
+
+	public static fetchPost = scope((query:Builder,userID) => {
+		query.withScopes((scope) => scope.postMeta(userID)).preload('user')
+	})
+
+	public static postMeta = scope((query:Builder,userID) => {
+		query.withCount('likes', (likeQuery) =>{
+			likeQuery.as('likes_count')
+		}).withCount('comments', (commentQuery) =>{
+			commentQuery.as('comments_count')
+		}).withCount('likes', (likeQuery) =>{
+			likeQuery.as('is_liked')
+				.where('user_id', userID)
+				.where('instance_type', Like.TYPE.POST)
+		})
+	})
+
+	public static globalPrivacy = scope((query:Builder,userID) =>{
+        query.whereHas('user',(userQuery) =>{
+            /*
+            * For POST (Not Alert)
+            * */
+            userQuery.where((innerQuery) =>{
+                innerQuery.where('posts.type',Post.TYPE.POST)
+                 /*
+                 * IF Post is public
+                 * */
+                .where('users.privacy', User.PROFILE.PUBLIC)
+                 /*
+                 * IF Post is only friends-only
+                 * */
+                .orWhere((subUserQuery) =>{
+                    subUserQuery.where('users.privacy', User.PROFILE.FRIENDS)
+                        .where((innerSubquery) =>{
+                            innerSubquery.where('id', userID)
+                                .orWhereExists((builder) =>{
+                                    builder.select('*').from('friends')
+                                        .whereRaw(`friends.status = ${Friend.STATUSES.ACCEPTED} AND users.id = friends.user_id AND friends.friend_id = ${userID}`)
+                                })
+                        })
+                })
+                 /*
+                 * IF Post is only-me
+                 * */
+                .orWhere((subUserQuery) =>{
+                    subUserQuery.where('users.privacy', User.PROFILE.ONLY_ME).where('id', userID)
+                })
+            })
+        }).whereNotExists((builder) => {
+            builder.select('*').from('reports')
+            .where('reports.user_id', userID).where({instance_type: Report.INSTANCE_TYPES.POST}).whereRaw(`reports.instance_id = posts.id`)
+        })
+    })
 
 }

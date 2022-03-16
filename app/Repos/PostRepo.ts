@@ -13,6 +13,8 @@ import { DurationUnit } from 'App/Interfaces/DurationObjectUnits'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
 import User from 'App/Models/User'
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import Database from '@ioc:Adonis/Lucid/Database'
 
 class PostRepo extends BaseRepo {
     model
@@ -157,13 +159,9 @@ class PostRepo extends BaseRepo {
     }
 
     async applyPostLimits(user, shareParkIds, hostPark) {
-        const userRoles = await user.related('roles').query()
-        const userRoleIds = userRoles.map(function(role) {
-            return role.id
-        })
-        const roleId = userRoleIds[0]
+        const role = await user.related('roles').query().first()
         const userSubscription = await user.related('subscription').query().first()
-        const postCriteria = await PostCriterion.query().where('role_id', roleId).where('subscription_id', userSubscription.id).first()
+        const postCriteria = await PostCriterion.query().where('role_id', role.id).where('subscription_id', userSubscription.id).first()
         if (!postCriteria) {
             return
         }
@@ -172,11 +170,11 @@ class PostRepo extends BaseRepo {
             return park.id
         })
         const count = await this.countCurrentDurationPosts(user.id)
-        if (userRoleIds.includes(Role.PARENT)) {
+        if (role.id === Role.PARENT) {
             if (postCriteria.postsPerMonth !== -1 && count >= postCriteria.postsPerMonth) {
                 throw new ExceptionWithCode(`${userSubscription.name} for parent account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`, 403)
             }
-        } else if (userRoleIds.includes(Role.BUSINESS)) {
+        } else if (role.id === Role.BUSINESS) {
             if (postCriteria.postsPerMonth !== -1 && count >= postCriteria.postsPerMonth && shareParkIds.sort().toString() !== hostParkIds.sort().toString()) {
                 throw new ExceptionWithCode(`${userSubscription.name} for business account includes ${postCriteria.postsPerMonth} posts per month. Upgrade your subscription plan for unlimited posting!`, 403)
             }
@@ -267,6 +265,59 @@ class PostRepo extends BaseRepo {
                 }
             }
         }
+    }
+
+    async newsfeed(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        page = 1,
+        perPage = constants.PER_PAGE,
+        ctx: HttpContextContract
+    )
+    {
+
+        let res = await Database.rawQuery(`CALL newsfeed(${ctx.auth?.user?.id})`)
+        let postIds = res ? res[0][0] : []
+        let postIdsArray = postIds.map(postId => postId.id)
+        postIdsArray = postIdsArray.filter((value,index) => postIdsArray.indexOf(value) === index)
+
+        let posts
+        let query = this.model.query().whereIn('id',postIdsArray)
+            .withScopes((scope) => scope.fetchPost(ctx.auth?.user?.id));
+
+        // if(ctx.request.input('user_id')){
+        //     query.where('user_id', ctx.request.input('user_id'))
+        // }
+
+        if(ctx.request.input('park_id')){
+            query.whereHas('sharedPosts', (sharedPostQuery) =>{
+                sharedPostQuery.where('park_id',ctx.request.input('park_id'))
+            })
+        }
+
+        query.preload('originalPost',(postQuery) =>{
+            postQuery.preload('user')
+        }).preload('sharedPosts')
+
+        posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+        posts = this.addPostMetaKeys(posts)
+        return posts
+    }
+
+    addPostMetaKeys(posts){
+        let rows:any[] = [];
+        if(posts.rows.length){
+            posts.rows.map(post =>{
+                return rows.push({
+                    ...post.toJSON(),
+                    likes_count:post.$extras.likes_count,
+                    comments_count:post.$extras.comments_count,
+                    is_liked:post.$extras.is_liked
+                })
+            })
+            posts.rows = rows
+        }
+        return posts
     }
 }
 
