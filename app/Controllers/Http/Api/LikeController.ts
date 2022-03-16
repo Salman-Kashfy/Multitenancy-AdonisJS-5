@@ -2,7 +2,6 @@ import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
 import LikeRepo from "App/Repos/LikeRepo";
 import LikeValidator from "App/Validators/LikeValidator";
-import CountLikeValidator from "App/Validators/CountLikeValidator";
 import constants from 'Config/constants'
 
 export default class LikeController extends ApiBaseController {
@@ -20,21 +19,14 @@ export default class LikeController extends ApiBaseController {
     }
 
     async store(ctx: HttpContextContract) {
-        let input:any = await ctx.request.validate(LikeValidator)
+        let input = await ctx.request.validate(LikeValidator)
         const {user} = ctx.auth
-        input.user_id = user?.id
-        if (ctx.request.input('unlike',0)) {
-            await this.repo.unlike(input)
+        if (!ctx.request.input('like',null)) {
+            await this.repo.unlike({...input,user_id:user?.id })
             return this.apiResponse('Unlike successfully!')
         }
-        await this.repo.store(input,ctx.request)
+        await this.repo.store({...input,user_id:user?.id },ctx.request)
         return this.apiResponse('Liked Successfully')
-    }
-
-    async countLikes({request}:HttpContextContract){
-        let input:any = await request.validate(CountLikeValidator)
-        const likes = await this.repo.countLikes(input)
-        return this.apiResponse('Record Fetched Successfully!',likes)
     }
 
 }

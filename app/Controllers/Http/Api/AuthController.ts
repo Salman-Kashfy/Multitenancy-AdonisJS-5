@@ -170,7 +170,7 @@ export default class AuthController extends ApiBaseController{
         const otp:OtpInterface = {email:input.email,userId:user.id,type:'reset-password'}
         const code = await OtpRepo.sendOTP(otp)
 
-        let message:any
+        let message
         if(input.via == 'email'){
             /* Send Email */
             const subject = 'Reset Password OTP'

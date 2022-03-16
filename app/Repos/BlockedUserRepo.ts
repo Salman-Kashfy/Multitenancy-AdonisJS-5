@@ -32,7 +32,7 @@ class BlockedUserRepo extends BaseRepo {
             }
         })
 
-        let rows:any = []
+        let rows:object[] = []
         blockedUsers.data.map((blockedUser) =>{
             rows.push(blockedUser.user)
         })
