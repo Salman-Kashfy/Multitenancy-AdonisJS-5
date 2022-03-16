@@ -14,7 +14,8 @@ import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
 import User from 'App/Models/User'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
-import Database from '@ioc:Adonis/Lucid/Database'
+import Database from "@ioc:Adonis/Lucid/Database"
+import myHelper from 'App/Helpers'
 
 class PostRepo extends BaseRepo {
     model
@@ -275,7 +276,6 @@ class PostRepo extends BaseRepo {
         ctx: HttpContextContract
     )
     {
-
         let res = await Database.rawQuery(`CALL newsfeed(${ctx.auth?.user?.id})`)
         let postIds = res ? res[0][0] : []
         let postIdsArray = postIds.map(postId => postId.id)
@@ -305,7 +305,7 @@ class PostRepo extends BaseRepo {
     }
 
     addPostMetaKeys(posts){
-        let rows:any[] = [];
+        let rows:object[] = [];
         if(posts.rows.length){
             posts.rows.map(post =>{
                 return rows.push({
@@ -318,6 +318,33 @@ class PostRepo extends BaseRepo {
             posts.rows = rows
         }
         return posts
+    }
+
+    async sendAlert(post){
+        if(typeof post !== "object"){
+            post = await this.model.find(post)
+        }
+        let blockedUsers = await myHelper.getBlockedUserIds(post.userId)
+        let query = User.query()
+            .select('*',Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,post.latitude,post.longitude,post.latitude]))
+            .having('distance','<=',constants.PARK_RADIUS)
+        if(blockedUsers.length>0){
+            query.whereNotIn('id', blockedUsers)
+        }
+        const users = await query
+        if(users.length){
+            let notification_message
+            users.map((user) => {
+                if(post.alertType === this.model.ALERT_TYPE.LOST_DOG){
+                    notification_message = 'A dog is lost nearby your area. Can you help them find it?'
+                }else if(post.alertType === this.model.ALERT_TYPE.FOUND_DOG){
+                    notification_message = 'A lost dog was found nearby your location.'
+                }else if(post.alertType === this.model.ALERT_TYPE.HEALTH_AND_SAFETY){
+                    notification_message = 'A healthy alert for your dog safety'
+                }
+                myHelpers.sendNotificationStructure(user.id, post.id, Notification.TYPES.ALERT, post.userId, null, notification_message)
+            })
+        }
     }
 }
 

@@ -12,6 +12,7 @@ import Role from 'App/Models/Role'
 import BadgeCriterion from 'App/Models/BadgeCriterion'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
+import Comment from 'App/Models/Comment'
 
 class LikeRepo extends BaseRepo {
     model
@@ -68,6 +69,19 @@ class LikeRepo extends BaseRepo {
         // Send Badge on Like (If applicable)
         if(request.input('like',null)){
             await this.sendBadge(input.user_id)
+
+            // Send Push notification
+            await this.handleNotifications(data)
+        }
+    }
+
+    async handleNotifications(data){
+        if(parseInt(data.instanceType) === this.model.TYPE.COMMENT){
+            const liker = await User.find(data.userId)
+            const commentor = await Comment.find(data.instanceId)
+            if(!liker || !commentor) return
+            const notification_message = `${liker.name} likes on your comment.`
+            myHelpers.sendNotificationStructure(commentor.userId, data.instanceId, Notification.TYPES.SOMEONE_LIKE_COMMENT, data.userId, null, notification_message)
         }
     }
 

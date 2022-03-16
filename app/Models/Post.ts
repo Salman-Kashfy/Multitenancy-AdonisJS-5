@@ -34,6 +34,8 @@ export default class Post extends CommonModel {
 		HEALTH_AND_SAFETY: 30,
 	}
 
+	public static distanceQuery = '( ? * acos ( cos ( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin ( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance'
+
     @column()
     public id: number
 	@column()

@@ -177,6 +177,7 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
+        Route.post('notifications/custom-push', 'Api/NotificationController.customPush').middleware('admin')
         Route.resource('notifications', 'Api/NotificationController')
 
         /*

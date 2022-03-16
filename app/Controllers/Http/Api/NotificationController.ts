@@ -2,6 +2,7 @@ import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import NotificationRepo from "App/Repos/NotificationRepo";
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import constants from "Config/constants";
+import CustomPushValidator from "App/Validators/CustomPushValidator";
 
 export default class NotificationController extends ApiBaseController {
 
@@ -23,6 +24,12 @@ export default class NotificationController extends ApiBaseController {
         const {user} = auth
         await this.repo.markAllRead(user?.id)
         return this.apiResponse("Marked read successfully!")
+    }
+
+    async customPush(ctx: HttpContextContract){
+        const input = await ctx.request.validate(CustomPushValidator)
+        await this.repo.customPush(input)
+        return this.apiResponse("Push sent successfully!")
     }
 
 }
