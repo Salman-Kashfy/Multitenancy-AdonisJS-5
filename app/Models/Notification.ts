@@ -14,6 +14,7 @@ export default class Notification extends CommonModel {
         MENTION_IN_POST: 35,
         MENTION_IN_COMMENT: 40,
         POST: 45,
+        CUSTOM_ALERTS:50
     }
 
     @column({ isPrimary: true })

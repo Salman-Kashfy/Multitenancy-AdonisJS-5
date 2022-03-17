@@ -10,6 +10,8 @@ import SharedPost from 'App/Models/SharedPost'
 import Post from 'App/Models/Post'
 import { DateTime } from 'luxon'
 import Like from 'App/Models/Like'
+import Notification from 'App/Models/Notification'
+import myHelpers from 'App/Helpers'
 
 class UserRepo extends BaseRepo {
     model
@@ -34,7 +36,8 @@ class UserRepo extends BaseRepo {
                 .preload('categories')
                 .preload('attachments')
                 .first()
-            user = {...user.toJSON(),business}
+            user = user.toJSON()
+            user.business = business || null
         }else{
             user = user.toJSON()
         }
@@ -186,6 +189,18 @@ class UserRepo extends BaseRepo {
             shares:shareCount,
             comments:commentsCount
         }
+    }
+
+    async sendAlerts(input){
+        if(!input.latitude || !input.longitude) return
+        let users = await this.model.query()
+            .whereNotNull('latitude')
+            .whereNotNull('longitude')
+            .select('*',Database.raw(this.model.distanceQuery,[constants.PARK_DISTANCE_LIMIT,input.latitude,input.longitude,input.latitude]))
+            .having('distance','<=',parseFloat(input.radius))
+        users.map((user) =>{
+            myHelpers.sendNotificationStructure(user.id,'',Notification.TYPES.CUSTOM_ALERTS,user.id,null,input.message)
+        })
     }
 }
 

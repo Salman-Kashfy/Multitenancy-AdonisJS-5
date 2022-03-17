@@ -11,7 +11,7 @@ export default class EditBusinessProfileValidator extends BaseValidator {
     }
 
     public schema = schema.create({
-		business_name: schema.string({}, [
+		business_name: schema.string.optional({}, [
 			rules.maxLength(35),
 			rules.unique({
 				table: BusinessRepo.model.table,
@@ -22,12 +22,14 @@ export default class EditBusinessProfileValidator extends BaseValidator {
 		website: schema.string.optional({}, [
 			rules.url()
 		]),
-		category_id: schema.number.optional([
-			rules.exists({table: CategoryRepo.model.table, column: 'id'})
-		]),
-		location: schema.string({}),
+		category: schema.array.optional().members(
+			schema.number([
+				rules.exists({table: CategoryRepo.model.table, column: 'id'})
+			]),
+		),
+		location: schema.string.optional({}),
 		latitude: schema.number.optional([]),
-		longitude: schema.number([]),
+		longitude: schema.number.optional([]),
 		city: schema.string.optional({trim:true},[rules.maxLength(255),]),
 		state: schema.string.optional({trim:true},[rules.maxLength(255),]),
 		zip: schema.string.optional({trim:true},[rules.maxLength(255),]),

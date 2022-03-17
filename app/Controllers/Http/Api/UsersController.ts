@@ -10,6 +10,7 @@ import UserPhoneValidator from 'App/Validators/UserPhoneValidator'
 import UserInviteValidator from 'App/Validators/UserInviteValidator'
 import UsernameExistValidator from 'App/Validators/UsernameExistValidator'
 import BusinessExistValidator from 'App/Validators/BusinessExistValidator'
+import CustomAlertNotifyValidator from 'App/Validators/CustomAlertNotifyValidator'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
@@ -31,16 +32,16 @@ export default class UsersController extends ApiBaseController{
     async updateParentProfile( { request,auth }: HttpContextContract ){
         const { user }:any = auth
         await request.validate(EditParentProfileValidator)
-        const profile = await this.repo.update(user.id,request.only(this.repo.model.fillables))
+        const profile = await this.repo.update(user.id,request.only(this.repo.fillables()))
         return this.apiResponse("Profile Updated Successfully!",profile)
     }
 
     async updateBusinessProfile( { request,auth }: HttpContextContract ){
         const { user } = auth
         const input = await request.validate(EditBusinessProfileValidator)
-        let userDetails = {...request.only(this.repo.model.fillables),name:input.business_name}
+        let userDetails = {...request.only(this.repo.fillables()),name:input.business_name}
         await this.repo.update(user?.id,userDetails)
-        await BusinessRepo.update(user,request.only(BusinessRepo.model.fillables),request)
+        await BusinessRepo.update(user,request.only(BusinessRepo.fillables()),request)
         const profile = await this.repo.profile(user?.id)
         return this.apiResponse("Profile Updated Successfully!",profile)
     }
@@ -94,6 +95,12 @@ export default class UsersController extends ApiBaseController{
         const {user} = auth
         const stats = await this.repo.statistics(user?.id)
         return this.apiResponse('Record fetched successfully!', stats)
+    }
+
+    async sendAlerts({request}:HttpContextContract){
+        const input = await request.validate(CustomAlertNotifyValidator)
+        await this.repo.sendAlerts(input)
+        return this.apiResponse("Notifications Sent!",true)
     }
 
 }

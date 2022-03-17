@@ -57,9 +57,11 @@ export default class RegisterBusinessValidator extends BaseValidator {
             rules.maxLength(255),
             rules.minLength(6)
         ]),
-        category_id: schema.number.optional([
-            rules.exists({table: CategoryRepo.model.table, column: 'id'})
-        ]),
+        category: schema.array().members(
+            schema.number([
+                rules.exists({table: CategoryRepo.model.table, column: 'id'})
+            ]),
+        ),
         location: schema.string({}),
         latitude: schema.number.optional([]),
         longitude: schema.number([]),

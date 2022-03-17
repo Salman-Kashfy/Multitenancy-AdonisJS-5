@@ -4,6 +4,7 @@ import { RequestContract } from '@ioc:Adonis/Core/Request'
 import Attachment from 'App/Models/Attachment'
 import { DateTime } from 'luxon'
 import Role from 'App/Models/Role'
+import HidePostInterface from 'App/Interfaces/HidePostInterface'
 import PostCriterion from 'App/Models/PostCriterion'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import SharedPost from 'App/Models/SharedPost'
@@ -26,14 +27,14 @@ class PostRepo extends BaseRepo {
         this.model = Post
     }
 
-    async createPost(input, request: RequestContract) {
-        input = { ...input, type: this.model.TYPE.POST }
+    async createPost(input,request:RequestContract){
+        input = {...input,type:this.model.TYPE.POST}
         let row = await this.model.create(input)
 
         /*
         * Share this post to parks
         * */
-        if (request.input('share_posts', []).length) {
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
             const dateObj = new Date()
             for (let sharedPost of request.input('share_posts')) {
@@ -53,7 +54,7 @@ class PostRepo extends BaseRepo {
                 await row.related('attachments').create({
                     instanceId: row.id,
                     instanceType: Attachment.TYPE.POST,
-                    path: request.input('media')[i].path,
+                    path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
                     duration: request.input('media')[i]?.duration || null,
                 })
@@ -68,13 +69,13 @@ class PostRepo extends BaseRepo {
         return row
     }
 
-    async update(id, input, request: RequestContract) {
-        let row = await super.update(id, input)
+    async update(id,input, request: RequestContract) {
+        let row = await super.update(id,input)
 
         /*
         * Share this post to parks
         * */
-        if (request.input('share_posts', []).length) {
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
             const dateObj = new Date()
             for (let sharedPost of request.input('share_posts')) {
@@ -84,15 +85,15 @@ class PostRepo extends BaseRepo {
                 }
             }
             await row.related('sharedPosts').sync(sharedPosts)
-        } else {
+        }else{
             await row.related('sharedPosts').sync([])
         }
 
         /*
         * Remove attachments
         * */
-        if (request.input('remove_media')) {
-            await Attachment.query().whereIn('id', request.input('remove_media')).update({ 'deleted_at': new Date() })
+        if(request.input('remove_media')){
+            await Attachment.query().whereIn('id',request.input('remove_media')).update({'deleted_at': new Date()})
         }
 
         /*
@@ -103,7 +104,7 @@ class PostRepo extends BaseRepo {
                 await row.related('attachments').create({
                     instanceId: row.id,
                     instanceType: Attachment.TYPE.POST,
-                    path: request.input('media')[i].path,
+                    path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
                     duration: request.input('media')[i]?.duration || null,
                 })
@@ -119,7 +120,7 @@ class PostRepo extends BaseRepo {
         /*
         * Share this post to parks
         * */
-        if (request.input('share_posts', []).length) {
+        if(request.input('share_posts',[]).length){
             let sharedPosts = {}
             for (let i = 0; i < request.input('share_posts').length; i++) {
                 sharedPosts[request.input('share_posts')[i]] = {
@@ -138,7 +139,7 @@ class PostRepo extends BaseRepo {
                 await row.related('attachments').create({
                     instanceId: row.id,
                     instanceType: Attachment.TYPE.POST,
-                    path: request.input('media')[i].path,
+                    path:request.input('media')[i].path,
                     mimeType: request.input('media')[i].mime_type,
                     duration: request.input('media')[i]?.duration || null,
                 })
@@ -202,7 +203,7 @@ class PostRepo extends BaseRepo {
         * */
         if (input.share_posts?.length) {
             let sharedPosts = {}
-            for (let sharedPost of input.share_posts) {
+            for(let sharedPost of input.share_posts){
                 sharedPosts[sharedPost] = {
                     user_id: input.user_id,
                     created_at: new Date(),
@@ -222,11 +223,11 @@ class PostRepo extends BaseRepo {
         let serializedObj = posts.serialize({
             fields: {
                 pick: [],
-            },
+            }
         })
 
-        let rows: string[] = []
-        serializedObj.data.map((post) => {
+        let rows:string[] = []
+        serializedObj.data.map((post) =>{
             rows.push(post.user)
         })
         return rows
@@ -298,6 +299,9 @@ class PostRepo extends BaseRepo {
         query.preload('originalPost',(postQuery) =>{
             postQuery.preload('user')
         }).preload('sharedPosts')
+        .whereDoesntHave('hidden',(builder) =>{
+            builder.where('id',ctx.auth.user?.id)
+        })
 
         posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
         posts = this.addPostMetaKeys(posts)
@@ -344,6 +348,15 @@ class PostRepo extends BaseRepo {
                 }
                 myHelpers.sendNotificationStructure(user.id, post.id, Notification.TYPES.ALERT, post.userId, null, notification_message)
             })
+        }
+    }
+
+    async hidePost(input:HidePostInterface){
+        const post = await this.model.find(input.postId)
+        if(input.hide){
+            await post.related('hidden').sync([input.userId],false)
+        }else{
+            await post.related('hidden').detach([input.userId])
         }
     }
 }

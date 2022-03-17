@@ -37,14 +37,12 @@ class AuthRepo extends BaseRepo {
         if(!user) return false
         await user.related('subscription').sync([Subscription.FREE_PLAN])
         const business = await user.related('business').create(businessDetails)
-        await business.related('categories').sync([request.input('category_id')])
+        await business.related('categories').sync(request.input('category'))
         return user
     }
 
-    async login(input,user,auth){
-        const token = await auth.use('api').attempt(input.email, input.password)
-        const role = await user.related('roles').query().first()
-        return { status:true, message: 'Logged in successfully !',data:{user,token,role} }
+    async login(input,auth){
+        return await auth.use('api').attempt(input.email, input.password)
     }
 
     async logout(input,auth){

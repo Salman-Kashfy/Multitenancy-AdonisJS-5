@@ -21,6 +21,9 @@ class ParkRequestRepo extends BaseRepo {
             .whereHas('park',(parkQuery) =>{
                 parkQuery.where('user_id',ctx.auth.user.id)
             })
+        if(ctx.request.input('park_id')){
+            query.where('park_id',ctx.request.input('park_id'))
+        }
         return await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 }

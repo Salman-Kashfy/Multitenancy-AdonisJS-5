@@ -140,10 +140,8 @@ export default class AuthController extends ApiBaseController{
             throw new ExceptionWithCode('User not found!',200)
         }
 
-        /*
-        * Verifications before login
-        * */
-        const validate = await this.repo.login(input,user,auth)
+        const token = await this.repo.login(input,auth)
+        user = await UserRepo.profile(user)
 
         /* Create User Device */
         const device = {
@@ -152,8 +150,7 @@ export default class AuthController extends ApiBaseController{
             deviceToken:input.device_token,
         }
         await UserDeviceRepo.updateOrCreate(device)
-
-        return this.apiResponse(validate.message,validate.data)
+        return this.apiResponse('Logged in successfully !',{user,token})
     }
 
     public async forgotPassword({request}: HttpContextContract) {
@@ -229,9 +226,13 @@ export default class AuthController extends ApiBaseController{
         let user;
         if (socialAccount) {
             user = await UserRepo.find(socialAccount.user_id)
+            const roles = await user.related('roles').query()
+            const roleIds = roles.map(role => role.id)
+            if(!roleIds.includes(request.input('account_type'))){
+                throw new ExceptionWithCode('Invalid role',false)
+            }
         }
         const userFillables:string[] = UserRepo.fillables()
-        const businessFillables:string[] = BusinessRepo.fillables()
         let input = request.only(userFillables)
         if (!user) {
             input.password = Math.random().toString(36).substring(2, 15)
@@ -243,9 +244,6 @@ export default class AuthController extends ApiBaseController{
             }, request.only(userFillables))
 
             await user.related('roles').sync([request.input('account_type')])
-            if(request.input('account_type') == RoleRepo.model.BUSINESS){
-                await user.related('business').create({userId:user.id,...request.only(businessFillables)})
-            }
             await SocialAccountRepo.store(request, user.id)
         }
         if (input.image) {

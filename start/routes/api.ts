@@ -47,6 +47,7 @@ Route.group(() => {
         Route.post('user/invite', 'Api/UsersController.invite')
         Route.post('user/check-username', 'Api/UsersController.checkUsername')
         Route.post('user/check-business-name', 'Api/UsersController.checkBusinessName')
+        Route.post('user/send-alerts', 'Api/UsersController.sendAlerts')
 
         /*
         |--------------------------------------------------------------------------
@@ -128,6 +129,7 @@ Route.group(() => {
         Route.get('posts/share/:id','Api/PostController.getShareList')
         Route.get('newsfeed','Api/PostController.newsfeed')
         Route.get('posts/park/:parkId','Api/PostController.parkPost')
+        Route.post('posts/hide-post','Api/PostController.hidePost')
 
         /*
         |--------------------------------------------------------------------------
