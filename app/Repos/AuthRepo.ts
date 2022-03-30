@@ -2,6 +2,7 @@ import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
 import Subscription from 'App/Models/Subscription'
 import UserDevice from 'App/Models/UserDevice'
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 class AuthRepo extends BaseRepo {
     model
@@ -23,6 +24,18 @@ class AuthRepo extends BaseRepo {
             }
         }
         return {status,message}
+    }
+
+    async beforeLogin(user,allowedRoles:number[]){
+        if(user.is_blocked){
+            throw new ExceptionWithCode('You have been blocked! Contact support for further information.',403)
+        }
+        const roles = await user.related('roles').query()
+        for (const role of roles) {
+            if(!allowedRoles.includes(role.id)){
+                throw new ExceptionWithCode('Invalid role.',403)
+            }
+        }
     }
 
     async createParent(input){

@@ -13,7 +13,7 @@ export default class LoginValidator extends BaseValidator {
             rules.email(),
         ]),
         password: schema.string({ trim: true }, []),
-        device_type: schema.enum( ['android','ios'] as const),
+        device_type: schema.enum( ['android','ios','web'] as const),
         device_token: schema.string({}),
     })
 }

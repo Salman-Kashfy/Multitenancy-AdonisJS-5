@@ -12,6 +12,7 @@ import { DateTime } from 'luxon'
 import Like from 'App/Models/Like'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
+import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 
 class UserRepo extends BaseRepo {
     model
@@ -22,11 +23,25 @@ class UserRepo extends BaseRepo {
         this.model = User
     }
 
-    async profile(user){
-        if(typeof user !== "object"){
-            user = await this.model.find(user)
+    async index(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        page = 1,
+        perPage = constants.PER_PAGE,
+        ctx: HttpContextContract
+    ) {
+        let query = this.model.query()
+        if (ctx.request.input('keyword')) {
+            query = query.where('name', 'like', `%${ctx.request.input('keyword')}%`)
         }
+        for (let relation of this.relations) await query.preload(relation)
+        return await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+    }
+
+    async profile(id){
+        let user = await this.model.find(id)
         const userRoles = await user.related('roles').query()
+        user.roles = userRoles
         const userRoleIds = userRoles.map(function(role) {
             return role.id;
         });

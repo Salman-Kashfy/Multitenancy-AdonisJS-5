@@ -25,7 +25,7 @@ export default class UsersController extends ApiBaseController{
         if(!user){
             throw new ExceptionWithCode("User not found!",404)
         }
-        const profile = await this.repo.profile(user)
+        const profile = await this.repo.profile(user.id)
         return this.apiResponse("Profile Retrieved Successfully!",profile)
     }
 
@@ -101,6 +101,12 @@ export default class UsersController extends ApiBaseController{
         const input = await request.validate(CustomAlertNotifyValidator)
         await this.repo.sendAlerts(input)
         return this.apiResponse("Notifications Sent!",true)
+    }
+
+    async adminUpdate(ctx:HttpContextContract){
+        let input = ctx.request.only(this.repo.fillables())
+        const res = await this.repo.update(ctx.request.param('id'), input, ctx.request)
+        return this.apiResponse('Record updated successfully!', res)
     }
 
 }

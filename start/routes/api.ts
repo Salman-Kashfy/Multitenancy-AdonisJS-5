@@ -14,6 +14,7 @@ Route.group(() => {
         Route.post('resend-signup-otp', 'Api/AuthController.resendSignupOtp')
         Route.post('verify-email', 'Api/AuthController.verifyEmail')
         Route.post('login', 'Api/AuthController.login')
+        Route.post('admin-login', 'Api/AuthController.adminLogin')
         Route.post('social-login', 'Api/AuthController.socialLogin')
         Route.post('signup-business', 'Api/AuthController.signupBusiness')
 
@@ -22,8 +23,6 @@ Route.group(() => {
         Route.post('verify-otp', 'Api/AuthController.verifyOtp')
         Route.post('reset-password', 'Api/AuthController.resetPassword')
     }).middleware('guest')
-
-    Route.get('categories/all','Api/CategoryController.all')
 
     /*
     |--------------------------------------------------------------------------
@@ -38,8 +37,10 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.post('logout', 'Api/AuthController.logout')
+        Route.get('user','Api/UsersController.index').middleware('admin')
         Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
+        Route.put('user/admin-update/:id', 'Api/UsersController.adminUpdate').middleware('admin')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
         Route.put('change-password', 'Api/UsersController.changePassword')
@@ -57,6 +58,7 @@ Route.group(() => {
         Route.get('sizes/all','Api/SizeController.all')
         Route.get('genders/all','Api/GenderController.all')
         Route.get('breeds/all','Api/BreedController.all')
+        Route.get('categories/all','Api/CategoryController.all')
 
         /*
         |--------------------------------------------------------------------------
@@ -195,6 +197,15 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.get('statistics', 'Api/UsersController.statistics')
+
+        /*
+        |--------------------------------------------------------------------------
+        | Categories API Routes
+        |--------------------------------------------------------------------------
+        */
+        Route.group(() =>{
+
+        }).middleware('admin')
 
     }).middleware('auth')
 

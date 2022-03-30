@@ -109,7 +109,7 @@ export default class User extends CommonModel {
     public isSocialLogin: number
 
     @column()
-    public is_blocked: number
+    public isBlocked: number
 
     @beforeSave()
     public static async hashPassword(user: User) {
