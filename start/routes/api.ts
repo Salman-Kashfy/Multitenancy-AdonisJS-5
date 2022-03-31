@@ -1,4 +1,4 @@
-import Route from "@ioc:Adonis/Core/Route";
+import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
 
@@ -26,6 +26,14 @@ Route.group(() => {
 
     /*
     |--------------------------------------------------------------------------
+    | Open Api Routes
+    |--------------------------------------------------------------------------
+    */
+    Route.get('settings', 'Api/SettingController.index')
+    Route.get('categories/all', 'Api/CategoryController.all')
+
+    /*
+    |--------------------------------------------------------------------------
     | Authenticated Api Routes
     |--------------------------------------------------------------------------
     */
@@ -37,10 +45,8 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.post('logout', 'Api/AuthController.logout')
-        Route.get('user','Api/UsersController.index').middleware('admin')
-        Route.get('user/suggested-friends','Api/UsersController.suggestedFriends')
+        Route.get('user/suggested-friends', 'Api/UsersController.suggestedFriends')
         Route.get('user/:id', 'Api/UsersController.show')
-        Route.put('user/admin-update/:id', 'Api/UsersController.adminUpdate').middleware('admin')
         Route.put('user/update-parent-profile', 'Api/UsersController.updateParentProfile').middleware('parent')
         Route.put('user/update-business-profile', 'Api/UsersController.updateBusinessProfile').middleware('business')
         Route.put('change-password', 'Api/UsersController.changePassword')
@@ -55,100 +61,91 @@ Route.group(() => {
         | Static Data API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('sizes/all','Api/SizeController.all')
-        Route.get('genders/all','Api/GenderController.all')
-        Route.get('breeds/all','Api/BreedController.all')
-        Route.get('categories/all','Api/CategoryController.all')
+        Route.get('sizes/all', 'Api/SizeController.all')
+        Route.get('genders/all', 'Api/GenderController.all')
+        Route.get('breeds/all', 'Api/BreedController.all')
 
         /*
         |--------------------------------------------------------------------------
         | Dogs API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('my-dogs','Api/DogController.myDogs')
-        Route.resource('dogs','Api/DogController')
+        Route.get('my-dogs', 'Api/DogController.myDogs')
+        Route.resource('dogs', 'Api/DogController')
 
         /*
         |--------------------------------------------------------------------------
         | Blocked Users API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('blocked-users','Api/BlockedUserController.blockedUsers')
-        Route.post('blocked-users','Api/BlockedUserController.blockOrUnblock')
+        Route.get('blocked-users', 'Api/BlockedUserController.blockedUsers')
+        Route.post('blocked-users', 'Api/BlockedUserController.blockOrUnblock')
 
         /*
         |--------------------------------------------------------------------------
         | Friends API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('friends/all','Api/FriendController.all')
-        Route.resource('friends','Api/FriendController').only(['index','store','destroy'])
+        Route.get('friends/all', 'Api/FriendController.all')
+        Route.resource('friends', 'Api/FriendController').only(['index', 'store', 'destroy'])
 
         /*
         |--------------------------------------------------------------------------
         | Parks API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('host-parks','Api/ParkController.hostParks')
-        Route.get('my-parks','Api/ParkController.myParks')
-        Route.post('parks/join','Api/ParkController.join')
-        Route.delete('parks/unjoin','Api/ParkController.unjoin')
-        Route.post('parks/accept-decline-request','Api/ParkController.acceptDeclineRequest')
-        Route.group(() =>{
-            Route.post('parks','Api/ParkController.store')
-            Route.put('parks/:id','Api/ParkController.update')
-            Route.delete('parks/:id','Api/ParkController.destroy')
+        Route.get('host-parks', 'Api/ParkController.hostParks')
+        Route.get('my-parks', 'Api/ParkController.myParks')
+        Route.post('parks/join', 'Api/ParkController.join')
+        Route.delete('parks/unjoin', 'Api/ParkController.unjoin')
+        Route.post('parks/accept-decline-request', 'Api/ParkController.acceptDeclineRequest')
+        Route.group(() => {
+            Route.post('parks', 'Api/ParkController.store')
+            Route.put('parks/:id', 'Api/ParkController.update')
+            Route.delete('parks/:id', 'Api/ParkController.destroy')
         }).middleware('premium')
-        Route.get('parks','Api/ParkController.index')
-        Route.get('parks/:id','Api/ParkController.show')
-        Route.get('park-requests','Api/ParkRequestController.index')
+        Route.get('parks', 'Api/ParkController.index')
+        Route.get('parks/:id', 'Api/ParkController.show')
+        Route.get('park-requests', 'Api/ParkRequestController.index')
 
         /*
         |--------------------------------------------------------------------------
         | Parks Blocked Members API Routes
         |--------------------------------------------------------------------------
         */
-        Route.post('park-block-user','Api/ParkController.block')
-        Route.get('park-blocked-users/:id','Api/ParkBlockedUserController.index')
+        Route.post('park-block-user', 'Api/ParkController.block')
+        Route.get('park-blocked-users/:id', 'Api/ParkBlockedUserController.index')
 
         /*
         |--------------------------------------------------------------------------
         | Park Members API Routes
         |--------------------------------------------------------------------------
         */
-        Route.get('park-members/:id','Api/ParkMemberController.index')
+        Route.get('park-members/:id', 'Api/ParkMemberController.index')
 
         /*
         |--------------------------------------------------------------------------
         | Post API Routes
         |--------------------------------------------------------------------------
         */
-        Route.post('posts','Api/PostController.createPost')
-        Route.put('posts/:id','Api/PostController.updatePost')
-        Route.delete('posts/:id','Api/PostController.destroy')
-        Route.get('posts/park-quota/:parkId','Api/PostController.parkQuota')
-        Route.post('posts/share/:id','Api/PostController.sharePost')
-        Route.get('posts/share/:id','Api/PostController.getShareList')
-        Route.get('newsfeed','Api/PostController.newsfeed')
-        Route.get('posts/park/:parkId','Api/PostController.parkPost')
-        Route.post('posts/hide-post','Api/PostController.hidePost')
+        Route.post('posts', 'Api/PostController.createPost')
+        Route.put('posts/:id', 'Api/PostController.updatePost')
+        Route.get('posts/:id', 'Api/PostController.show')
+        Route.delete('posts/:id', 'Api/PostController.destroy')
+        Route.get('posts/park-quota/:parkId', 'Api/PostController.parkQuota')
+        Route.post('posts/share/:id', 'Api/PostController.sharePost')
+        Route.get('posts/share/:id', 'Api/PostController.getShareList')
+        Route.get('newsfeed', 'Api/PostController.newsfeed')
+        Route.get('posts/park/:parkId', 'Api/PostController.parkPost')
+        Route.post('posts/hide-post', 'Api/PostController.hidePost')
 
         /*
         |--------------------------------------------------------------------------
         | Alert API Routes
         |--------------------------------------------------------------------------
         */
-        Route.post('alerts','Api/PostController.createAlert')
-        Route.put('alerts/:id','Api/PostController.updateAlert')
-
-        /*
-        |--------------------------------------------------------------------------
-        | Post Criteria API Routes
-        |--------------------------------------------------------------------------
-        */
-        Route.group(() =>{
-            Route.resource('post-criteria','Api/PostCriterionController')
-        }).middleware('admin')
+        Route.post('alerts', 'Api/PostController.createAlert')
+        Route.put('alerts/:id', 'Api/PostController.updateAlert')
 
         /*
         |--------------------------------------------------------------------------
@@ -162,18 +159,14 @@ Route.group(() => {
         | Like API Routes
         |--------------------------------------------------------------------------
         */
-        Route.resource('likes','Api/LikeController').only(['index', 'store'])
+        Route.resource('likes', 'Api/LikeController').only(['index', 'store'])
 
         /*
         |--------------------------------------------------------------------------
         | Badge and Criteria API Routes
         |--------------------------------------------------------------------------
         */
-        Route.group(() =>{
-            Route.resource('badges','Api/BadgeController').except(['show'])
-            Route.resource('badge-criteria','Api/BadgeCriterionController')
-        }).middleware('admin')
-        Route.get('badges/:id','Api/BadgeController.show')
+        Route.get('badges/:id', 'Api/BadgeController.show')
 
         /*
         |--------------------------------------------------------------------------
@@ -181,7 +174,6 @@ Route.group(() => {
         |--------------------------------------------------------------------------
         */
         Route.post('notifications/mark-all-read', 'Api/NotificationController.markAllRead')
-        Route.post('notifications/custom-push', 'Api/NotificationController.customPush').middleware('admin')
         Route.resource('notifications', 'Api/NotificationController')
 
         /*
@@ -189,7 +181,7 @@ Route.group(() => {
         | Report API Routes
         |--------------------------------------------------------------------------
         */
-        Route.resource('reports', 'Api/ReportController')
+        Route.post('reports', 'Api/ReportController.store')
 
         /*
         |--------------------------------------------------------------------------
@@ -200,12 +192,10 @@ Route.group(() => {
 
         /*
         |--------------------------------------------------------------------------
-        | Categories API Routes
+        | Pages API Routes
         |--------------------------------------------------------------------------
         */
-        Route.group(() =>{
-
-        }).middleware('admin')
+        Route.resource('pages', 'Api/PageController')
 
     }).middleware('auth')
 

@@ -22,9 +22,22 @@ class PostRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = []
+        const relations = ['user','attachments']
         super(Post, relations)
         this.model = Post
+    }
+
+    async index(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        page = 1,
+        perPage = constants.PER_PAGE,
+        // @ts-ignore
+        ctx: HttpContextContract
+    ) {
+        let query = this.model.query().whereNull('shared_post_id').orderBy(orderByColumn, orderByValue)
+        for (let relation of this.relations) await query.preload(relation)
+        return await query.paginate(page, perPage)
     }
 
     async createPost(input,request:RequestContract){

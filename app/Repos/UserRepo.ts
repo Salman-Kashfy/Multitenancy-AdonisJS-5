@@ -217,6 +217,32 @@ class UserRepo extends BaseRepo {
             myHelpers.sendNotificationStructure(user.id,'',Notification.TYPES.CUSTOM_ALERTS,user.id,null,input.message)
         })
     }
+
+    async update(id: number, input): Promise<User> {
+        if(input.roles){
+            const user = await this.model.find(id)
+            await user.related('roles').sync(input.roles)
+        }
+        return super.update(id, input);
+    }
+
+    async store(input){
+        const user = await this.model.create(input)
+        await user.related('roles').sync(input.roles)
+    }
+
+    async all(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        ctx: HttpContextContract
+    ) {
+        let query = this.model.query()
+        if (ctx.request.input('keyword')) {
+            query = query.where('name', 'like', `%${ctx.request.input('keyword')}%`)
+        }
+        for (let relation of this.relations) await query.preload(relation)
+        return await query.orderBy(orderByColumn, orderByValue)
+    }
 }
 
 export default new UserRepo()

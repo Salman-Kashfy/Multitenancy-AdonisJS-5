@@ -38,7 +38,7 @@ class NotificationRepo extends BaseRepo {
 
     async customPush(input){
         const devices = await UserDevice.query()
-            .where('user_id',input.receiver_id)
+            .whereIn('user_id',input.users)
             .whereHas('user',(userQuery) =>{
                 userQuery.where('push_notify',1)
             })

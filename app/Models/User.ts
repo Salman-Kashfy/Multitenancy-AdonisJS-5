@@ -91,10 +91,19 @@ export default class User extends CommonModel {
     public identification: number
 
     @column()
+    public profession: string
+
+    @column()
+    public school: string
+
+    @column()
     public privacy: number
 
     @column()
     public image: string
+
+    @column()
+    public profilePicture: string
 
     @column()
     public pushNotify: number
@@ -151,6 +160,11 @@ export default class User extends CommonModel {
     @computed()
     public get imagePath() {
         return myHelpers.userImageWithBaseURLOrNotFound(this.image)
+    }
+
+    @computed()
+    public get profilePicturePath() {
+        return myHelpers.userImageWithBaseURLOrNotFound(this.profilePicture)
     }
 
     @computed()

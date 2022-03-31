@@ -9,9 +9,11 @@ export default class CustomPushValidator extends BaseValidator {
     }
 
     public schema = schema.create({
-        receiver_id: schema.number([
-            rules.exists({table: UserRepo.model.table, column: 'id', where:{'deleted_at':null}})
-        ]),
-        message: schema.string.optional({trim:true},[rules.maxLength(250)]),
+        users: schema.array().members(
+            schema.number([
+                rules.exists({table: UserRepo.model.table, column: 'id', where:{'deleted_at':null}})
+            ]),
+        ),
+        message: schema.string({trim:true},[rules.maxLength(250)]),
     })
 }
