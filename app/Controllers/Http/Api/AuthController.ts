@@ -269,9 +269,6 @@ export default class AuthController extends ApiBaseController{
             await user.related('roles').sync([request.input('account_type')])
             await SocialAccountRepo.store(request, user.id)
         }
-        if (input.image) {
-            await UserRepo.update(user.id,{image: input.image})
-        }
 
         /* Create User Device */
         const device = {
