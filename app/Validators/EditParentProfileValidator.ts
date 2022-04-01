@@ -21,8 +21,11 @@ export default class EditParentProfileValidator extends BaseValidator {
             rules.before('today')
         ]),
         image: schema.string.optional(),
+        profile_picture: schema.string.optional(),
         marital_status: schema.enum.optional(Object.values(UserRepo.model.MARITAL_STATUS)),
         gender: schema.enum.optional(Object.values(UserRepo.model.GENDER)),
         identification: schema.enum.optional(Object.values(UserRepo.model.IDENTIFICATION)),
+        profession: schema.string.optional(),
+        school: schema.string.optional(),
     })
 }

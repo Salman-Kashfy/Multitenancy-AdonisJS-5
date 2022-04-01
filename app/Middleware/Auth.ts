@@ -1,6 +1,7 @@
 import { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { AuthenticationException } from '@adonisjs/auth/build/standalone'
+import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 /**
  * Auth middleware is meant to restrict un-authenticated access to a given route
@@ -41,6 +42,9 @@ export default class AuthMiddleware {
          * the rest of the request, since the user authenticated
          * succeeded here
          */
+        if(auth?.user?.isBlocked){
+          throw new ExceptionWithCode('You have been blocked! Contact support for further information.',401)
+        }
         auth.defaultGuard = guard
         return true
       }

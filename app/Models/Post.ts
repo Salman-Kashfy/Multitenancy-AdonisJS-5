@@ -114,6 +114,11 @@ export default class Post extends CommonModel {
 	})
 	public originalPost: BelongsTo<typeof Post>
 
+	@computed()
+	public get typeText() {
+		return Object.keys(Post.TYPE).find(key => Post.TYPE[key] === this.type);
+	}
+
 	public static fetchPost = scope((query:Builder,userID) => {
 		query.withScopes((scope) => scope.postMeta(userID)).preload('user')
 	})

@@ -9,6 +9,10 @@ class RoleRepo extends BaseRepo {
         super(Role, relations)
         this.model = Role
     }
+
+    async index(){
+        return this.model.query()
+    }
 }
 
 export default new RoleRepo()

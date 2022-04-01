@@ -140,8 +140,11 @@ export default class AuthController extends ApiBaseController{
             throw new ExceptionWithCode('User not found!',200)
         }
 
+        // Validations before login
+        await this.repo.beforeLogin(user,[RoleRepo.model.PARENT,RoleRepo.model.BUSINESS])
+
         const token = await this.repo.login(input,auth)
-        user = await UserRepo.profile(user)
+        user = await UserRepo.profile(user.id)
 
         /* Create User Device */
         const device = {
@@ -150,6 +153,22 @@ export default class AuthController extends ApiBaseController{
             deviceToken:input.device_token,
         }
         await UserDeviceRepo.updateOrCreate(device)
+        return this.apiResponse('Logged in successfully !',{user,token})
+    }
+
+    public async adminLogin( { auth, request }: HttpContextContract ){
+
+        const input = await request.validate(LoginValidator)
+        let user = await this.repo.findByEmail(input.email)
+        if (!user) {
+            throw new ExceptionWithCode('User not found!',200)
+        }
+
+        // Validations before login
+        await this.repo.beforeLogin(user,[RoleRepo.model.ADMIN])
+
+        const token = await this.repo.login(input,auth)
+        user = await UserRepo.profile(user.id)
         return this.apiResponse('Logged in successfully !',{user,token})
     }
 

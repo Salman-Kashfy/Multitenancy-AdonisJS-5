@@ -11,8 +11,10 @@ import UserInviteValidator from 'App/Validators/UserInviteValidator'
 import UsernameExistValidator from 'App/Validators/UsernameExistValidator'
 import BusinessExistValidator from 'App/Validators/BusinessExistValidator'
 import CustomAlertNotifyValidator from 'App/Validators/CustomAlertNotifyValidator'
+import CreateUserValidator from 'App/Validators/CreateUserValidator'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import EditUserValidator from 'App/Validators/EditUserValidator'
 
 export default class UsersController extends ApiBaseController{
 
@@ -25,7 +27,7 @@ export default class UsersController extends ApiBaseController{
         if(!user){
             throw new ExceptionWithCode("User not found!",404)
         }
-        const profile = await this.repo.profile(user)
+        const profile = await this.repo.profile(user.id)
         return this.apiResponse("Profile Retrieved Successfully!",profile)
     }
 
@@ -101,6 +103,28 @@ export default class UsersController extends ApiBaseController{
         const input = await request.validate(CustomAlertNotifyValidator)
         await this.repo.sendAlerts(input)
         return this.apiResponse("Notifications Sent!",true)
+    }
+
+    async adminUpdate(ctx:HttpContextContract){
+        const input = await ctx.request.validate(EditUserValidator)
+        const res = await this.repo.update(ctx.request.param('id'), input, ctx.request)
+        return this.apiResponse('Record updated successfully!', res)
+    }
+
+    async store(ctx:HttpContextContract){
+        const input = await ctx.request.validate(CreateUserValidator)
+        if(!input.roles || !input.roles.length){
+            throw new ExceptionWithCode('At least one role is required',422)
+        }
+        const user = await this.repo.store({...input,email_verified:1})
+        return super.apiResponse(`User Created Successfully!`, user)
+    }
+
+    async all(ctx: HttpContextContract) {
+        let orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        let rows = await this.repo.all(orderByColumn, orderByValue, ctx)
+        return this.apiResponse('Records fetched successfully', rows)
     }
 
 }
