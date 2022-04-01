@@ -12,8 +12,12 @@ class BusinessRepo extends BaseRepo {
     }
 
     async update(user,input,request){
-        await user.related('business').query().update(input)
-        const business = await user.related('business').query().first()
+        let business = await this.model.query().where('user_id',user.id).first()
+        if(!business){
+            business = await this.model.create({...input,user_id:user.id})
+        }else{
+            await user.related('business').query().update(input)
+        }
         if(request.input('category')){
             await business.related('categories').sync(request.input('category'))
         }

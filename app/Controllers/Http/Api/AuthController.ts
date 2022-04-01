@@ -140,6 +140,10 @@ export default class AuthController extends ApiBaseController{
             throw new ExceptionWithCode('User not found!',200)
         }
 
+        if(user.isBlocked){
+            throw new ExceptionWithCode('You have been blocked! Contact support for further information.',403)
+        }
+
         // Validations before login
         await this.repo.beforeLogin(user,[RoleRepo.model.PARENT,RoleRepo.model.BUSINESS])
 
@@ -248,7 +252,7 @@ export default class AuthController extends ApiBaseController{
             const roles = await user.related('roles').query()
             const roleIds = roles.map(role => role.id)
             if(!roleIds.includes(request.input('account_type'))){
-                throw new ExceptionWithCode('Invalid role',false)
+                throw new ExceptionWithCode(`Please login using ${roles[0].displayName} account`,false)
             }
         }
         const userFillables:string[] = UserRepo.fillables()
@@ -278,9 +282,8 @@ export default class AuthController extends ApiBaseController{
         await UserDeviceRepo.updateOrCreate(device)
 
         let token = await auth.use('api').generate(user)
-        const role = await user.related('roles').query().first()
-        user = user.toJSON()
-        return super.apiResponse(`Your account has been created successfully`, {user,token,role})
+        user = await UserRepo.profile(user.id)
+        return super.apiResponse(`Your account has been created successfully`, {user,token})
     }
 
     public async signupBusiness({request}: HttpContextContract){
