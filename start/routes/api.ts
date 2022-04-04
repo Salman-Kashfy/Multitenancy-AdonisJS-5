@@ -31,6 +31,8 @@ Route.group(() => {
     */
     Route.get('settings', 'Api/SettingController.index')
     Route.get('categories/all', 'Api/CategoryController.all')
+    Route.post('user/check-username', 'Api/UsersController.checkUsername')
+    Route.post('user/check-business-name', 'Api/UsersController.checkBusinessName')
 
     /*
     |--------------------------------------------------------------------------
@@ -52,8 +54,6 @@ Route.group(() => {
         Route.put('change-password', 'Api/UsersController.changePassword')
         Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
         Route.post('user/invite', 'Api/UsersController.invite')
-        Route.post('user/check-username', 'Api/UsersController.checkUsername')
-        Route.post('user/check-business-name', 'Api/UsersController.checkBusinessName')
         Route.post('user/send-alerts', 'Api/UsersController.sendAlerts')
 
         /*

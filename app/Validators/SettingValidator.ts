@@ -12,9 +12,13 @@ export default class SettingValidator extends BaseValidator {
     about: schema.string.optional({trim: true}, [rules.maxLength(65535),]),
     phone: schema.string.optional({trim: true}, [rules.maxLength(255),]),
     address: schema.string.optional({trim: true}, [rules.maxLength(255),]),
-    app_store_link: schema.string({trim: true}, [rules.maxLength(255),]),
+    app_store_link: schema.string.optional({trim: true}, [rules.maxLength(255),]),
+    facebook_link: schema.string.optional({trim: true}, [rules.maxLength(255),]),
     build_version: schema.string({trim: true}, [rules.maxLength(255),]),
-    base_url: schema.string({trim: true}, [rules.maxLength(255),]),
-    year: schema.number([]),
+    base_url: schema.string.optional({trim: true}, [rules.maxLength(255),]),
+    year: schema.number.optional([]),
+    sales_tax: schema.number.optional([]),
+    commission: schema.number.optional([]),
+    penalty_charges: schema.number.optional([]),
   })
 }
