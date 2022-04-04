@@ -165,7 +165,7 @@ export default class AuthController extends ApiBaseController{
         const input = await request.validate(LoginValidator)
         let user = await this.repo.findByEmail(input.email)
         if (!user) {
-            throw new ExceptionWithCode('User not found!',200)
+            throw new ExceptionWithCode('User not found!',400)
         }
 
         // Validations before login
