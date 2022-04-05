@@ -32,5 +32,9 @@ export default class BaseValidator {
         mobile: "The {{field}} format is invalid",
         "phone.requiredIfNotExists": 'Phone is required',
         'requiredWhen': 'The {{ field }} is required ',
+        'build_version.required': 'The build version is required ',
+        'base_url.required': 'The base url is required ',
+        'app_store_link.required': 'The app store link is required ',
+        'dob.before': 'Date of birth should not be after or equal to today.',
     }
 }
