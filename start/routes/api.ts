@@ -33,6 +33,7 @@ Route.group(() => {
     Route.get('categories/all', 'Api/CategoryController.all')
     Route.post('user/check-username', 'Api/UsersController.checkUsername')
     Route.post('user/check-business-name', 'Api/UsersController.checkBusinessName')
+    Route.post('user/check-email-exist', 'Api/UsersController.checkEmailExist')
 
     /*
     |--------------------------------------------------------------------------

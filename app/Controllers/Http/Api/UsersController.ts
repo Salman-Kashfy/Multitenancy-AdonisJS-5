@@ -15,6 +15,7 @@ import CreateUserValidator from 'App/Validators/CreateUserValidator'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import EditUserValidator from 'App/Validators/EditUserValidator'
+import CheckEmailExistValidator from 'App/Validators/CheckEmailExistValidator'
 
 export default class UsersController extends ApiBaseController{
 
@@ -125,6 +126,11 @@ export default class UsersController extends ApiBaseController{
         let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
         let rows = await this.repo.all(orderByColumn, orderByValue, ctx)
         return this.apiResponse('Records fetched successfully', rows)
+    }
+
+    async checkEmailExist({request}: HttpContextContract) {
+        await request.validate(CheckEmailExistValidator)
+        return this.apiResponse("Email is available",true)
     }
 
 }
