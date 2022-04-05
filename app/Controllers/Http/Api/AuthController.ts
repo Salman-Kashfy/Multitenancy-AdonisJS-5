@@ -165,7 +165,7 @@ export default class AuthController extends ApiBaseController{
         const input = await request.validate(LoginValidator)
         let user = await this.repo.findByEmail(input.email)
         if (!user) {
-            throw new ExceptionWithCode('User not found!',400)
+            throw new ExceptionWithCode('User not found!',404)
         }
 
         // Validations before login
@@ -252,7 +252,7 @@ export default class AuthController extends ApiBaseController{
             const roles = await user.related('roles').query()
             const roleIds = roles.map(role => role.id)
             if(!roleIds.includes(request.input('account_type'))){
-                throw new ExceptionWithCode(`Please login using ${roles[0].displayName} account`,false)
+                throw new ExceptionWithCode(`Please login using ${roles[0].displayName} account`,200)
             }
         }
         const userFillables:string[] = UserRepo.fillables()
