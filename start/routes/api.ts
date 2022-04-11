@@ -34,6 +34,7 @@ Route.group(() => {
     Route.post('user/check-username', 'Api/UsersController.checkUsername')
     Route.post('user/check-business-name', 'Api/UsersController.checkBusinessName')
     Route.post('user/check-email-exist', 'Api/UsersController.checkEmailExist')
+    Route.post('parks/check-title-exist', 'Api/ParkController.checkTitleExist')
 
     /*
     |--------------------------------------------------------------------------

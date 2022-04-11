@@ -11,6 +11,7 @@ import ParkMemberRepo from 'App/Repos/ParkMemberRepo'
 import ParkRequestRepo from 'App/Repos/ParkRequestRepo'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import ParkExistValidator from 'App/Validators/ParkExistValidator'
 
 export default class ParkController extends ApiBaseController {
 
@@ -143,6 +144,11 @@ export default class ParkController extends ApiBaseController {
         const orderByValue = ctx.request.input('order', 'asc')
         const park = await this.repo.index(orderByColumn,orderByValue,page,perPage,ctx);
         return this.apiResponse('Record Fetched Successfully',park)
+    }
+
+    async checkTitleExist({request}: HttpContextContract){
+        await request.validate(ParkExistValidator)
+        return this.apiResponse("Park title is available",true)
     }
 
 }
