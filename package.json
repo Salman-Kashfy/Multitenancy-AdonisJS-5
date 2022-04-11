@@ -39,6 +39,7 @@
     "fcm-node": "^1.6.1",
     "ffmpeg-extract-frames": "^2.0.2",
     "get-video-duration": "^3.1.0",
+    "jsonwebtoken": "^8.5.1",
     "luxon": "^1.27.0",
     "mysql": "^2.18.1",
     "node-image-resizer": "^1.0.0",

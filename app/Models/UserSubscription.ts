@@ -18,6 +18,19 @@ export default class UserSubscription extends CommonModel {
     static SUBSCRIPTION_REVOKED                = 12;
     static SUBSCRIPTION_EXPIRED                = 13;
 
+    static STATUS_ACTIVE    = 10;
+    static STATUS_CANCELLED = 20;
+    static STATUS_EXPIRE    = 30;
+    static STATUS_HOLD      = 40;
+
+    static IOS_SUBSCRIBED = "SUBSCRIBED";
+    static IOS_DID_RENEW  = "DID_RENEW";
+    static IOS_EXPIRED    = "EXPIRED";
+    static IOS_CANCEL     = "CANCEL";
+
+
+    @column({ isPrimary: true })
+    public id: number
     @column()
     public userId: number
 	@column()
