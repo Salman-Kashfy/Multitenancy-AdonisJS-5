@@ -4,7 +4,6 @@ import SubscriptionRepo from "App/Repos/SubscriptionRepo";
 import SubscriptionValidator from "App/Validators/SubscriptionValidator";
 import Attachment from "App/Models/Attachment";
 
-
 export default class SubscriptionController extends ApiBaseController {
 
     constructor() {
