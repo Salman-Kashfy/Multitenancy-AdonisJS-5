@@ -24,7 +24,7 @@ export default class AddParkValidator extends BaseValidator {
 		state: schema.string.optional({trim:true},[rules.maxLength(20)]),
 		zip: schema.string.optional({trim:true},[rules.maxLength(20)]),
 		privacy: schema.boolean(),
-		allow_invite: schema.boolean(),
+		//allow_invite: schema.boolean(),
 		invite: schema.array.optional().members(schema.number([
 			rules.exists({table: UserRepo.model.table, column: 'id'})
 		])),
