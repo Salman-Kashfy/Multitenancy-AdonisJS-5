@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
-import Subscription from 'App/Models/Subscription'
 import UserDevice from 'App/Models/UserDevice'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
@@ -40,7 +39,6 @@ class AuthRepo extends BaseRepo {
 
     async createParent(input){
         const user = await this.model.create(input);
-        await user.related('subscription').sync([Subscription.FREE_PLAN])
         return user
     }
 
@@ -48,7 +46,6 @@ class AuthRepo extends BaseRepo {
         input.name = businessDetails.business_name
         const user = await this.model.create(input);
         if(!user) return false
-        await user.related('subscription').sync([Subscription.FREE_PLAN])
         const business = await user.related('business').create(businessDetails)
         await business.related('categories').sync(request.input('category'))
         return user

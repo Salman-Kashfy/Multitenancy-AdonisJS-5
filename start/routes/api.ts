@@ -38,6 +38,14 @@ Route.group(() => {
 
     /*
     |--------------------------------------------------------------------------
+    | User Subscription API Routes
+    |--------------------------------------------------------------------------
+    */
+    Route.post('user-subscription-webhook', 'Api/UserSubscriptionsController.updateSubscriptionWebhook');
+    Route.get('user-subscription-webhook-android', 'Api/UserSubscriptionsController.updateSubscriptionWebhookAndroid')
+
+    /*
+    |--------------------------------------------------------------------------
     | Authenticated Api Routes
     |--------------------------------------------------------------------------
     */
@@ -202,3 +210,5 @@ Route.group(() => {
     }).middleware('auth')
 
 }).prefix('/api')
+/*API-WebhookLog*/
+Route.resource('webhook-logs','Api/WebhookLogController')

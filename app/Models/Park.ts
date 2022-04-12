@@ -15,6 +15,8 @@ type Builder = ModelQueryBuilderContract<typeof Park>
 
 export default class Park extends CommonModel {
 
+	public serializeExtras = true
+
 	public static STATUSES = {
 		REQUESTED: 10,
 		ACCEPTED: 20,
@@ -62,7 +64,7 @@ export default class Park extends CommonModel {
 		return query.preload('attachments')
 			.preload('parkRequests',(requestQuery) =>{
 			 	requestQuery.where('member_id',userId)
-			})
+			}).withCount('members')
 	})
 
 	public static parkPrivacy = scope((query:Builder,userId) => {

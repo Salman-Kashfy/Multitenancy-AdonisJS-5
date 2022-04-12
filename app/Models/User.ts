@@ -169,17 +169,17 @@ export default class User extends CommonModel {
 
     @computed()
     public get maritalStatusText() {
-        return this.maritalStatus ? (Object.keys(User.MARITAL_STATUS).find(key => User.MARITAL_STATUS[key] === this.maritalStatus)) : 'N/A'
+        return this.maritalStatus ? (Object.keys(User.MARITAL_STATUS).find(key => User.MARITAL_STATUS[key] === this.maritalStatus)) : ''
     }
 
     @computed()
     public get genderText() {
-        return this.gender ? (Object.keys(User.GENDER).find(key => User.GENDER[key] === this.gender)) : 'N/A'
+        return this.gender ? (Object.keys(User.GENDER).find(key => User.GENDER[key] === this.gender)) : ''
     }
 
     @computed()
     public get identificationText() {
-        return this.identification ? (Object.keys(User.IDENTIFICATION).find(key => User.IDENTIFICATION[key] === this.identification)) : 'N/A'
+        return this.identification ? (Object.keys(User.IDENTIFICATION).find(key => User.IDENTIFICATION[key] === this.identification)) : ''
     }
 
 }
