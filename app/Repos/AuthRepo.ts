@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import User from 'App/Models/User';
-import Subscription from 'App/Models/Subscription'
 import UserDevice from 'App/Models/UserDevice'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
