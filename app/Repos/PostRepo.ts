@@ -321,6 +321,34 @@ class PostRepo extends BaseRepo {
         return posts
     }
 
+    async userPosts(
+        orderByColumn = constants.ORDER_BY_COLUMN,
+        orderByValue = constants.ORDER_BY_VALUE,
+        page = 1,
+        perPage = constants.PER_PAGE,
+        userId
+    ){
+        let res = await Database.rawQuery(`CALL user_posts(${userId})`)
+        let postIds = res ? res[0][0] : []
+        let postIdsArray = postIds.map(postId => postId.id)
+        postIdsArray = postIdsArray.filter((value,index) => postIdsArray.indexOf(value) === index)
+
+        let posts
+        let query = this.model.query().whereIn('id',postIdsArray)
+            .withScopes((scope) => scope.fetchPost(userId));
+
+        query.preload('originalPost',(postQuery) =>{
+            postQuery.preload('user')
+        }).preload('sharedPosts')
+        .whereDoesntHave('hidden',(builder) =>{
+            builder.where('id',userId)
+        })
+
+        posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
+        posts = this.addPostMetaKeys(posts)
+        return posts
+    }
+
     addPostMetaKeys(posts){
         let rows:object[] = [];
         if(posts.rows.length){
