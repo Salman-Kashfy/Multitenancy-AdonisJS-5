@@ -51,7 +51,11 @@ export default class RegisterBusinessValidator extends BaseValidator {
         phone: schema.string({}, [
             rules.minLength(8),
             rules.maxLength(15),
-            //rules.mobile()
+        ]),
+        country_code: schema.string.optional({}, [
+            rules.minLength(2),
+            rules.maxLength(3),
+            rules.requiredIfExists('phone')
         ]),
         password: schema.string({}, [
             rules.maxLength(255),

@@ -20,6 +20,7 @@ export default class CreateUserValidator extends BaseValidator {
             rules.unique({table: 'users', column: 'email'}),
         ]),
         phone: schema.string({trim: true}, [rules.maxLength(15)]),
+        country_code: schema.string({trim: true}, [rules.maxLength(5)]),
         password: schema.string({trim: true}, [
             rules.minLength(6),
         ]),

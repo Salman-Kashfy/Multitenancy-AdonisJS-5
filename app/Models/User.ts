@@ -66,6 +66,9 @@ export default class User extends CommonModel {
     @column()
     public phone: string
 
+    @column()
+    public countryCode: string
+
     @column({ serializeAs: null })
     public password: string
 
