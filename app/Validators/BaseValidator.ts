@@ -35,6 +35,6 @@ export default class BaseValidator {
         'build_version.required': 'The build version is required ',
         'base_url.required': 'The base url is required ',
         'app_store_link.required': 'The app store link is required ',
-        'dob.before': 'Date of birth should not be after or equal to today.',
+        'dob.before': 'Date of birth cannot have future date.',
     }
 }

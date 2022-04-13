@@ -1,6 +1,8 @@
-import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import User from 'App/Models/User'
+import ParkMember from 'App/Models/ParkMember'
+import ParkRequest from 'App/Models/ParkRequest'
 
 export default class Friend extends CommonModel {
 
@@ -9,6 +11,8 @@ export default class Friend extends CommonModel {
 		ACCEPTED: 20,
 		CANCELLED: 30
 	}
+
+	public serializeExtras = true
 
     @column()
     public id: number
@@ -28,4 +32,19 @@ export default class Friend extends CommonModel {
 		foreignKey: 'userId'
 	})
 	public user: BelongsTo<typeof User>
+
+	@hasOne(() => ParkMember, {
+		localKey: 'friendId',
+		foreignKey: 'memberId'
+	})
+	public parkJoined: HasOne<typeof ParkMember>
+
+	@hasOne(() => ParkRequest, {
+		localKey: 'friendId',
+		foreignKey: 'memberId',
+		onQuery: query => query.where({ type: ParkRequest.TYPE.INVITE })
+	})
+	public parkRequest: HasOne<typeof ParkRequest>
+
+
 }
