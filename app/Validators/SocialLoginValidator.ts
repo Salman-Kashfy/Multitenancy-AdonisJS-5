@@ -15,7 +15,11 @@ export default class SocialLoginValidator extends BaseValidator {
         phone: schema.string.optional({}, [
             rules.minLength(8),
             rules.maxLength(20),
-            rules.mobile()
+        ]),
+        country_code: schema.string.optional({}, [
+            rules.minLength(2),
+            rules.maxLength(3),
+            rules.requiredIfExists('phone')
         ]),
         client_id: schema.string({trim: true}),
         platform: schema.string({trim: true}),

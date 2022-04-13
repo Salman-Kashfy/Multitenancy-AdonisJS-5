@@ -46,7 +46,7 @@ export default class User extends CommonModel {
     static IDENTIFICATION = {
         STRAIGHT:10,
         GAY:20,
-        BI:30,
+        OTHER:30,
     }
 
     public static distanceQuery = '( ? * acos ( cos ( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin ( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance'
@@ -65,6 +65,9 @@ export default class User extends CommonModel {
 
     @column()
     public phone: string
+
+    @column()
+    public countryCode: string
 
     @column({ serializeAs: null })
     public password: string

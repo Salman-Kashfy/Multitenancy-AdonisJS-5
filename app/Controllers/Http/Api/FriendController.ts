@@ -32,9 +32,8 @@ export default class FriendController extends ApiBaseController {
                 message = "Friend request has been cancelled successfully!"
                 break;
             default:
-                ref_user = await User.findOrFail(input.friend_id)
-                notification_message = ref_user.name + " has send you a friend request"
-                await myHelpers.sendNotificationStructure(input.user_id, input.friend_id, Notification.TYPES.FRIEND_REQUEST, input.friend_id, null, notification_message)
+                notification_message =`${ctx.auth.user?.name} has send you a friend request`
+                myHelpers.sendNotificationStructure(input.friend_id, input.user_id, Notification.TYPES.FRIEND_REQUEST, input.user_id, null, notification_message)
                 message = "Friend request has been send successfully!"
                 break;
         }

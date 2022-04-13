@@ -246,13 +246,18 @@ export default class AuthController extends ApiBaseController{
     public async socialLogin({request,auth}: HttpContextContract) {
         await request.validate(SocialLoginValidator)
         let socialAccount = await SocialAccountRepo.findSocialLogin(request)
-        let user;
+        let user,message:string;
         if (socialAccount) {
             user = await UserRepo.find(socialAccount.user_id)
-            const roles = await user.related('roles').query()
-            const roleIds = roles.map(role => role.id)
-            if(!roleIds.includes(request.input('account_type'))){
-                throw new ExceptionWithCode(`Please login using ${roles[0].displayName} account`,200)
+
+            const role = await user.related('roles').query().first()
+            if(role.id !== parseInt(request.input('account_type'))){
+                if(role.id === RoleRepo.model.PARENT){
+                    message = `This email is already registered as a mom/dad role`
+                }else{
+                    message = `This email is already registered as a pet ${role.name} role`
+                }
+                throw new ExceptionWithCode(message,200)
             }
         }
         const userFillables:string[] = UserRepo.fillables()

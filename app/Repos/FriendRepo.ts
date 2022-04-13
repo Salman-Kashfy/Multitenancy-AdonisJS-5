@@ -38,6 +38,15 @@ class FriendRepo extends BaseRepo {
                 friendQuery.where('name','like',`%${ctx.request.input('keyword')}%`)
             })
         }
+
+        if(ctx.request.input('park_id')){
+            query.withCount('parkJoined',(parkMemberQuery) =>{
+                parkMemberQuery.where('park_id',ctx.request.input('park_id'))
+            }).withCount('parkRequest',(parkRequestQuery) =>{
+                parkRequestQuery.where('park_id',ctx.request.input('park_id'))
+            })
+        }
+
         return await query.paginate(page, perPage)
     }
 

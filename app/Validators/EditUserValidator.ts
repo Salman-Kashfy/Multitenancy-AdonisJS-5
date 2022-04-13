@@ -16,6 +16,7 @@ export default class EditUserValidator extends BaseValidator {
         ),
         name: schema.string({trim: true}, [rules.maxLength(80)]),
         phone: schema.string({trim: true}, [rules.maxLength(15)]),
+        country_code: schema.string({trim: true}, [rules.maxLength(5)]),
         password: schema.string.optional({trim: true}, [
             rules.minLength(6),
         ]),

@@ -11,6 +11,7 @@ export default class Users extends BaseSchema {
             table.string('email', 255).unique().notNullable()
             table.string('username', 50).unique()
             table.string('phone', 15)
+            table.string('country_code', 5)
             table.string('password', 255)
             table.string('bio', 250)
             table.string('zip', 15)
