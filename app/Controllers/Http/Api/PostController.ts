@@ -28,6 +28,15 @@ export default class PostController extends ApiBaseController {
         return this.apiResponse('Posts fetched successfully', rows)
     }
 
+    async userPosts(ctx: HttpContextContract){
+        let page = ctx.request.input('page', 1)
+        let perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        let orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        let rows = await this.repo.userPosts(orderByColumn, orderByValue, page, perPage, ctx.request.param('userId'))
+        return this.apiResponse('Posts fetched successfully', rows)
+    }
+
     async createPost({request,auth}: HttpContextContract) {
         const {user} = auth
         await request.validate(CreatePostValidator)
