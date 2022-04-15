@@ -13,7 +13,7 @@ export default class SocialLoginValidator extends BaseValidator {
             rules.email({sanitize: true, domainSpecificValidation: true}),
         ]),
         phone: schema.string.optional({}, [
-            rules.minLength(8),
+            rules.minLength(6),
             rules.maxLength(20),
         ]),
         country_code: schema.string.optional({}, [

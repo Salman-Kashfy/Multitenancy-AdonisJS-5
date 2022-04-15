@@ -26,7 +26,7 @@ export default class UserInviteValidator {
 	 */
   public schema = schema.create({
 	  phone: schema.string.optional({}, [
-		  rules.minLength(8),
+		  rules.minLength(6),
 		  rules.maxLength(20),
 		  rules.mobile()
 	  ]),

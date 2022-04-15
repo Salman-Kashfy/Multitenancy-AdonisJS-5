@@ -49,7 +49,7 @@ export default class RegisterBusinessValidator extends BaseValidator {
             rules.email(),
         ]),
         phone: schema.string({}, [
-            rules.minLength(8),
+            rules.minLength(6),
             rules.maxLength(15),
         ]),
         country_code: schema.string.optional({}, [
