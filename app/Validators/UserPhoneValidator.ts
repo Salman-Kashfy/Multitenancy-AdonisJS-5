@@ -12,7 +12,7 @@ export default class UserPhoneValidator extends BaseValidator{
 			schema.object.optional().members({
 				name: schema.string(),
 				phone: schema.string.optional({}, [
-					rules.minLength(8),
+					rules.minLength(6),
 					rules.maxLength(20),
 					rules.mobile()
 				]),

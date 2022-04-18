@@ -21,7 +21,7 @@ export default class RegisterParentValidator extends BaseValidator{
             rules.email(),
         ]),
         phone: schema.string({ trim: true }, [
-            rules.minLength(8),
+            rules.minLength(6),
             rules.maxLength(15),
         ]),
         country_code: schema.string.optional({}, [
