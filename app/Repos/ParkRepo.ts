@@ -117,6 +117,12 @@ class ParkRepo extends BaseRepo {
             .paginate(page, perPage)
     }
 
+    async unPaginatedHostParks(userId) {
+        return this.model.query()
+            .withScopes((scope) => scope.parkRelations(userId))
+            .where({ userId})
+    }
+
     async myParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
         return this.model.query()
             .withScopes((scope) => scope.parkRelations(ctx.auth.user.id))
