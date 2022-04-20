@@ -123,13 +123,25 @@ export default class Post extends CommonModel {
 		query.withScopes((scope) => scope.postMeta(userID)).preload('user')
 	})
 
+	// public static postMeta = scope((query:Builder,userID) => {
+	// 	query.withCount('likes', (likeQuery) =>{
+	// 		likeQuery.as('likes_count')
+	// 	}).withCount('comments', (commentQuery) =>{
+	// 		commentQuery.as('comments_count')
+	// 	}).withCount('likes', (likeQuery) =>{
+	// 		likeQuery.as('is_liked')
+	// 			.where('user_id', userID)
+	// 			.where('instance_type', Like.TYPE.POST)
+	// 	})
+	// })
+
 	public static postMeta = scope((query:Builder,userID) => {
 		query.withCount('likes', (likeQuery) =>{
 			likeQuery.as('likes_count')
 		}).withCount('comments', (commentQuery) =>{
 			commentQuery.as('comments_count')
-		}).withCount('likes', (likeQuery) =>{
-			likeQuery.as('is_liked')
+		}).preload('likes', (likeQuery) =>{
+			likeQuery.select('reaction')
 				.where('user_id', userID)
 				.where('instance_type', Like.TYPE.POST)
 		})

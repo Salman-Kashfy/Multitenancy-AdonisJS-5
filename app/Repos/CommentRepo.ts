@@ -36,17 +36,6 @@ class CommentRepo extends BaseRepo {
     }
 
     /*
-    * Depricated
-    * */
-    // async notifyCommentRespond(userId,commentId){
-    //     const commentor = await User.find(userId)
-    //     const commentAuthor = await this.model.find(commentId)
-    //     if(!commentor || !commentAuthor || commentAuthor.userId === commentor.id) return
-    //     const notification_message = `${commentor.name} replied to your comment.`
-    //     myHelpers.sendNotificationStructure(commentAuthor.userId, commentId, Notification.TYPES.SOMEONE_REPLIED_COMMENT, commentor.id, null, notification_message)
-    // }
-
-    /*
     * This function handles two cases, mention in post and in comment
     * */
     async notifyMentions(mentions,comment){
@@ -111,7 +100,22 @@ class CommentRepo extends BaseRepo {
             query = query.where('parent_id', input.parent_id)
         }
         query.withScopes((scope) => scope.commentRelations(ctx?.auth?.user?.id))
-        return await query.paginate(page, perPage)
+        const comments = await query.paginate(page, perPage)
+
+        // let rows:object[] = [];
+        // if(comments.rows.length){
+        //     comments.rows.map(post =>{
+        //         return rows.push({
+        //             ...post.toJSON(),
+        //             likes_count:post.$extras.likes_count,
+        //             comments_count:post.$extras.comments_count,
+        //             likes:post.$preloaded.likes.length>0 ? post.$preloaded.likes[0] : null
+        //         })
+        //     })
+        //     posts.rows = rows
+        // }
+
+        return comments
     }
 }
 

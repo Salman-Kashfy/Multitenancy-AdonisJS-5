@@ -59,15 +59,16 @@ export default class Comment extends CommonModel {
 		foreignKey: 'instanceId',
 		onQuery: query => query.select('reaction').where({instance_type: Like.TYPE.COMMENT}),
 	})
-	public is_liked: HasOne<typeof Like>
+	public likes: HasOne<typeof Like>
 
 	public static commentRelations = scope((query:Builder,userId) => {
 		return query.preload('children',(commentQuery) =>{
-			commentQuery.preload('mentions').preload('is_liked', (postFavouritesQuery) =>{
+			commentQuery.preload('mentions')
+			.preload('likes', (postFavouritesQuery) =>{
 				postFavouritesQuery.as('my_likes').where('user_id', userId)
 			})
 		}).preload('user').preload('mentions')
-			.preload('is_liked', (postFavouritesQuery) =>{
+			.preload('likes', (postFavouritesQuery) =>{
 				postFavouritesQuery.as('my_likes').where('user_id', userId)
 			})
 	})

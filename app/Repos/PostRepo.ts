@@ -357,7 +357,7 @@ class PostRepo extends BaseRepo {
                     ...post.toJSON(),
                     likes_count:post.$extras.likes_count,
                     comments_count:post.$extras.comments_count,
-                    is_liked:post.$extras.is_liked
+                    likes:post.$preloaded.likes.length>0 ? post.$preloaded.likes[0] : null
                 })
             })
             posts.rows = rows
