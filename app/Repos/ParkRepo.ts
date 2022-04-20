@@ -109,18 +109,28 @@ class ParkRepo extends BaseRepo {
 
     }
 
-    async hostParks(userId) {
+    async hostParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,userId) {
         return this.model.query()
             .withScopes((scope) => scope.parkRelations(userId))
             .where({ userId })
+            .orderBy(orderByColumn, orderByValue)
+            .paginate(page, perPage)
     }
 
-    async myParks(userId) {
+    async unPaginatedHostParks(userId) {
+        return this.model.query()
+            .withScopes((scope) => scope.parkRelations(userId))
+            .where({ userId})
+    }
+
+    async myParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,userId) {
         return this.model.query()
             .withScopes((scope) => scope.parkRelations(userId))
             .whereHas('members', (memberQuery) => {
                 memberQuery.where('member_id', userId)
             })
+            .orderBy(orderByColumn, orderByValue)
+            .paginate(page, perPage)
     }
 
     async join(park, userId) {

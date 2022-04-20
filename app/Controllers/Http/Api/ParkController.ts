@@ -51,16 +51,22 @@ export default class ParkController extends ApiBaseController {
         return this.apiResponse('Record Deleted Successfully')
     }
 
-    async hostParks({auth}:HttpContextContract){
-        const {user} = auth
-        const row = await this.repo.hostParks(user?.id)
-        return this.apiResponse('Record Fetched Successfully',row)
+    async hostParks(ctx:HttpContextContract){
+        let page = ctx.request.input('page', 1)
+        let perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        let orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        let rows = await this.repo.hostParks(orderByColumn, orderByValue, page, perPage, ctx.auth.user?.id)
+        return this.apiResponse('Records fetched successfully', rows)
     }
 
-    async myParks({auth}:HttpContextContract){
-        const {user} = auth
-        const row = await this.repo.myParks(user?.id)
-        return this.apiResponse('Record Fetched Successfully',row)
+    async myParks(ctx:HttpContextContract){
+        let page = ctx.request.input('page', 1)
+        let perPage = ctx.request.input('per-page', constants.PER_PAGE)
+        let orderByColumn = ctx.request.input('order-column', constants.ORDER_BY_COLUMN)
+        let orderByValue = ctx.request.input('order', constants.ORDER_BY_VALUE)
+        let rows = await this.repo.myParks(orderByColumn, orderByValue, page, perPage, ctx.auth.user?.id)
+        return this.apiResponse('Records fetched successfully', rows)
     }
 
     async join({ request,auth }: HttpContextContract){
