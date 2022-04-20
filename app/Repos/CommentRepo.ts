@@ -92,7 +92,7 @@ class CommentRepo extends BaseRepo {
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx: HttpContextContract) {
         let input = ctx.request.all()
-        let query = this.model.query().orderBy(orderByColumn, orderByValue)
+        let query = this.model.query()
         if (input.post_id) {
             query = query.where('post_id', input.post_id).where('parent_id', null)
         }
@@ -100,22 +100,7 @@ class CommentRepo extends BaseRepo {
             query = query.where('parent_id', input.parent_id)
         }
         query.withScopes((scope) => scope.commentRelations(ctx?.auth?.user?.id))
-        const comments = await query.paginate(page, perPage)
-
-        // let rows:object[] = [];
-        // if(comments.rows.length){
-        //     comments.rows.map(post =>{
-        //         return rows.push({
-        //             ...post.toJSON(),
-        //             likes_count:post.$extras.likes_count,
-        //             comments_count:post.$extras.comments_count,
-        //             likes:post.$preloaded.likes.length>0 ? post.$preloaded.likes[0] : null
-        //         })
-        //     })
-        //     posts.rows = rows
-        // }
-
-        return comments
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 }
 
