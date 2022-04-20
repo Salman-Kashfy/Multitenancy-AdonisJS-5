@@ -109,10 +109,10 @@ class ParkRepo extends BaseRepo {
 
     }
 
-    async hostParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
+    async hostParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkRelations(ctx.auth.user.id))
-            .where({ userId:ctx.auth.user.id })
+            .withScopes((scope) => scope.parkRelations(userId))
+            .where({ userId })
             .orderBy(orderByColumn, orderByValue)
             .paginate(page, perPage)
     }
@@ -123,11 +123,11 @@ class ParkRepo extends BaseRepo {
             .where({ userId})
     }
 
-    async myParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,ctx) {
+    async myParks(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE,userId) {
         return this.model.query()
-            .withScopes((scope) => scope.parkRelations(ctx.auth.user.id))
+            .withScopes((scope) => scope.parkRelations(userId))
             .whereHas('members', (memberQuery) => {
-                memberQuery.where('member_id', ctx.auth.user.id)
+                memberQuery.where('member_id', userId)
             })
             .orderBy(orderByColumn, orderByValue)
             .paginate(page, perPage)
