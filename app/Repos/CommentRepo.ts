@@ -36,17 +36,6 @@ class CommentRepo extends BaseRepo {
     }
 
     /*
-    * Depricated
-    * */
-    // async notifyCommentRespond(userId,commentId){
-    //     const commentor = await User.find(userId)
-    //     const commentAuthor = await this.model.find(commentId)
-    //     if(!commentor || !commentAuthor || commentAuthor.userId === commentor.id) return
-    //     const notification_message = `${commentor.name} replied to your comment.`
-    //     myHelpers.sendNotificationStructure(commentAuthor.userId, commentId, Notification.TYPES.SOMEONE_REPLIED_COMMENT, commentor.id, null, notification_message)
-    // }
-
-    /*
     * This function handles two cases, mention in post and in comment
     * */
     async notifyMentions(mentions,comment){
@@ -103,7 +92,7 @@ class CommentRepo extends BaseRepo {
 
     async index(orderByColumn = constants.ORDER_BY_COLUMN, orderByValue = constants.ORDER_BY_VALUE, page = 1, perPage = constants.PER_PAGE, ctx: HttpContextContract) {
         let input = ctx.request.all()
-        let query = this.model.query().orderBy(orderByColumn, orderByValue)
+        let query = this.model.query()
         if (input.post_id) {
             query = query.where('post_id', input.post_id).where('parent_id', null)
         }
@@ -111,7 +100,7 @@ class CommentRepo extends BaseRepo {
             query = query.where('parent_id', input.parent_id)
         }
         query.withScopes((scope) => scope.commentRelations(ctx?.auth?.user?.id))
-        return await query.paginate(page, perPage)
+        return query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 }
 

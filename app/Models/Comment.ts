@@ -16,6 +16,8 @@ import Like from 'App/Models/Like'
 type Builder = ModelQueryBuilderContract<typeof Comment>
 export default class Comment extends CommonModel {
 
+	public serializeExtras = true
+
 	static MENTION_TYPE = {
 		COMMENT:10,
 		POST:20,
@@ -49,26 +51,22 @@ export default class Comment extends CommonModel {
 	})
 	public children: HasMany<typeof Comment>
 
-	@hasMany(() => Like, {
-		foreignKey: 'instanceId',
-		onQuery: query => query.select('reaction').where({instance_type: Like.TYPE.COMMENT}),
-	})
-	public commentLikes: HasMany<typeof Like>
-
 	@hasOne(() => Like, {
 		foreignKey: 'instanceId',
-		onQuery: query => query.select('reaction').where({instance_type: Like.TYPE.COMMENT}),
+		onQuery: query => query.where({instance_type: Like.TYPE.COMMENT}),
 	})
-	public is_liked: HasOne<typeof Like>
+	public likes: HasOne<typeof Like>
 
 	public static commentRelations = scope((query:Builder,userId) => {
-		return query.preload('children',(commentQuery) =>{
-			commentQuery.preload('mentions').preload('is_liked', (postFavouritesQuery) =>{
+		return query
+		.preload('children',(commentQuery) =>{
+			commentQuery.preload('mentions')
+			.preload('likes', (postFavouritesQuery) =>{
 				postFavouritesQuery.as('my_likes').where('user_id', userId)
 			})
 		}).preload('user').preload('mentions')
-			.preload('is_liked', (postFavouritesQuery) =>{
-				postFavouritesQuery.as('my_likes').where('user_id', userId)
-			})
+		.preload('likes', (postFavouritesQuery) =>{
+			postFavouritesQuery.as('my_likes').where('user_id', userId)
+		}).withCount('likes')
 	})
 }

@@ -310,12 +310,12 @@ class PostRepo extends BaseRepo {
         }
 
         query.preload('originalPost',(postQuery) =>{
-            postQuery.preload('user')
+            for (let relation of this.relations) postQuery.preload(relation)
         }).preload('sharedPosts')
         .whereDoesntHave('hidden',(builder) =>{
             builder.where('id',ctx.auth.user?.id)
         })
-
+        for (let relation of this.relations) query.preload(relation)
         posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
         posts = this.addPostMetaKeys(posts)
         return posts
@@ -338,12 +338,12 @@ class PostRepo extends BaseRepo {
             .withScopes((scope) => scope.fetchPost(userId));
 
         query.preload('originalPost',(postQuery) =>{
-            postQuery.preload('user')
+            for (let relation of this.relations) postQuery.preload(relation)
         }).preload('sharedPosts')
         .whereDoesntHave('hidden',(builder) =>{
             builder.where('id',userId)
         })
-
+        for (let relation of this.relations) query.preload(relation)
         posts = await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
         posts = this.addPostMetaKeys(posts)
         return posts
@@ -357,7 +357,7 @@ class PostRepo extends BaseRepo {
                     ...post.toJSON(),
                     likes_count:post.$extras.likes_count,
                     comments_count:post.$extras.comments_count,
-                    is_liked:post.$extras.is_liked
+                    likes:post.$preloaded.likes.length>0 ? post.$preloaded.likes[0] : null
                 })
             })
             posts.rows = rows

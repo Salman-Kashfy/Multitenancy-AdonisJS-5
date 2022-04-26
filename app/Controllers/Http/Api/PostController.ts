@@ -42,7 +42,7 @@ export default class PostController extends ApiBaseController {
         await request.validate(CreatePostValidator)
         const input = request.only(this.repo.fillables())
         await ParkRepo.filterNonParkMember(user,request.input('share_posts'))
-        const hostParks = await ParkRepo.hostParks(user?.id)
+        const hostParks = await ParkRepo.unPaginatedHostParks(user?.id)
         await this.repo.applyPostLimits(user,request.input('share_posts'),hostParks)
         let row = await this.repo.createPost({...input,userId:user?.id}, request)
         return this.apiResponse('Record Added Successfully', row)
@@ -55,9 +55,12 @@ export default class PostController extends ApiBaseController {
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
-        const attachmentBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
-        if(ctx.request.input('remove_media') && !attachmentBelonging){
-            throw new ExceptionWithCode('Permission denied!',403)
+
+        if(ctx.request.input('remove_media')){
+            const attachmentBelonging = await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)
+            if(!attachmentBelonging){
+                throw new ExceptionWithCode('Permission denied!',403)
+            }
         }
         const input = ctx.request.only(this.repo.fillables())
         const row = await this.repo.update(ctx.request.param('id'),{...input,userId:user?.id}, ctx.request)
@@ -101,7 +104,7 @@ export default class PostController extends ApiBaseController {
 
     async parkQuota({request,auth}: HttpContextContract){
         const {user} = auth
-        const hostParks = await ParkRepo.hostParks(user?.id)
+        const hostParks = await ParkRepo.unPaginatedHostParks(user?.id)
         await this.repo.applyPostLimits(user,[request.param('parkId')],hostParks)
         return this.apiResponse('You have enough quota')
     }

@@ -22,6 +22,7 @@ import RegisterBusinessValidator from 'App/Validators/RegisterBusinessValidator'
 import PasswordUpdated from 'App/Mailers/PasswordUpdated'
 import BusinessRepo from 'App/Repos/BusinessRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
+import Subscription from 'App/Models/Subscription'
 
 export default class AuthController extends ApiBaseController{
     
@@ -269,9 +270,13 @@ export default class AuthController extends ApiBaseController{
 
             user = await UserRepo.model.updateOrCreate({
                 email: request.input('email', null)
-            }, request.only(userFillables))
-
+            }, input)
             await user.related('roles').sync([request.input('account_type')])
+            await user.related('subscription').sync({
+                [Subscription.FREE_PLAN]:{
+                    platform:'local'
+                }
+            })
             await SocialAccountRepo.store(request, user.id)
         }
 

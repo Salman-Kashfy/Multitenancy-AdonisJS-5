@@ -1,6 +1,5 @@
 import BaseRepo from 'App/Repos/BaseRepo'
 import Like from "App/Models/Like";
-import Comment from "App/Models/Comment";
 import Post from "App/Models/Post";
 import {LikeInterface} from "App/Interfaces/LikeInterface";
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
