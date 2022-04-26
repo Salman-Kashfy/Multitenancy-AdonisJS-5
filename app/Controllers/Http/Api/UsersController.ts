@@ -16,6 +16,7 @@ import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import EditUserValidator from 'App/Validators/EditUserValidator'
 import CheckEmailExistValidator from 'App/Validators/CheckEmailExistValidator'
+import Role from 'App/Models/Role'
 
 export default class UsersController extends ApiBaseController{
 
@@ -131,6 +132,17 @@ export default class UsersController extends ApiBaseController{
     async checkEmailExist({request}: HttpContextContract) {
         await request.validate(CheckEmailExistValidator)
         return this.apiResponse("Email is available",true)
+    }
+
+    async delete(ctx: HttpContextContract) {
+        if(ctx.auth.user?.id !== parseInt(ctx.request.param('id'))){
+            let role = await ctx.auth.user?.related('roles').query().where('role_id',Role.ADMIN).first()
+            if(!role){
+                throw new ExceptionWithCode("Permission denied!",403)
+            }
+        }
+        const res = await this.repo.delete(ctx.request.param('id'))
+        return this.apiResponse('Record deleted successfully!', res)
     }
 
 }
