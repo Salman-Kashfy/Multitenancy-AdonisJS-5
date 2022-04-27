@@ -46,8 +46,17 @@ class FriendRepo extends BaseRepo {
                 parkRequestQuery.where('park_id',ctx.request.input('park_id'))
             })
         }
+        let result = await query.paginate(page, perPage)
+        if(parseInt(input.status) === this.model.STATUSES.ACCEPTED && input.user_id){
+            const friendRequestCount = await this.model.query()
+                .where('friend_id',input.user_id)
+                .where('status',this.model.STATUSES.REQUESTED)
+                .getCount('id as count')
+                .first()
+            result = {friends:result,friendRequestCount:friendRequestCount.$extras.count}
+        }
 
-        return await query.paginate(page, perPage)
+        return result
     }
 
     async store(input) {
