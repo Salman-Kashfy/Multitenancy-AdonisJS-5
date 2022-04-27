@@ -65,6 +65,7 @@ Route.group(() => {
         Route.post('user/get-users-by-phone', 'Api/UsersController.getUsersByPhone')
         Route.post('user/invite', 'Api/UsersController.invite')
         Route.post('user/send-alerts', 'Api/UsersController.sendAlerts')
+        Route.delete('user/:id', 'Api/UsersController.delete')
 
         /*
         |--------------------------------------------------------------------------

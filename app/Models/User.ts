@@ -1,4 +1,5 @@
 import {
+    beforeDelete,
     beforeSave,
     column, computed,
     hasMany,
@@ -15,6 +16,12 @@ import myHelpers from 'App/Helpers'
 import Friend from 'App/Models/Friend'
 import Subscription from 'App/Models/Subscription'
 import Badge from 'App/Models/Badge'
+import Post from 'App/Models/Post'
+import Dog from 'App/Models/Dog'
+import ParkMember from 'App/Models/ParkMember'
+import ParkRequest from 'App/Models/ParkRequest'
+import Park from 'App/Models/Park'
+import Report from 'App/Models/Report'
 
 export default class User extends CommonModel {
 
@@ -159,6 +166,42 @@ export default class User extends CommonModel {
         pivotTable: 'user_badges'
     })
     public badges: ManyToMany<typeof Badge>
+
+    @hasMany(() => Friend)
+    public myFriendsWithRequests: HasMany<typeof Friend>
+
+    @hasMany(() => Post)
+    public posts: HasMany<typeof Post>
+
+    @hasMany(() => Dog)
+    public dogs: HasMany<typeof Dog>
+
+    @hasMany(() => ParkMember,{
+        foreignKey:'memberId'
+    })
+    public parkMember: HasMany<typeof ParkMember>
+
+    @hasMany(() => ParkRequest,{
+        foreignKey:'memberId'
+    })
+    public parkRequests: HasMany<typeof ParkRequest>
+
+    @hasMany(() => Park)
+    public parks: HasMany<typeof Park>
+
+    @hasMany(() => Report)
+    public reports: HasMany<typeof Report>
+
+    @beforeDelete()
+    public static async deleteUser(user: User) {
+        await user.related('myFriendsWithRequests').query().update({'deleted_at': new Date()})
+        await user.related('posts').query().update({'deleted_at': new Date()})
+        await user.related('dogs').query().update({'deleted_at': new Date()})
+        await user.related('parkMember').query().update({'deleted_at': new Date()})
+        await user.related('parkRequests').query().update({'deleted_at': new Date()})
+        await user.related('parks').query().update({'deleted_at': new Date()})
+        await user.related('reports').query().update({'deleted_at': new Date()})
+    }
 
     @computed()
     public get imagePath() {
