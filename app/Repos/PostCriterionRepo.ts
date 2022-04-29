@@ -6,7 +6,7 @@ class PostCriterionRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = []
+        const relations = ['role','subscription']
         super(PostCriterion, relations)
         this.model = PostCriterion
     }
