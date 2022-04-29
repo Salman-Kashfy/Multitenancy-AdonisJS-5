@@ -14,7 +14,6 @@ export default class UserPhoneValidator extends BaseValidator{
 				phone: schema.string.optional({}, [
 					rules.minLength(6),
 					rules.maxLength(20),
-					rules.mobile()
 				]),
 				email: schema.string.optional({}, [
 					rules.requiredIfNotExists('phone'),
