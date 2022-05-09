@@ -12,6 +12,7 @@ import ParkRequestRepo from 'App/Repos/ParkRequestRepo'
 import constants from 'Config/constants'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import ParkExistValidator from 'App/Validators/ParkExistValidator'
+import Role from 'App/Models/Role'
 
 export default class ParkController extends ApiBaseController {
 
@@ -43,7 +44,9 @@ export default class ParkController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
-        if(! await this.repo.belonging(ctx)){
+        const role = await ctx.auth.user?.related('roles').query().where('role_id',Role.ADMIN).first()
+        const belonging = await this.repo.belonging(ctx)
+        if(!role && !belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.PARK})

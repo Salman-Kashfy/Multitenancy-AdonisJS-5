@@ -17,12 +17,13 @@ import User from 'App/Models/User'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import Database from "@ioc:Adonis/Lucid/Database"
 import myHelper from 'App/Helpers'
+import Report from 'App/Models/Report'
 
 class PostRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = ['user','attachments']
+        const relations = ['user','attachments','sharedPosts']
         super(Post, relations)
         this.model = Post
     }
@@ -35,9 +36,20 @@ class PostRepo extends BaseRepo {
         // @ts-ignore
         ctx: HttpContextContract
     ) {
-        let query = this.model.query().whereNull('shared_post_id').orderBy(orderByColumn, orderByValue)
+        let input = ctx.request.all()
+        let query = this.model.query().whereNull('shared_post_id')
+        if (input.keyword) {
+            query.where((postQuery) => {
+                postQuery.where('description', 'like', `%${input.keyword}%`)
+                    .orWhere((postQuery) => {
+                        postQuery.whereHas('user', (userQuery) => {
+                            userQuery.where('name', 'like', `%${input.keyword}%`)
+                        })
+                    })
+            })
+        }
         for (let relation of this.relations) await query.preload(relation)
-        return await query.paginate(page, perPage)
+        return await query.orderBy(orderByColumn, orderByValue).paginate(page, perPage)
     }
 
     async createPost(input,request:RequestContract){
@@ -310,8 +322,8 @@ class PostRepo extends BaseRepo {
         }
 
         query.preload('originalPost',(postQuery) =>{
-            for (let relation of this.relations) postQuery.preload(relation)
-        }).preload('sharedPosts')
+            postQuery.preload('user').preload('attachments')
+        })
         .whereDoesntHave('hidden',(builder) =>{
             builder.where('id',ctx.auth.user?.id)
         })
@@ -338,8 +350,8 @@ class PostRepo extends BaseRepo {
             .withScopes((scope) => scope.fetchPost(userId));
 
         query.preload('originalPost',(postQuery) =>{
-            for (let relation of this.relations) postQuery.preload(relation)
-        }).preload('sharedPosts')
+            postQuery.preload('user').preload('attachments')
+        })
         .whereDoesntHave('hidden',(builder) =>{
             builder.where('id',userId)
         })
@@ -400,6 +412,16 @@ class PostRepo extends BaseRepo {
             await post.related('hidden').detach([input.userId])
         }
     }
+
+    async delete(id) {
+        let row = await this.model.findOrFail(id)
+        await Report.query()
+            .where('instance_id',id)
+            .where('instance_type',Report.INSTANCE_TYPES.POST)
+            .update({'deleted_at': new Date()})
+        await row.delete()
+    }
+
 }
 
 export default new PostRepo()

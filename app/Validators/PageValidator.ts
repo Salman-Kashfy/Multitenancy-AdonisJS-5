@@ -9,6 +9,6 @@ export default class PageValidator extends BaseValidator {
 
   public schema = schema.create({
     title: schema.string({trim: true}, [rules.maxLength(255),]),
-    content: schema.string.optional({})
+    content: schema.string({})
   })
 }

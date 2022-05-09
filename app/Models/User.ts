@@ -189,7 +189,10 @@ export default class User extends CommonModel {
     @hasMany(() => Park)
     public parks: HasMany<typeof Park>
 
-    @hasMany(() => Report)
+    @hasMany(() => Report,{
+        foreignKey: 'instanceId',
+        onQuery: query => query.where('status', Report.INSTANCE_TYPES.USER),
+    })
     public reports: HasMany<typeof Report>
 
     @beforeDelete()
@@ -200,7 +203,9 @@ export default class User extends CommonModel {
         await user.related('parkMember').query().update({'deleted_at': new Date()})
         await user.related('parkRequests').query().update({'deleted_at': new Date()})
         await user.related('parks').query().update({'deleted_at': new Date()})
-        await user.related('reports').query().update({'deleted_at': new Date()})
+        await Report.query().where('instance_id',user.id)
+            .where('instance_type',Report.INSTANCE_TYPES.USER)
+            .update({'deleted_at': new Date()})
     }
 
     @computed()

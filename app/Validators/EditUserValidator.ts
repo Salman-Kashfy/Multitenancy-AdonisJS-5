@@ -19,7 +19,15 @@ export default class EditUserValidator extends BaseValidator {
         country_code: schema.string({trim: true}, [rules.maxLength(5)]),
         password: schema.string.optional({trim: true}, [
             rules.minLength(6),
+            rules.confirmed()
         ]),
         is_blocked: schema.boolean.optional(),
+        marital_status: schema.number.optional(),
+        identification: schema.number.optional(),
+        dob: schema.date.optional({
+            format: 'yyyy-MM-dd',
+        },[
+            rules.before( 'today')
+        ]),
     })
 }

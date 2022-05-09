@@ -108,8 +108,8 @@ export default class UsersController extends ApiBaseController{
     }
 
     async adminUpdate(ctx:HttpContextContract){
-        const input = await ctx.request.validate(EditUserValidator)
-        const res = await this.repo.update(ctx.request.param('id'), input, ctx.request)
+        await ctx.request.validate(EditUserValidator)
+        const res = await this.repo.update(ctx.request.param('id'), ctx.request.only(this.repo.fillables()), ctx.request)
         return this.apiResponse('Record updated successfully!', res)
     }
 
