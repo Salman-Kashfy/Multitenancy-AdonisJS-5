@@ -32,7 +32,8 @@ export default class ParkController extends ApiBaseController {
     async update(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
         const {user} = ctx.auth
         await ctx.request.validate(EditParkValidator)
-        if(! await this.repo.belonging(ctx)){
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)){
@@ -44,8 +45,9 @@ export default class ParkController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
+        const {user} = ctx.auth
         const role = await ctx.auth.user?.related('roles').query().where('role_id',Role.ADMIN).first()
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!role && !belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
@@ -131,7 +133,9 @@ export default class ParkController extends ApiBaseController {
     }
 
     async getBlockList(ctx: HttpContextContract){
-        if(! await this.repo.belonging(ctx)){
+        const {user} = ctx.auth
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         const res = await this.repo.getBlockList(ctx.request.param('id'))

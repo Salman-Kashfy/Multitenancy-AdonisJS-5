@@ -33,7 +33,7 @@ export default class DogController extends ApiBaseController {
     async update(ctx: HttpContextContract): Promise<{ data: any; message: string; status: boolean }> {
         const {user} = ctx.auth
         await ctx.request.validate(EditDogValidator)
-        if(! await this.repo.belonging(ctx)){
+        if(! await this.repo.belonging(ctx.request.param('id'),user?.id)){
             throw new ExceptionWithCode('Record not found!',404)
         }
         if(ctx.request.input('remove_media') && !await AttachmentRepo.checkAllBelonging(ctx.request.input('remove_media'),user?.id)){
@@ -45,7 +45,9 @@ export default class DogController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
-        if(! await this.repo.belonging(ctx)){
+        const {user} = ctx.auth
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
+        if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.DOG})

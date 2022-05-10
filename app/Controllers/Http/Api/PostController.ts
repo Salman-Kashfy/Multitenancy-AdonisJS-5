@@ -52,7 +52,7 @@ export default class PostController extends ApiBaseController {
     async updatePost(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user} = ctx.auth
         await ctx.request.validate(EditPostValidator)
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
@@ -69,8 +69,9 @@ export default class PostController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
+        const {user} = ctx.auth
         const role = await ctx.auth.user?.related('roles').query().where('role_id',Role.ADMIN).first()
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!role && !belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
@@ -90,7 +91,7 @@ export default class PostController extends ApiBaseController {
     async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user} = ctx.auth
         await ctx.request.validate(EditAlertValidator)
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
