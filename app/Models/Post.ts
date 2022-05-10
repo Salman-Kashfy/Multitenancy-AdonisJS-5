@@ -139,7 +139,7 @@ export default class Post extends CommonModel {
 		query.withCount('likes', (likeQuery) =>{
 			likeQuery.as('likes_count')
 		}).withCount('comments', (commentQuery) =>{
-			commentQuery.as('comments_count')
+			commentQuery.as('comments_count').whereNull('deleted_at')
 		}).preload('likes', (likeQuery) =>{
 			likeQuery.select('reaction')
 				.where('user_id', userID)
