@@ -60,13 +60,13 @@ export default class Comment extends CommonModel {
 	public static commentRelations = scope((query:Builder,userId) => {
 		return query
 		.preload('children',(commentQuery) =>{
-			commentQuery.preload('mentions')
+			commentQuery.preload('user').preload('mentions')
 			.preload('likes', (postFavouritesQuery) =>{
-				postFavouritesQuery.as('my_likes').where('user_id', userId)
-			})
+				postFavouritesQuery.where('user_id', userId)
+			}).withCount('likes')
 		}).preload('user').preload('mentions')
 		.preload('likes', (postFavouritesQuery) =>{
-			postFavouritesQuery.as('my_likes').where('user_id', userId)
+			postFavouritesQuery.where('user_id', userId)
 		}).withCount('likes')
 	})
 }
