@@ -13,7 +13,7 @@ class CommentRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = []
+        const relations = ['user']
         super(Comment, relations)
         this.model = Comment
     }

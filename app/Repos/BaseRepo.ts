@@ -123,7 +123,11 @@ export default class BaseRepo {
         return await this.model.query().select('id').where({id:ctx.request.param('id')}).limit(1).first();
     }
 
-    async belonging(ctx,matchColumn = 'user_id'){
-        return await this.model.query().select('id').where({id:ctx.request.param('id')}).where(matchColumn,ctx.auth.user.id).limit(1).first();
+    // async belonging(ctx,matchColumn = 'user_id'){
+    //     return await this.model.query().select('id').where({id:ctx.request.param('id')}).where(matchColumn,ctx.auth.user.id).limit(1).first();
+    // }
+
+    async belonging(id:number,userId:number,matchColumn = 'user_id'){
+        return await this.model.query().select('id').where({id}).where(matchColumn,userId).limit(1).first();
     }
 }

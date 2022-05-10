@@ -17,7 +17,7 @@ class ParkRepo extends BaseRepo {
     model
 
     constructor() {
-        const relations = []
+        const relations = ['user']
         super(Park, relations)
         this.model = Park
     }
@@ -49,6 +49,7 @@ class ParkRepo extends BaseRepo {
         countQuery = query
         const total = await countQuery
         let offset = (page-1)*perPage
+        for (let relation of this.relations) await query.preload(relation)
         let parks = await query.orderBy(orderByColumn, orderByValue).offset(offset).limit(perPage)
         return myHelpers.formatPages(parks,total.length,page,perPage)
     }
@@ -209,8 +210,9 @@ class ParkRepo extends BaseRepo {
     async parkDetails(id,userId) {
         let row = this.model.query()
             .withScopes((scope) => scope.parkRelations(userId))
-            .where('id',id).first()
-        return row
+            .where('id',id)
+        for (let relation of this.relations) row.preload(relation)
+        return row.first()
     }
 
     async filterNonParkMember(user,parkId){

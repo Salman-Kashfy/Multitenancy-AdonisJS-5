@@ -22,7 +22,8 @@ export default class CommentController extends ApiBaseController {
 
     async update(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         await ctx.request.validate(EditCommentValidator)
-        const belonging = await this.repo.belonging(ctx)
+        const {user} = ctx.auth
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
@@ -32,12 +33,12 @@ export default class CommentController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
-        const belonging = await this.repo.belonging(ctx)
+        const {user} = ctx.auth
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         await this.repo.delete(ctx.request.param('id'))
         return this.apiResponse('Record Deleted Successfully')
     }
-
 }

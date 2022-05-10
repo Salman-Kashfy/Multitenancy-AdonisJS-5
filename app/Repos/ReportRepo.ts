@@ -6,6 +6,7 @@ import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import constants from "Config/constants";
 import myHelpers from 'App/Helpers'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 class ReportRepo extends BaseRepo {
     model
@@ -25,7 +26,10 @@ class ReportRepo extends BaseRepo {
         ctx: HttpContextContract
     ) {
         let countQuery
-        let query = this.model.query().orderBy(orderByColumn, orderByValue)
+        let query = this.model
+            .query()
+            .select('*',Database.raw('COUNT(DISTINCT user_id) as report_count'))
+
         for (let relation of this.relations) await query.preload(relation)
 
         if(ctx.request.input('keyword')){
@@ -38,7 +42,8 @@ class ReportRepo extends BaseRepo {
         let offset = (page-1)*perPage
         let reports = await query
             .groupBy(['instance_id','instance_type'])
-            .orderBy(orderByColumn, orderByValue).offset(offset).limit(perPage)
+            .orderBy(orderByColumn, orderByValue).offset(offset)
+            .limit(perPage)
         return myHelpers.formatPages(reports,total.length,page,perPage)
     }
 

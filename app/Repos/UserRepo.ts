@@ -13,6 +13,7 @@ import Like from 'App/Models/Like'
 import Notification from 'App/Models/Notification'
 import myHelpers from 'App/Helpers'
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
+import Subscription from 'App/Models/Subscription'
 
 class UserRepo extends BaseRepo {
     model
@@ -229,6 +230,13 @@ class UserRepo extends BaseRepo {
     async store(input){
         const user = await this.model.create(input)
         await user.related('roles').sync(input.roles)
+        if(input.roles.includes(Role.PARENT) || input.roles.includes(Role.BUSINESS)){
+            await user.related('subscription').sync({
+                [Subscription.FREE_PLAN]:{
+                    platform:'local'
+                }
+            })
+        }
     }
 
     async all(

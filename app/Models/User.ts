@@ -189,7 +189,10 @@ export default class User extends CommonModel {
     @hasMany(() => Park)
     public parks: HasMany<typeof Park>
 
-    @hasMany(() => Report)
+    @hasMany(() => Report,{
+        foreignKey: 'instanceId',
+        onQuery: query => query.where('instance_type', Report.INSTANCE_TYPES.USER),
+    })
     public reports: HasMany<typeof Report>
 
     @beforeDelete()

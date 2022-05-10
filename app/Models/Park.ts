@@ -5,7 +5,7 @@ import {
 	scope,
 	ModelQueryBuilderContract,
 	manyToMany,
-	ManyToMany,
+	ManyToMany, BelongsTo, belongsTo,
 } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import Attachment from 'App/Models/Attachment'
@@ -72,6 +72,9 @@ export default class Park extends CommonModel {
 			builder.where('id',userId)
 		})
 	})
+
+	@belongsTo(() => User)
+	public user: BelongsTo<typeof User>
 
 	@manyToMany(() => User, {
 		pivotTable: 'park_members',

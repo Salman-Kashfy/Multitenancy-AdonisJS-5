@@ -113,8 +113,8 @@ Route.group(() => {
         Route.group(() => {
             Route.post('parks', 'Api/ParkController.store')
             Route.put('parks/:id', 'Api/ParkController.update')
-            Route.delete('parks/:id', 'Api/ParkController.destroy')
         }).middleware('premium')
+        Route.delete('parks/:id', 'Api/ParkController.destroy')
         Route.get('parks', 'Api/ParkController.index')
         Route.get('parks/:id', 'Api/ParkController.show')
         Route.get('park-requests', 'Api/ParkRequestController.index')

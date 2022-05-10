@@ -12,6 +12,7 @@ import ParkRepo from 'App/Repos/ParkRepo'
 import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 import GlobalResponseInterface from 'App/Interfaces/GlobalResponseInterface'
 import constants from 'Config/constants'
+import Role from 'App/Models/Role'
 
 export default class PostController extends ApiBaseController {
 
@@ -51,7 +52,7 @@ export default class PostController extends ApiBaseController {
     async updatePost(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user} = ctx.auth
         await ctx.request.validate(EditPostValidator)
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
@@ -68,8 +69,10 @@ export default class PostController extends ApiBaseController {
     }
 
     async destroy(ctx:HttpContextContract){
-        const belonging = await this.repo.belonging(ctx)
-        if(!belonging){
+        const {user} = ctx.auth
+        const role = await ctx.auth.user?.related('roles').query().where('role_id',Role.ADMIN).first()
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
+        if(!role && !belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }
         await AttachmentRepo.removeAttachments({instanceId:ctx.request.param('id'),instanceType:AttachmentRepo.model.TYPE.POST})
@@ -88,7 +91,7 @@ export default class PostController extends ApiBaseController {
     async updateAlert(ctx: HttpContextContract): Promise<GlobalResponseInterface> {
         const {user} = ctx.auth
         await ctx.request.validate(EditAlertValidator)
-        const belonging = await this.repo.belonging(ctx)
+        const belonging = await this.repo.belonging(ctx.request.param('id'),user?.id)
         if(!belonging){
             throw new ExceptionWithCode('Record not found!',404)
         }

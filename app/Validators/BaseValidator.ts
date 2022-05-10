@@ -27,7 +27,7 @@ export default class BaseValidator {
         email: "The email is not valid",
         minLength: "The {{field}} should be at least {{options.minLength}} character long",
         maxLength: "The {{field}} should not greater than {{options.minLength}} character",
-        confirmed: "The {{field}} doesn't match",
+        confirmed: "The password confirmation doesn't match",
         otp_code: "The {{field}} is required",
         mobile: "The {{field}} format is invalid",
         "phone.requiredIfNotExists": 'Phone is required',

@@ -1,8 +1,10 @@
-import { BelongsTo, belongsTo, column, computed } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column, computed, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
 import CommonModel from "App/Models/CommonModel";
 import User from "App/Models/User";
 
 export default class Report extends CommonModel {
+    public serializeExtras = true
+
     static INSTANCE_TYPES = {
         USER: 10,
         POST: 20
@@ -33,4 +35,15 @@ export default class Report extends CommonModel {
     public get statusText() {
         return Object.keys(Report.STATUSES).find(key => Report.STATUSES[key] === this.status);
     }
+    @hasOne(() => User, {
+		foreignKey: 'instanceId',
+		onQuery: query => query.where({ instanceType: Report.INSTANCE_TYPES.USER }).select('id','mimeType','path'),
+	})
+	public reportedUser: HasOne<typeof User>
+
+    // @hasOne(() => User, {
+	// 	foreignKey: 'instanceId',
+	// 	onQuery: query => query.where({ instanceType: Report.INSTANCE_TYPES.USER }).select('id','mimeType','path'),
+	// })
+	// public reportedUser: HasOne<typeof User>
 }

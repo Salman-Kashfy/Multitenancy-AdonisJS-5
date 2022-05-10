@@ -18,11 +18,13 @@ export default class CreateUserValidator extends BaseValidator {
         email: schema.string({trim: true}, [
             rules.email({sanitize: true}),
             rules.unique({table: 'users', column: 'email'}),
+            rules.maxLength(100)
         ]),
         phone: schema.string({trim: true}, [rules.maxLength(15)]),
         country_code: schema.string({trim: true}, [rules.maxLength(5)]),
         password: schema.string({trim: true}, [
             rules.minLength(6),
+            rules.confirmed()
         ]),
         dob: schema.date.optional({
             format: 'yyyy-MM-dd',
