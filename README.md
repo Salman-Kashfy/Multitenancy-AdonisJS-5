@@ -61,3 +61,6 @@ node ace tenant:rollback <dbName>
 ```
 where *dbName* is tenant's database
 **Note:** It's recommended not to run rollbacks in production enviroment.
+
+## Conclusion
+The following solution is tested with benchmark testing and can handle thousands of concurrent requests from multple tenants at the same time.
