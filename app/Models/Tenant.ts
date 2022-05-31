@@ -1,20 +1,18 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Role extends BaseModel {
+export default class Tenant extends BaseModel {
 
-    static SUPER_ADMIN = 1;
-    static ADMIN = 2;
-    static USER = 3;
+    public static connection = 'landlord'
 
     @column({ isPrimary: true })
     public id: number
 
     @column()
-    public name: string
+    public domain: string
 
     @column()
-    public displayName: string
+    public database: string
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime

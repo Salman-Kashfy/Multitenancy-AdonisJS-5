@@ -6,7 +6,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import UserDevice from 'App/Models/UserDevice'
 import Notification from 'App/Models/Notification'
 import Application from "@ioc:Adonis/Core/Application";
-import BlockedUser from 'App/Models/BlockedUser'
+import Database from "@ioc:Adonis/Lucid/Database"
 
 const ImageResizer = require('node-image-resizer')
 const FCM = require('fcm-node')
@@ -83,28 +83,6 @@ export default {
             type: file.type,
         }
     },
-    // async sendNotificationStructure(user_id, ref_id, type, referenced_user_id, title = null, msg) {
-    //     let notification: any;
-    //     let payload: any;
-    //     let devices = await UserDevice.query()
-    //         .where('user_id', user_id)
-    //         .whereHas('author', (query) => {
-    //             query.where('push_notification', 1)
-    //         })
-    //     if (devices.length > 0) {
-    //         payload = {
-    //             notifiable_id: user_id,
-    //             ref_id: ref_id,
-    //             type: type,
-    //             referenced_user_id: referenced_user_id,
-    //             title: title ? title : constants.APP_NAME,
-    //             message: msg
-    //         }
-    //         notification = await Notification.create(payload)
-    //         payload.notification_id = notification.id
-    //         this.sendNotification(constants.APP_NAME, msg, payload, devices)
-    //     }
-    // },
     async sendNotification(title = constants.APP_NAME, body = null, payload = {}, devices) {
         var serverKey = constants.FCM_KEY
         var fcm = await new FCM(serverKey)
@@ -200,46 +178,6 @@ export default {
             })
         }
     },
-    /* async sendWebSocketNotification(title, body) {
-
-         let topic = Ws.getChannel('notification:*').topic('notification:subscribedUser')
-         if (topic) {
-             /!*notification data*!/
-             let notificationData = {
-                 // title: _.truncate(title, {length: 40}),
-                 title,
-                 body: _.truncate(body, {length: 85})
-             }
-
-             /!*send notification to users*!/
-             topic.broadcast('newNotification', notificationData)
-         }
-     },*/
-
-    /*  async sendWsNotificationToUser(title, body, userId) {
-
-          /!*Saving data*!/
-          // await Notification.create({
-          //     to_user: userId,
-          //     title: title,
-          //     body: body
-          // })
-
-          /!*Live Broadcasting *!/
-          let topic = Ws.getChannel('notification:*').topic('notification:user' + userId)
-          if (topic) {
-              /!*notification data*!/
-              let notificationData = {
-                  title,
-                  body
-              }
-
-              /!*send notification to users*!/
-              topic.broadcast('newNotification', notificationData)
-
-
-          }
-      },*/
     async uploadFileS3(file, path) {
         /* INSTRUCTIONS */
         // - use env(S3_URL) for full url
@@ -422,16 +360,20 @@ export default {
             this.sendNotification(constants.APP_NAME, msg, payload, devices)
         }
     },
-    async getBlockedUserIds(userId){
-        let userIds:number[] = []
-        let users = await BlockedUser.query().where('user_id',userId).orWhere('blocked_user_id',userId)
-        users.map((user) =>{
-            if(user.userId === userId){
-                userIds.push(user.blockedUserId)
-            }else if(user.blockedUserId === userId){
-                userIds.push(user.userId)
+    setTenantDB(database){
+        Database.manager.patch('tenant', {
+            client: 'mysql',
+            connection: {
+                host: Env.get('MYSQL_HOST'),
+                port: Env.get('MYSQL_PORT'),
+                user: Env.get('MYSQL_USER'),
+                password: Env.get('MYSQL_PASSWORD', ''),
+                database:database
+            },
+            pool: {
+                min:1,
+                max:1,
             }
         })
-        return userIds
     }
 }

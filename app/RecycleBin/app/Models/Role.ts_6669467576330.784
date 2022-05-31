@@ -1,0 +1,7 @@
+import {column,BaseModel} from '@ioc:Adonis/Lucid/Orm'
+
+export default class Role extends BaseModel {
+    @column()
+    public id: number
+
+}

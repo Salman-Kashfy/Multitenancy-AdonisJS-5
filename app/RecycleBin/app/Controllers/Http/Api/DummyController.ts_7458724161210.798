@@ -1,25 +1,25 @@
 import ApiBaseController from 'App/Controllers/Http/Api/ApiBaseController'
 import {HttpContextContract} from '@ioc:Adonis/Core/HttpContext'
-import RoleRepo from "App/Repos/RoleRepo";
-import RoleValidator from "App/Validators/RoleValidator";
+import DummyRepo from "App/Repos/DummyRepo";
+import DummyValidator from "App/Validators/DummyValidator";
 import Attachment from "App/Models/Attachment";
 
 
-export default class RoleController extends ApiBaseController {
+export default class DummyController extends ApiBaseController {
 
     constructor() {
-        super(RoleRepo)
+        super(DummyRepo)
     }
 
     async store(ctx: HttpContextContract, instanceType?: number, mediaType?: String) {
-        await ctx.request.validate(RoleValidator)
+        await ctx.request.validate(DummyValidator)
         let input = ctx.request.only(this.repo.fillables())
-        let row = await RoleRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
+        let row = await DummyRepo.store(input, ctx.request, instanceType || Attachment.TYPE[this.repo.model.name.toUpperCase()], mediaType)
         return this.apiResponse('Record Added Successfully', row)
     }
 
     async update(ctx: HttpContextContract, instanceType?: number, mediaType?: String): Promise<{ data: any; message: string; status: boolean }> {
-        await ctx.request.validate(RoleValidator)
+        await ctx.request.validate(DummyValidator)
         return super.update(ctx, instanceType, mediaType)
     }
 

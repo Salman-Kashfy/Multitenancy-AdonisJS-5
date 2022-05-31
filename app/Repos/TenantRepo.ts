@@ -1,15 +1,15 @@
 import BaseRepo from 'App/Repos/BaseRepo'
-import User from "App/Models/User";
+import Tenant from "App/Models/Tenant";
 //import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 
-class UserRepo extends BaseRepo {
+class TenantRepo extends BaseRepo {
     model
 
     constructor() {
         const relations = []
-        super(User, relations)
-        this.model = User
+        super(Tenant, relations)
+        this.model = Tenant
     }
 }
 
-export default new UserRepo()
+export default new TenantRepo()

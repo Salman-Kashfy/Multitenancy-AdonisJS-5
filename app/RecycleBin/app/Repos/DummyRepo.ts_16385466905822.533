@@ -1,0 +1,15 @@
+import BaseRepo from 'App/Repos/BaseRepo'
+import Dummy from "App/Models/Dummy";
+
+
+class DummyRepo extends BaseRepo {
+    model
+
+    constructor() {
+        const relations = []
+        super(Dummy, relations)
+        this.model = Dummy
+    }
+}
+
+export default new DummyRepo()
