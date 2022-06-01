@@ -6,9 +6,12 @@ import myHelpers from 'App/Helpers'
 
 export default class SwitchTenant {
     public async handle({request}: HttpContextContract ,next: () => Promise<void>) {
-        const tenant = await Tenant.findBy('domain',request.headers().host)
+        if(!request.headers().simpill_public_key){
+            throw new ExceptionWithCode('Invalid Request. Missing simpill public key.',403)
+        }
+        const tenant = await Tenant.findBy('simpill_public_key',request.headers().simpill_public_key)
         if(!tenant?.database){
-            throw new ExceptionWithCode('Domain/Tenant not found',403)
+            throw new ExceptionWithCode('Invalid keys provided.',403)
         }
         const conn = Database.manager.get('tenant')
         //@ts-ignore

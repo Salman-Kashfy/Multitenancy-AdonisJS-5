@@ -9,7 +9,7 @@ export default class Tenant extends BaseModel {
     public id: number
 
     @column()
-    public domain: string
+    public simpillPublicKey: string
 
     @column()
     public database: string

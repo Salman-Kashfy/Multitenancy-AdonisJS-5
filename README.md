@@ -8,14 +8,14 @@ We will register two database connections in our database config file, namely la
 keeping landlord as default database which will be used by super-admin. 
 
 #### Tenants
-Tenants table resides in landlord database. All tenants entries will be stored here. The domain column in this table serves a vital role in switching database on every request.
+Tenants table resides in landlord database. All tenants entries will be stored here. The *simpill_public_key* column in this table serves a vital role in switching database on every request.
 
 #### Switching database LifeCycle
 All HTTP requests that are tenant based needs to go through a global middleware called "SwitchTenant".
-The middleware extracts the domain from header of the http request and use it to get tenant details from default database i.e landlord.
+The middleware extracts the *simpill_public_key* from header of the http request and use it to get tenant details from default database i.e landlord.
 Details includes its database name. Now, we programmatically switch the database of tenant connection using database library.
 
-**Note:** We keep a track record if the upcoming http requests are of the same domain. If yes, we donot change connection database. 
+**Note:** We keep a track record if the upcoming http requests are coming from the same *simpill_public_key*. If yes, we donot change connection database. 
 We only change connection if the upcoming request is different from the previous database. Ignoring this will result in severe performance issues or even failure of every http request.
 
 #### Migrations for landlord

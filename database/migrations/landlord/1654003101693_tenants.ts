@@ -6,7 +6,7 @@ export default class Tenants extends BaseSchema {
     public async up() {
         this.schema.createTable(this.tableName, (table) => {
             table.increments('id')
-            table.string('domain').unique()
+            table.string('simpill_public_key').unique()
             table.string('database').unique()
             table.string('name', 35).unique()
             table.string('email', 100).unique()
