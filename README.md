@@ -19,7 +19,7 @@ Details includes its database name. Now, we programmatically switch the database
 We only change connection if the upcoming request is different from the previous database. Ignoring this will result in severe performance issues or even failure of every http request.
 
 #### Migrations for landlord
-The migration files for landlord are pre-configured to be created in /migrations/landlord folder. This is done to maintain migrations for landlord and tenants separately.
+The migration files for landlord are pre-configured to be created in */migrations/landlord* folder. This is done to maintain migrations for landlord and tenants separately.
 Use the following command to create a migration for landlord:
 ```
 node ace make:migration tenants --connection=landlord
@@ -31,7 +31,10 @@ node ace migration:run --connection=landlord
 ```
 #### Migrations for tenants
 This boiler ships with a custom command to migrate database to every tenant stored in tenants table in landlord database.
-The command uses default migrations directory i.e */migrations* for all our tenants.
+The command uses tenant migrations directory i.e */migrations/tenant* for all tenants.
+```
+node ace make:migration users --connection=tenant
+```
 
 **Note:** Make sure there are tenants stored in tenants table in landlord database before running tenants migration.
 

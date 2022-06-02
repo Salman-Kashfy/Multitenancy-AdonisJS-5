@@ -44,6 +44,8 @@ const databaseConfig: DatabaseConfig = {
             },
             migrations: {
                 naturalSort: true,
+                paths: ['./database/migrations/tenant'],
+                disableRollbacksInProduction: true,
             },
             healthCheck: true,
             debug: false,
@@ -66,7 +68,8 @@ const databaseConfig: DatabaseConfig = {
             },
             migrations: {
                 naturalSort: true,
-                paths: ['./database/migrations/landlord']
+                paths: ['./database/migrations/landlord'],
+                disableRollbacksInProduction: true,
             },
             healthCheck: true,
             debug: false,
