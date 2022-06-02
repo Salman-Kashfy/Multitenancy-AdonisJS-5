@@ -31,7 +31,7 @@ node ace migration:run --connection=landlord
 ```
 #### Migrations for tenants
 This boiler ships with a custom command to migrate database to every tenant stored in tenants table in landlord database.
-We use default migrations directory for all our tenants.
+The command uses default migrations directory i.e */migrations* for all our tenants.
 
 **Note:** Make sure there are tenants stored in tenants table in landlord database before running tenants migration.
 
