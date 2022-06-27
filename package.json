@@ -1,5 +1,5 @@
 {
-  "name": "demo-multitenancy",
+  "name": "Simpill",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -40,7 +40,9 @@
     "fcm-node": "^1.6.1",
     "ffmpeg-extract-frames": "^2.0.2",
     "get-video-duration": "^3.1.0",
+    "ip": "^1.1.8",
     "jsonwebtoken": "^8.5.1",
+    "kafkajs": "^2.0.2",
     "luxon": "^1.27.0",
     "mysql": "^2.18.1",
     "node-image-resizer": "^1.0.0",

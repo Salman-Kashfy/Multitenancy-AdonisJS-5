@@ -10,6 +10,10 @@ class UserRepo extends BaseRepo {
         super(User, relations)
         this.model = User
     }
+
+    async profile(id){
+        return this.model.query().where('id',id).preload('roles')
+    }
 }
 
 export default new UserRepo()

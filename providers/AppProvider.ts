@@ -27,7 +27,6 @@ export default class AppProvider {
         // App is ready
     }
 
-
     public async shutdown() {
         // Cleanup, since app is going down
     }

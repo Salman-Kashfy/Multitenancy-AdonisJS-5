@@ -19,12 +19,10 @@
 */
 import Route from '@ioc:Adonis/Core/Route'
 import './routes/api'
-import './routes/admin'
 
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 
 Route.on('/').render('welcome')
-
 Route.get('health', async ({response}) => {
     const report = await HealthCheck.getReport()
 

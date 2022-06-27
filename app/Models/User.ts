@@ -1,6 +1,7 @@
-import {beforeSave,column} from '@ioc:Adonis/Lucid/Orm'
+import {beforeSave,column,manyToMany,ManyToMany} from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import CommonModel from 'App/Models/CommonModel'
+import Role from 'App/Models/Role'
 import { DateTime } from 'luxon'
 
 export default class User extends CommonModel {
@@ -18,22 +19,19 @@ export default class User extends CommonModel {
     public email: string
 
     @column()
-    public username: string
-
-    @column()
     public phone: string
 
     @column()
     public countryCode: string
 
+    @column()
+    public phoneCode: string
+
     @column({ serializeAs: null })
     public password: string
 
     @column()
-    public bio: string
-
-    @column()
-    public zip: string
+    public kycDoc: string
 
     @column()
     public latitude: number
@@ -43,6 +41,27 @@ export default class User extends CommonModel {
 
     @column()
     public maritalStatus: number
+
+    @column()
+    public buzzerCode: number
+
+    @column()
+    public streetAddress: string
+
+    @column()
+    public unitNumber: string
+
+    @column()
+    public country: string
+
+    @column()
+    public state: string
+
+    @column()
+    public city: string
+
+    @column()
+    public zip: string
 
     @column()
     public gender: number
@@ -63,10 +82,19 @@ export default class User extends CommonModel {
     public image: string
 
     @column()
-    public profilePicture: string
+    public referralCode: string
+
+    @column()
+    public referralCredit: number
 
     @column()
     public pushNotify: number
+
+    @column()
+    public otpCode: number
+
+    @column.date()
+    public otpExpiry: DateTime
 
     @column()
     public emailVerified: boolean
@@ -78,7 +106,7 @@ export default class User extends CommonModel {
     public isSocialLogin: number
 
     @column()
-    public isBlocked: number
+    public accountDeactivated: boolean
 
     @beforeSave()
     public static async hashPassword(user: User) {
@@ -86,4 +114,9 @@ export default class User extends CommonModel {
             user.password = await Hash.make(user.password)
         }
     }
+
+    @manyToMany(() => Role,{
+        pivotTable: 'user_roles'
+    })
+    public roles: ManyToMany<typeof Role>
 }
