@@ -4,7 +4,6 @@ import UserDevice from 'App/Models/UserDevice'
 import Role from 'App/Models/Role'
 import VerifyEmailInterface from 'App/Interfaces/VerifyEmailInterface'
 import constants from 'Config/constants'
-import ExceptionWithCode from 'App/Exceptions/ExceptionWithCode'
 
 class AuthRepo extends BaseRepo {
     model
@@ -59,7 +58,7 @@ class AuthRepo extends BaseRepo {
 
     async security(user){
         let result = { status:true, message:'', code:200 }
-        if(user.isBlocked){
+        if(user.accountDeactivated){
             result = { status:false, message:'You have been blocked! Contact support for further information.', code:403 }
         }
         return result
